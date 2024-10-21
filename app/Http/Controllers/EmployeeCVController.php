@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\EmployeeCVImport;
+use App\Exports\ExistingSheetExport;
 use App\Mail\SimpleEmail;
-use App\Models\EmployeeCV;
+use App\Models\EmployeeCV; // We'll create this import class later
 use App\Services\SalaryEstimationService;
-use Carbon\Carbon; // We'll create this import class later
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class EmployeeCVController extends Controller
 {
@@ -19,6 +23,15 @@ class EmployeeCVController extends Controller
         session()->forget('applicationId');
 
         return view('welcome');
+    }
+
+    public function openApplication(EmployeeCV $employeeCV)
+    {
+        session(['applicationId' => $employeeCV->id]);
+        session()->flash('message', 'Dine lagrede opplysninger er lastet inn.');
+        session()->flash('alert-class', 'alert-success');
+
+        return redirect()->route('enter-employment-information');
     }
 
     public function sendEmailLink(Request $request)
@@ -34,15 +47,6 @@ class EmployeeCVController extends Controller
 
         return response('Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.')->header('Content-Type', 'text/html');
 
-    }
-
-    public function openApplication(EmployeeCV $employeeCV)
-    {
-        session(['applicationId' => $employeeCV->id]);
-        session()->flash('message', 'Dine lagrede opplysninger er lastet inn.');
-        session()->flash('alert-class', 'alert-success');
-
-        return redirect()->route('enter-employment-information');
     }
 
     public function EnterEmploymentInformation()
@@ -355,31 +359,68 @@ class EmployeeCVController extends Controller
 
         return $totalMonths;
     }
-    // public function upload(Request $request)
-    // {
-    //     $request->validate([
-    //         'excel_file' => 'required|mimes:xlsx,xls',
-    //     ]);
 
-    //     Excel::import(new EmployeeCVImport, $request->file('excel_file'));
+    public function loadExcel(Request $request)
+    {
+        // Validate that an Excel file is provided
+        $validated = $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
 
-    //     // Retrieve the latest uploaded data
-    //     $employeeCV = EmployeeCV::latest()->first();
+        try {
+            // Load the uploaded file
+            $file = $request->file('excel_file');
 
-    //     // Access the education and work experience data
-    //     $educationData = $employeeCV->education;
-    //     $workExperienceData = $employeeCV->work_experience;
+            // Use Maatwebsite Excel to read the data from the first sheet
+            $data = Excel::toArray([], $file)[0]; // Get the first sheet
+            // Optional: Log or view the extracted data (useful for debugging)
+            // Log::info($data);
+            $employeeCV = EmployeeCV::create();
+            session(['applicationId' => $employeeCV->id]);
 
-    //     // Perform your salary calculation logic here based on $educationData and $workExperienceData
-    //     // This is where you'll apply your specific rules and algorithms
+            $employeeCV->birth_date = Date::excelToDateTimeObject($data[6][4])->format('Y-m-d');
+            $employeeCV->job_title = $data[7][4];
+            $employeeCV->work_start_date = Date::excelToDateTimeObject($data[8][4])->format('Y-m-d');
 
-    //     // For now, let's just return a placeholder salary
-    //     $calculatedSalary = 50000; // Replace with your actual calculation
+            $education = [];
+            $work_experience = [];
 
-    //     // You can store the calculated salary in the database or pass it to the view for display
+            foreach ($data as $row => $column) {
+                if ($row >= 14 && $row <= 24) {
+                    if (! empty(trim($column[1]))) {
+                        if ($column[20] == 'bestått') {
+                            $studyPercentage = '100';
+                        } else {
+                            $studyPercentage = SalaryEstimationService::calculateStudyPercentage(Date::excelToDateTimeObject($column[18])->format('Y-m-d'), Date::excelToDateTimeObject($column[19])->format('Y-m-d'), $column[20]);
+                        }
+                        $education[] = ['topic_and_school' => $column[1], 'start_date' => Date::excelToDateTimeObject($column[18])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[19])->format('Y-m-d'), 'study_points' => $column[20], 'study_percentage' => $studyPercentage];
+                    }
+                }
 
-    //     return redirect()->back()->with('success', 'File uploaded and processed successfully! Calculated salary: '.$calculatedSalary);
-    // }
+                if ($row >= 27 && $row <= 41) {
+                    if (! empty(trim($column[1]))) {
+                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => $column[15], 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
+                    }
+                }
+            }
+            $employeeCV->education = $education;
+            $employeeCV->work_experience = $work_experience;
+            $employeeCV->save();
+
+            // Example: Perform calculations based on the extracted data
+            // $results = $this->performCalculations($data);
+            session()->flash('message', 'Excel dokumentet er lastet inn og du kan arbeide videre med den i her.');
+            session()->flash('alert-class', 'alert-success');
+
+            return redirect()->route('enter-employment-information');
+
+        } catch (PhpSpreadsheetException $e) {
+            return response()->json([
+                'message' => 'Error processing the Excel file.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     public function destroyEducationInformation(Request $request)
     {
@@ -421,5 +462,114 @@ class EmployeeCVController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function exportAsXls(SalaryEstimationService $salaryEstimationService, Excel $excel)
+    {
+
+        if (! session('applicationId')) {
+            session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
+            session()->flash('alert-class', 'alert-danger');
+
+            return redirect()->route('welcome');
+        }
+        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $employeeCV = $salaryEstimationService->adjustEducationAndWork($employeeCV);
+        $timelineData = $this->createTimelineData($employeeCV->education, $employeeCV->work_experience);
+        $timelineData_adjusted = $this->createTimelineData($employeeCV->education_adjusted, $employeeCV->work_experience_adjusted);
+
+        $workStartDate = Carbon::parse($employeeCV->work_start_date);
+        $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($employeeCV->work_experience_adjusted);
+        $ansiennitetFromDate = $workStartDate->subMonths($calculatedTotalWorkExperienceMonths);
+
+        // Prepare the data to be inserted
+        $data = [
+            ['row' => 8, 'column' => 'E', 'value' => $employeeCV->job_title, 'datatype' => 'text'],
+            ['row' => 7, 'column' => 'E', 'value' => $employeeCV->birth_date, 'datatype' => 'date'],
+            ['row' => 9, 'column' => 'R', 'value' => $employeeCV->work_start_date, 'datatype' => 'date'],
+        ];
+
+        $row = 15;
+        foreach ($employeeCV->education_adjusted as $item) {
+
+            $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $item['highereducation'].($item['relevance'] ? 'relevant' : ''), 'datatype' => 'text'];
+            $row++;
+        }
+
+        $row = 28;
+        foreach ($employeeCV->work_experience as $enteredItem) {
+            $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'R', 'value' => $enteredItem['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Opprinnelig registrert', 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AC', 'value' => $enteredItem['relevance'] ? 'relevant' : '', 'datatype' => 'text'];
+            $row++;
+        }
+
+        foreach ($employeeCV->work_experience_adjusted as $adjustedItem) {
+            $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'R', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => $adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt modifisert', 'datatype' => 'text'];
+            $row++;
+        }
+
+        $salaryCategory = EmployeeCV::positionsLaddersGroups[$employeeCV->job_title];
+
+        $ladder = $salaryCategory['ladder'];
+        $group = $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '';
+        $salaryPlacement = EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][intval($calculatedTotalWorkExperienceMonths / 12)];
+        $data[] = ['row' => 62, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
+        $data[] = ['row' => 64, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
+        $data[] = ['row' => 67, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
+        $data[] = ['row' => 71, 'column' => 'S', 'value' => $employeeCV->competence_points, 'datatype' => 'text'];
+
+        // Define the path to the original file and the modified file
+        $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
+        $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
+
+        $export = new ExistingSheetExport($data, $originalFilePath);
+
+        // Modify and save the Excel file
+        $export->modifyAndSave($modifiedFilePath);
+
+        // Download the saved file
+        return response()->download(storage_path('app/public/'.$modifiedFilePath));
+
+    }
+
+    private function performCalculations(array $data)
+    {
+        $total = 0;
+        $validRows = 0;
+
+        foreach ($data as $index => $row) {
+            // Skip header row (assuming it's the first row)
+            if ($index === 0) {
+                continue;
+            }
+
+            // Example calculation: Sum a specific numeric column (e.g., column 2)
+            $value = is_numeric($row[1]) ? $row[1] : 0;
+            $total += $value;
+
+            if ($value > 0) {
+                $validRows++;
+            }
+        }
+
+        // Return summary calculations
+        return [
+            'total_sum' => $total,
+            'valid_rows' => $validRows,
+            'average' => $validRows > 0 ? $total / $validRows : 0,
+        ];
     }
 }

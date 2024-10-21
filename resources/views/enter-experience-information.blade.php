@@ -40,11 +40,11 @@
                                     @foreach ($employeeCV->work_experience as $id => $item)
                                         <tr>
                                             <th scope="row">{{ $item['title_workplace'] }}</th>
-                                            <td>{{ $item['workplace_type'] }}</td>
+                                            <td>{{ @$item['workplace_type'] }}</td>
                                             <td>{{ $item['work_percentage'] }}</td>
                                             <td>{{ $item['start_date'] }}</td>
                                             <td>{{ $item['end_date'] }}</td>
-                                            <td>{{ $item['relevance'] == true ? 'relevant' : '' }}</td>
+                                            <td>{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                             <td><a href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
                                         </tr>
                                     @endforeach

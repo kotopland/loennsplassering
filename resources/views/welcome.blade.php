@@ -20,7 +20,12 @@
         @else
             <a href="{{ route('enter-employment-information') }}">Gjør en beregning av lønnen din</a>
         @endif
-
+        <h2>Last opp et utfylt lønnsplasseringsskjema</h2>
+        <form action="{{ route('loadExcel') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="excel_file" required>
+            <button type="submit">Last inn og fortsett utfylling</button>
+        </form>
     </div>
 </body>
 

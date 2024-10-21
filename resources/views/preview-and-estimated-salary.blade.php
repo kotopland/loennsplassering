@@ -104,6 +104,7 @@
     Total work experience: {{ $calculatedTotalWorkExperienceMonths }}<br />
     Ansiennitet fra: {{ $ansiennitetFromDate }}<br />
     Ansettes fra: {{ $employeeCV->work_start_date }}
+    <a href="{{ route('export-as-xls') }}">Last ned Utfylt lønnsplasseringsskjema</a>
     @dd($adjustedDataset);
 </body>
 

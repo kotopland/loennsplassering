@@ -37,9 +37,9 @@
                                         <td>{{ $item['start_date'] }}</td>
                                         <td>{{ $item['end_date'] }}</td>
                                         <td>{{ $item['study_points'] }}</td>
-                                        <td>{{ $item['study_percentage'] }}%</td>
-                                        <td>{{ $item['highereducation'] }}</td>
-                                        <td>{{ $item['relevance'] == true ? 'relevant' : '' }}</td>
+                                        <td>{{ @$item['study_percentage'] }}%</td>
+                                        <td>{{ @$item['highereducation'] }}</td>
+                                        <td>{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                         <td><a href={{ route('destroy-education-information', ['id' => $id]) }}>Slett linje</a></td>
                                     </tr>
                                 @endforeach
