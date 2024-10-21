@@ -1,0 +1,3 @@
+# Ignore email templates
+resources/views/vendor/mail/**
+resources/views/emails/**
