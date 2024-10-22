@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Salary Calculator</title>
+    <title>Lønnsplassering</title>
     <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -15,7 +15,16 @@
         @endif
 
         <div class="container">
-            <h1>Salary Calculator</h1>
+            <h1>Lønnsplassering</h1>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <div class="my-2 py-3">
                 <h2>Arbeidserfaring</h2>
@@ -34,18 +43,29 @@
                                         <th scope="col">Til</th>
                                         <th scope="col">Relevanse</th>
                                         <th scope="col"></th>
+                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($employeeCV->work_experience as $id => $item)
                                         <tr>
-                                            <th scope="row">{{ $item['title_workplace'] }}</th>
-                                            <td>{{ @$item['workplace_type'] }}</td>
-                                            <td>{{ $item['work_percentage'] }}</td>
-                                            <td>{{ $item['start_date'] }}</td>
-                                            <td>{{ $item['end_date'] }}</td>
-                                            <td>{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
+                                            <th id="title_workplace-{{ $id }}" scope="row">{{ $item['title_workplace'] }}</th>
+                                            <td id="workplace_type-{{ $id }}">{{ @$item['workplace_type'] }}</td>
+                                            <td id="work_percentage-{{ $id }}">{{ $item['work_percentage'] }}</td>
+                                            <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
+                                            <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
+                                            <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                             <td><a href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
+                                            <td><a href="#" _="on click
+                                            set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then
+                                            {{-- set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then --}}
+                                            set the value of #work_percentage to the innerText of #work_percentage-{{ $id }} then
+                                            set  the value of #start_date to the innerText of #start_date-{{ $id }} then
+                                            set  the value of #end_date to the innerText of #end_date-{{ $id }} then
+                                            {{-- set the value of #study_points to the innerText of #study_points-{{ $id }} then --}}
+                                            {{-- set the value of #study_percentage to the innerText of #study_percentage-{{ $id }} then --}}
+                                            {{-- set the value of #relevance to the innerText of #relevance-{{ $id }} then --}}
+                                                remove .disabled from #btn-next then add .disabled to #btn-submit">Lag ny basert på denne</a></td>
                                         </tr>
                                     @endforeach
                                 </tbody>

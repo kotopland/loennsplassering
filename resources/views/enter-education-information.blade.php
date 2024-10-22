@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Salary Calculator</title>
+    <title>Lønnsplassering</title>
     <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -10,8 +10,16 @@
 
 <body>
     <div class="container">
-        <h1>Salary Calculator</h1>
-
+        <h1>Lønnsplassering</h1>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="my-2 py-3">
             <h2>Utdanning</h2>
             <div class="vstack gap-3">
@@ -33,14 +41,22 @@
                             <tbody>
                                 @foreach ($employeeCV->education as $id => $item)
                                     <tr>
-                                        <th scope="row">{{ $item['topic_and_school'] }}</th>
-                                        <td>{{ $item['start_date'] }}</td>
-                                        <td>{{ $item['end_date'] }}</td>
-                                        <td>{{ $item['study_points'] }}</td>
-                                        <td>{{ @$item['study_percentage'] }}%</td>
-                                        <td>{{ @$item['highereducation'] }}</td>
-                                        <td>{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
-                                        <td><a href={{ route('destroy-education-information', ['id' => $id]) }}>Slett linje</a></td>
+                                        <th id="topic_and_school-{{ $id }}" scope="row">{{ $item['topic_and_school'] }}</th>
+                                        <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
+                                        <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
+                                        <td id="study_points-{{ $id }}">{{ $item['study_points'] }}</td>
+                                        <td id="study_percentage-{{ $id }}">{{ @$item['study_percentage'] }}%</td>
+                                        <td id="highereducation-{{ $id }}">{{ @$item['highereducation'] }}</td>
+                                        <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
+                                        <td><a href="{{ route('destroy-education-information', ['id' => $id]) }}"">Slett linje</a></td>
+                                        <td><a href="#" _="on click
+                                set the value of #topic_and_school to the innerText of #topic_and_school-{{ $id }} then
+                                set  the value of #start_date to the innerText of #start_date-{{ $id }} then
+                                set  the value of #end_date to the innerText of #end_date-{{ $id }} then
+                                {{-- set the value of #study_points to the innerText of #study_points-{{ $id }} then --}}
+                                {{-- set the value of #study_percentage to the innerText of #study_percentage-{{ $id }} then --}}
+                                {{-- set the value of #relevance to the innerText of #relevance-{{ $id }} then --}}
+                                    add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -87,7 +103,9 @@
                                         <option value="180" @if (old('study_points') === '180') selected @endif>180</option>
                                         <option value="240" @if (old('study_points') === '240') selected @endif>240</option>
                                         <option value="300" @if (old('study_points') === '300') selected @endif>300</option>
-                                        <option value="0">Bestått</option>
+                                        <option value="360" @if (old('study_points') === '360') selected @endif>360</option>
+                                        <option value="420" @if (old('study_points') === '420') selected @endif>420</option>
+                                        <option value="bestått">Bestått</option>
                                     </select>
                                     @error('study_points')
                                         <div class="alert alert-danger">{{ $message }}</div>
@@ -106,6 +124,7 @@
                                     <label class="form-check-label" for="master">Mastergradsnivå, siviltittel med videre</label>
                                 </div>
                                 <div class="col-auto pe-4">
+                                    <input type="hidden" name="relevance" value="false">
                                     <input type="checkbox" class="form-check-input" id="relevant" name="relevance" value="true">
                                     <label class="form-check-label" for="relevant">Særdeles høy relevanse for stillingen?</label>
                                 </div>

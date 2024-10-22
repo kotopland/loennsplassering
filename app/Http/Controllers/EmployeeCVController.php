@@ -93,8 +93,8 @@ class EmployeeCVController extends Controller
             return redirect()->route('welcome');
         }
         $employeeCV = EmployeeCV::find(session('applicationId'));
+        // dd($employeeCV->education);
         // $employeeCV->education = null;
-
         if ($employeeCV->education == null) {
             $jsonData = [
                 1 => [
@@ -154,33 +154,50 @@ class EmployeeCVController extends Controller
 
     public function PostEducationInformation(Request $request)
     {
-        $validatedData = $request->validate([
-            'topic_and_school' => 'string|required',
-            'start_date' => 'date|required',
-            'end_date' => 'date|required',
-            'study_points' => 'string|required',
-            'highereducation' => 'string|nullable',
-            'relevance' => 'boolean|sometimes',
-        ]);
+
+        $request->validate(
+            [
+                'topic_and_school' => 'string|required',
+                'start_date' => 'date|required',
+                'end_date' => 'date|required',
+                'study_points' => 'string|in:bestått,30,60,120,180,240,300,0|required', // Changed to numeric and in
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master', // Added in validation
+                'relevance' => 'in:true,false|nullable', // Removed required
+            ],
+            [
+                'topic_and_school.required' => 'Vennligst fyll inn navnet på studiet og skolen.',
+                'topic_and_school.string' => 'Navnet på studiet må være tekst.',
+                'start_date.required' => 'Vennligst velg en startdato.',
+                'start_date.date' => 'Ugyldig dato format.',
+                'end_date.required' => 'Vennligst velg en sluttdato.',
+                'end_date.date' => 'Ugyldig dato format.',
+                'study_points.required' => 'Vennligst velg antall studiepoeng.',
+                'study_points.numeric' => 'Studiepoeng må være et tall.',
+                'study_points.in' => 'Ugyldig antall studiepoeng.',
+                'highereducation.in' => 'Ugyldig type studie.',
+                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+            ]
+        );
 
         $employeeCV = EmployeeCV::find(session('applicationId'));
-        $relevance = $validatedData['relevance'] ?? 0;
+        $relevance = $request->relevance === 'true' ? 1 : 0;
         $education = $employeeCV->education ?? [];
 
-        if ($validatedData['study_points'] == 'bestått') {
+        if (strtolower($request->study_points) === 'bestått') {
             $studyPercentage = '100';
         } else {
-            $studyPercentage = SalaryEstimationService::calculateStudyPercentage($validatedData['start_date'], $validatedData['end_date'], $validatedData['study_points']);
+
+            $studyPercentage = SalaryEstimationService::calculateStudyPercentage($request->start_date, $request->end_date, intval($request->study_points));
         }
         // dd($validatedData['start_date'], $validatedData['end_date'], '60', $studyPercentage);
 
         $education[] = [
-            'topic_and_school' => $validatedData['topic_and_school'],
-            'start_date' => $validatedData['start_date'],
-            'end_date' => $validatedData['end_date'],
-            'study_points' => $validatedData['study_points'],
+            'topic_and_school' => $request->topic_and_school,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'study_points' => $request->study_points,
             'study_percentage' => $studyPercentage,
-            'highereducation' => $validatedData['highereducation'],
+            'highereducation' => $request->highereducation,
             'relevance' => $relevance,
         ];
         $employeeCV->education = $education;
@@ -241,9 +258,19 @@ class EmployeeCVController extends Controller
             'work_percentage' => 'required|numeric|between:0,100',
             'start_date' => 'date|required',
             'end_date' => 'date|required',
-            'workplace_type' => 'string|required',
-            'relevance' => 'boolean|sometimes',
-        ]);
+            'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
+            'relevance' => 'in:true,false|nullable',
+        ],
+            [
+                'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
+                'title_workplace.string' => 'Navnet må være tekst.',
+                'start_date.required' => 'Vennligst velg en startdato.',
+                'start_date.date' => 'Ugyldig dato format.',
+                'end_date.required' => 'Vennligst velg en sluttdato.',
+                'end_date.date' => 'Ugyldig dato format.',
+                'workplace_type.in' => 'Ugyldig type type arbeidssted.',
+                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+            ]);
         $employeeCV = EmployeeCV::find(session('applicationId'));
         $relevance = $validatedData['relevance'] ?? 0;
         $work_experience = $employeeCV->work_experience ?? [];
@@ -388,10 +415,10 @@ class EmployeeCVController extends Controller
             foreach ($data as $row => $column) {
                 if ($row >= 14 && $row <= 24) {
                     if (! empty(trim($column[1]))) {
-                        if ($column[20] == 'bestått') {
+                        if (strtolower($column[20]) == 'bestått') {
                             $studyPercentage = '100';
                         } else {
-                            $studyPercentage = SalaryEstimationService::calculateStudyPercentage(Date::excelToDateTimeObject($column[18])->format('Y-m-d'), Date::excelToDateTimeObject($column[19])->format('Y-m-d'), $column[20]);
+                            $studyPercentage = SalaryEstimationService::calculateStudyPercentage(Date::excelToDateTimeObject($column[18])->format('Y-m-d'), Date::excelToDateTimeObject($column[19])->format('Y-m-d'), intval($column[20]));
                         }
                         $education[] = ['topic_and_school' => $column[1], 'start_date' => Date::excelToDateTimeObject($column[18])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[19])->format('Y-m-d'), 'study_points' => $column[20], 'study_percentage' => $studyPercentage];
                     }
@@ -399,7 +426,7 @@ class EmployeeCVController extends Controller
 
                 if ($row >= 27 && $row <= 41) {
                     if (! empty(trim($column[1]))) {
-                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => $column[15], 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
+                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => floatval($column[15]) * 100, 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
                     }
                 }
             }
@@ -507,7 +534,7 @@ class EmployeeCVController extends Controller
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'R', 'value' => $enteredItem['end_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Opprinnelig registrert', 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AC', 'value' => $enteredItem['relevance'] ? 'relevant' : '', 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AC', 'value' => @$enteredItem['relevance'] ? 'relevant' : '', 'datatype' => 'text'];
             $row++;
         }
 
@@ -516,7 +543,7 @@ class EmployeeCVController extends Controller
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'R', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => $adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt modifisert', 'datatype' => 'text'];
             $row++;
         }
@@ -525,7 +552,7 @@ class EmployeeCVController extends Controller
 
         $ladder = $salaryCategory['ladder'];
         $group = $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '';
-        $salaryPlacement = EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][intval($calculatedTotalWorkExperienceMonths / 12)];
+        $salaryPlacement = EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][intval($calculatedTotalWorkExperienceMonths / 12) + 2];
         $data[] = ['row' => 62, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
         $data[] = ['row' => 64, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
         $data[] = ['row' => 67, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];

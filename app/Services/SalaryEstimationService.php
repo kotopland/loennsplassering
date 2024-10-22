@@ -131,15 +131,16 @@ class SalaryEstimationService
 
             // Skip if employee was under 18
             if ($birthDate->diffInYears($eduStartDate) < 18) {
+
                 continue;
             }
 
             // Transfer to work if overlapping employment start
-            if ($eduEndDate->greaterThan($workStartDate)) {
-                $adjustedWorkExperience[] = $this->convertEducationToWork($education);
+            // if ($eduEndDate->greaterThan($workStartDate)) {
+            //     $adjustedWorkExperience[] = $this->convertEducationToWork($education);
 
-                continue;
-            }
+            //     continue;
+            // }
 
             $competencePoint = $this->calculateCompetencePoints($education);
             $competencePoints += $competencePoint;
@@ -180,25 +181,25 @@ class SalaryEstimationService
             'start_date' => $education['start_date'],
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
-            'relevance' => $education['relevance'],
+            'relevance' => @$education['relevance'],
         ];
     }
 
     private function calculateCompetencePoints($education)
     {
-        if ($education['study_points'] === 'bestått') {
+        if (strtolower($education['study_points']) === 'bestått') {
             $months = Carbon::parse($education['start_date'])->diffInMonths($education['end_date']);
 
             return ($months >= 9) && $education['relevance'] ? 1 : 0;
         }
 
-        switch ($education['highereducation']) {
+        switch (@$education['highereducation']) {
             case 'bachelor':
-                return $education['relevance'] ? 3 : 1;
+                return $education['relevance'] ? 4 : 1;
             case 'master':
                 return 3;
             default:
-                return 0;
+                return 1;
         }
     }
 
@@ -296,11 +297,11 @@ class SalaryEstimationService
                 // Add the split segment to the collection.
                 $splitWork[] = [
                     'title_workplace' => $work['title_workplace'],
-                    'workplace_type' => $work['workplace_type'],
+                    'workplace_type' => @$work['workplace_type'],
                     'work_percentage' => $allocatedPercentage,
                     'start_date' => $workStart->copy()->startOfMonth()->toDateString(),
                     'end_date' => $workStart->copy()->endOfMonth()->toDateString(),
-                    'relevance' => $work['relevance'],
+                    'relevance' => @$work['relevance'],
                 ];
 
                 // Update the monthly percentage tracker.
@@ -312,7 +313,12 @@ class SalaryEstimationService
         }
 
         // Step 3: Merge consecutive segments with the same title and percentage.
-        return $this->mergeConsecutiveSegments($splitWork);
+        $test = $this->mergeConsecutiveSegments($splitWork);
+        if (count($test) === 1) {
+            $test[0]['end_date'] = $work['end_date'];
+        }
+
+        return $test;
     }
 
     private function mergeConsecutiveSegments($workSegments)
@@ -361,27 +367,48 @@ class SalaryEstimationService
 
     public static function calculateStudyPercentage(string $startDate, string $endDate, int $studyPoints): float
     {
-        // Define constants for a normal study year
-        $fullTimePoints = 60;  // Full-time points for a study year
-        $studyMonths = 10;     // From August to June (10 months)
+        // Constants
+        $fullTimePointsPerYear = 60;        // Standard points for a full-time year
+        $activeStudyMonthsPerYear = 10;     // Active study months per year
+        $allowedExtraMonths = 3;            // Extra months allowed without penalty
 
-        // Convert input dates to Carbon instances for easy manipulation
+        // Parse input dates using Carbon
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
-        // Calculate the total number of months between the start and end date
-        $totalMonths = $start->diffInMonths($end) + 1;
+        // Validate dates: start must be before end
+        if ($start->greaterThanOrEqualTo($end)) {
+            throw new InvalidArgumentException('The start date must be before the end date.');
+        }
 
-        // Calculate the expected months to complete the provided study points
-        $expectedMonths = ($studyPoints / $fullTimePoints) * $studyMonths;
+        if ($studyPoints >= 60) {
+            $expectedStudyYears = $studyPoints / 60;
+            $studyMonths = $start->diffInMonths($end) + 3;
+            $percentage = $expectedStudyYears * 100 / ($studyMonths / 12);
+        } else {
 
-        // Calculate the raw study percentage
-        $percentage = ($expectedMonths / $totalMonths) * 100;
+            // Calculate total months between start and end dates
+            $totalMonths = $start->diffInMonths($end);
 
-        // Ensure the percentage does not exceed 100%
+            // Calculate expected years and months based on study points
+            $yearsRequired = $studyPoints / $fullTimePointsPerYear;
+            $expectedMonths = $yearsRequired * $activeStudyMonthsPerYear;
+
+            // Include allowed extra months
+            $expectedMonthsWithGrace = $expectedMonths + $allowedExtraMonths;
+
+            // If the actual time is within the expected range (+3 months), return 100%
+            if ($totalMonths <= $expectedMonthsWithGrace) {
+                return 100.0;
+            }
+
+            // Otherwise, calculate the percentage based on actual time taken
+            $percentage = ($expectedMonths / $totalMonths) * 100;
+        }
+        // Ensure the percentage doesn't exceed 100%
         $percentage = min($percentage, 100);
 
-        // Round up to the nearest 10
+        // Round to the nearest multiple of 10
         return (int) ceil($percentage / 10) * 10;
     }
 }
