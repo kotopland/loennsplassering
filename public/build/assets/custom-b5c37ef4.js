@@ -1,0 +1,2 @@
+window.validateAcceptOnlyNumbers=function(e){var o=window.event?e.keyCode:e.which;return e.keyCode==13||e.keyCode==8||e.keyCode==9||e.keyCode==46||e.keyCode==37||e.keyCode==39||e.keyCode==16?!0:!(o<48||o>57)};document.addEventListener("DOMContentLoaded",()=>{[...document.querySelectorAll('[data-bs-toggle="popover"]')].map(t=>new bootstrap.Popover(t)),[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(t=>new bootstrap.Tooltip(t))});
+//# sourceMappingURL=custom-b5c37ef4.js.map
