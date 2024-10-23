@@ -1,55 +1,59 @@
-<!DOCTYPE html>
-<html>
+@extends('layouts.app')
 
-<head>
-    <title>Lønnsplassering</title>
-    <style>
-        .table-container {
-            width: 100% !important;
-            overflow-x: auto !important;
-        }
+@section('content')
+    <h1>Beregning av lønnsplassering</h1>
+    @if (session()->has('message'))
+        <p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
+    @endif
+    <div class="callout callout-primary bg-primary-subtle">
+        Her er din beregnede lønnsplassering. Tenk at det er en feilmargin på pluss minus 1-2 lønnstrinn. Siden utdanning, arbeidserfaring og også frivillig innsats er komplisert kan det ha blitt beregnet feil. Usikkerhetsmonn er hva av utdanning og arbeid som arbeidsgiver mener er relevant. Relevanse kan bety en eller to ekstra eller mindre på f.eks en bachelor eller master.
+    </div>
+    <div class="m-2">
+        <strong>Sum måneder ansiennitet:</strong> {{ $calculatedTotalWorkExperienceMonths }}<br />
+    </div>
+    <div class="m-2">
+        <strong>Ansiennitet beregnet fra:</strong> {{ $ansiennitetFromDate }}<br />
+    </div>
+    <div class="m-2">
+        <strong>Ansettelese fra:</strong> {{ $employeeCV->work_start_date }}<br />
+    </div>
+    <div class="m-2">
+        <strong>Lønnsstige:</strong> {{ $ladder }}<br />
+    </div>
+    @if (!in_array($ladder, ['B', 'D']))
+        <div class="m-2">
+            <strong>Lønnsgruppe:</strong> {{ $group }}<br />
+        </div>
+    @endif
+    <div class="m-2">
+        <strong>Lønnsplassering før gitt kompetansepoeng:</strong> {{ $salaryPlacement }}<br />
+    </div>
+    <div class="m-2">
+        <strong>Kompetansepoeng:</strong> {{ $employeeCV->competence_points }}<br />
+    </div>
+    <div class="m-2">
+        <strong>Lønnsplassering med kompetansepoeng:</strong> {{ $salaryPlacement + $employeeCV->competence_points }}<br />
+    </div>
+    <div class="m-2">
+        <a href="{{ route('export-as-xls') }}" class="btn btn-success btn-lg">Last ned Utfylt lønnsplasseringsskjema i Excel</a>
+    </div>
 
-        table {
-            width: max-content !important;
-            border-collapse: collapse !important;
-        }
-
-        th,
-        td {
-            border: 1px solid black !important;
-            padding: 8px !important;
-            text-align: left !important;
-            white-space: nowrap !important;
-        }
-
-        td:first-child {
-            position: sticky !important;
-            left: 0 !important;
-            background-color: white !important;
-        }
-    </style>
-
-    <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</head>
-</head>
-
-<body>
-    <h1>Salary Preview</h1>
+    <h2>Din tidslinje over utdannelse og ansiennitet</h2>
     <div class="table-container">
-        <table>
+        <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Registrert lønnskjema for plassering</th>
+                    <th>
+                        <h2>Hva du har registrert</h2>
+                    </th>
                 </tr>
             </thead>
 
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th>Utdannelse/Ansiennitets opplysninger:</th>
                     @foreach ($timeline as $month)
-                        <th>{{ $month }}</th>
+                        <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -63,7 +67,7 @@
                                 $itemEnd = strtotime($item['end_date']);
                                 $currentMonth = strtotime($month);
                             @endphp
-                            <td>
+                            <td class="table-primary">
                                 @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
                                     <span class="badge bg-primary" @class([
                                         'education' => $item['type'] === 'education',
@@ -79,7 +83,7 @@
             </tbody>
             <thead>
                 <tr>
-                    <td><strong>Sum per month</strong></td>
+                    <td><strong>Sum over total studie/ansiennitet (maks 100% gir uttelling)</strong></td>
                     @foreach ($timeline as $month)
                         @php
                             $monthlySum = 0;
@@ -98,6 +102,7 @@
                         <td @class([
                             'bg-danger' => $monthlySum > 100,
                             'bg-warning' => $monthlySum === 0,
+                            'table-secondary',
                         ])>
                             <strong>{{ $monthlySum }}%</strong>
                         </td>
@@ -106,15 +111,20 @@
             </thead>
             <thead>
                 <tr>
-                    <th>Maskinelt endret lønnskjema for plassering</th>
+                    <th></th>
+                </tr>
+                <tr class="">
+                    <th>
+                        <h2>Maskinbehandlet med regler fra lønnsavtalen</h2>
+                    </th>
                 </tr>
             </thead>
 
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th>Utdannelse/Ansiennitets opplysninger:</th>
                     @foreach ($timeline_adjusted as $month)
-                        <th>{{ $month }}</th>
+                        <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -128,7 +138,7 @@
                                 $itemEnd = strtotime($item['end_date']);
                                 $currentMonth = strtotime($month);
                             @endphp
-                            <td>
+                            <td class="table-primary">
                                 @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
                                     <span class="badge bg-primary" @class([
                                         'education' => $item['type'] === 'education',
@@ -144,7 +154,7 @@
             </tbody>
             <thead>
                 <tr>
-                    <td><strong>Sum per month</strong></td>
+                    <td><strong>Sum over total studie/ansiennitet (maks 100% gir uttelling)</strong></td>
                     @foreach ($timeline as $month)
                         @php
                             $monthlySum = 0;
@@ -163,6 +173,7 @@
                         <td @class([
                             'bg-danger' => $monthlySum > 100,
                             'bg-warning' => $monthlySum === 0,
+                            'table-secondary',
                         ])>
                             <strong>{{ $monthlySum }}%</strong>
                         </td>
@@ -170,12 +181,5 @@
                 </tr>
             </thead>
         </table>
-    </div>
-    Total work experience months: {{ $calculatedTotalWorkExperienceMonths }}<br />
-    Ansiennitet fra: {{ $ansiennitetFromDate }}<br />
-    Ansettes fra: {{ $employeeCV->work_start_date }}
-    <a href="{{ route('export-as-xls') }}" class="btn btn-success btn-lg">Last ned Utfylt lønnsplasseringsskjema</a>
-    {{-- @dd($adjustedDataset); --}}
-</body>
-
-</html>
+        {{-- @dd($adjustedDataset); --}}
+    @endsection

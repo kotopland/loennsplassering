@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ locale()->current() }}" dir="{{ locale()->dir() }}">
+<html lang="nb" dir="ltr">
 
 <head>
     <meta charset="utf-8">
@@ -27,10 +27,74 @@
     </script>
 
     <script src='{{ url('js/_hyperscript.min.js') }}'></script>
+    <style>
+        .table-container {
+            width: 100% !important;
+            overflow-x: auto !important;
+        }
+
+        table {
+            width: max-content !important;
+            border-collapse: collapse !important;
+        }
+
+        th:first-child,
+        td:first-child {
+            position: sticky !important;
+            left: 0 !important;
+            /* background-color: white !important; */
+        }
+
+        .callout {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--bs-border-color);
+            /* Use Bootstrap's border color */
+            border-left-width: 5px;
+            border-radius: 3px;
+            background-color: var(--bs-body-bg);
+            /* Default background */
+        }
+
+        .callout h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .callout-primary {
+            background-color: var(--bs-primary-subtle);
+            /* Bootstrap's subtle primary background */
+            border-left-color: var(--bs-primary);
+        }
+
+        .callout-success {
+            background-color: var(--bs-success-subtle);
+            /* Subtle success background */
+            border-left-color: var(--bs-success);
+        }
+
+        .callout-danger {
+            background-color: var(--bs-danger-subtle);
+            /* Subtle danger background */
+            border-left-color: var(--bs-danger);
+        }
+
+        .callout-info {
+            background-color: var(--bs-info-subtle);
+            /* Subtle info background */
+            border-left-color: var(--bs-info);
+        }
+
+        .callout-warning {
+            background-color: var(--bs-warning-subtle);
+            /* Subtle warning background */
+            border-left-color: var(--bs-warning);
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" class="container">
         <nav class="navbar navbar-expand-md shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
@@ -59,112 +123,22 @@
                                 </li>
                             @endif
 
-                            @if (Route::has('register'))
-                                <li class="nav-item mr-auto">
-                                    <a class="nav-link" href="{{ route('register') }}">
-                                        <span class="iconify" data-icon="mdi:account-plus"></span>
-                                        @lang('Register')
-                                    </a>
-                                </li>
-                            @endif
-                            @php $locale = request()->cookie('locale'); @endphp
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdownLocale" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                                    @switch($locale)
-                                        @case('us')
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> EN
-                                        @break
-
-                                        @case('ja')
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> JA
-                                        @break
-
-                                        @default
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> EN
-                                    @endswitch
-
-                                    <span class="caret"></span>
-                                </a>
-                                {{-- <form class="form-inline navbar-select" action="{{ route('change_locale') }}" method="POST">
-                                @csrf
-                                <div class="form-group @if ($errors->first('locale')) has-error @endif">
-                                    <span aria-hidden="true"><i class="fa fa-flag"></i></span>
-                                    <select name="locale" id="locale" class="form-control form-select form-select-sm"
-                                        required="required" onchange="this.form.submit()">
-                                        <option value="nb" @if (session()->get('locale') == 'nb') selected="selected" @endif>
-                                            NORSK</option>
-                                        <option value="en" @if (session()->get('locale') == 'en') selected="selected" @endif>
-                                            ENGLISH</option>
-                                        <option value="ja" @if (session()->get('locale') == 'ja') selected="selected" @endif>
-                                            日本語</option>
-                                    </select>
-                                    <small class="text-danger">{{ $errors->first('locale') }}</small>
-                                </div>
-                            </form> --}}
-                                <ul class="dropdown-menu bg-secondary" aria-labelledby="navbarDropdownLocale" tabindex="0">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('change_locale', ['en']) }}">English</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('change_locale', ['ja']) }}">日本語</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        @else
-                            @php $locale = auth()->user()->locale; @endphp
-
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdownLocale" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                                    @switch($locale)
-                                        @case('us')
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> EN
-                                        @break
-
-                                        @case('ja')
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> JA
-                                        @break
-
-                                        @default
-                                            <span class="iconify" data-icon="bi:globe" data-inline="false"></span> EN
-                                    @endswitch
-
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownLocale" tabindex="0">
-                                    <li>
-                                        <a class="dropdown-item" href="/lang/en">English</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/lang/ja">日本語</a>
-                                    </li>
-                                </ul>
-                            </li>
                             <li class="navUnreadNotifications-item nav-item mr-auto dropdown text-start" style="">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{ Auth::user()->person->name ?? Auth::user()->email }}
-                                </a>
 
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                                    <li><a class="dropdown-item" href="{{ route('dashboard') }}">
-                                            @lang('Profile')
-                                        </a>
-                                    </li>
-
                                     <li class="nav-item mr-auto @if (request()->routeIs('privacy_policy')) active-menu @endif">
-                                        <a class="dropdown-item" href="{{ route('privacy_policy') }}">
+                                        <a class="dropdown-item" href="{{ route('welcome') }}">
                                             @lang('My privacy')
                                         </a>
                                     </li>
 
-                                    <li><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <li><a class="dropdown-item" href="{{ route('welcome') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             @lang('Logout')
                                         </a></li>
 
                                 </ul>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form" action="{{ route('welcome') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>
                             </li>

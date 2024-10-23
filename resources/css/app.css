@@ -1,0 +1,93 @@
+/* VERTICAL STEPPER WITH INDICATOR */
+.step {
+    position: relative;
+    min-height: 1em;
+    /* color: gray; */
+}
+
+.step+.step {
+    margin-top: 1.5em;
+}
+
+.step>div:first-child {
+    position: static;
+    height: 0;
+}
+
+.step>div:not(:first-child) {
+    margin-top: 0.7em;
+    margin-left: 3.5em;
+    padding-left: 1em;
+    padding-bottom: 1em;
+
+}
+
+.step.step-active {
+    color: #4285f4
+}
+
+.step.step-active .step-circle {
+    background-color: #bbb;
+}
+
+/* step-Circle */
+.step-circle {
+    font-size: 1.5em;
+    /* background: white; */
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
+    border-radius: 100%;
+    color: #555;
+    text-align: center;
+    box-shadow: 0 0 0 3px #bbb;
+    z-index: 1;
+}
+
+/* Vertical Line */
+.step:after {
+    content: ' ';
+    position: absolute;
+    display: block;
+    top: 39px;
+    /* right: 10px; */
+    /* bottom: -30px; */
+    left: 17px;
+    height: -webkit-calc(100% - 18px);
+    width: 3px;
+    /* transform: scale(1, 2); */
+    /* transform-origin: 50% -100%; */
+    background-color: #bbb;
+    z-index: 0;
+    /* line-height: 1.5em; */
+}
+
+.step HR {
+    top: 20px;
+    display: block;
+    border: 0;
+    border-top: 2px solid #555;
+    padding: 0;
+    margin: 0;
+    z-index: 0;
+    position: relative;
+}
+
+.step:last-child .step-circle:after {
+    display: none;
+}
+
+/* Stepper Titles */
+.step-title {
+    line-height: 1.2em;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.step-caption {
+    padding-top: 0.5em;
+    line-height: 1.5em;
+    vertical-align: top;
+    /* font-size: 0.8em; */
+}
