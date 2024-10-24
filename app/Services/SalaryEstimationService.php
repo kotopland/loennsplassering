@@ -22,7 +22,7 @@ class SalaryEstimationService
     /**
      * Method to process the employee's educatoin based on a ruleset
      */
-    // public function processEducation(EmployeeCV $employeeCV)
+    // public function processEducation(EmployeeCV $application)
     // {
 
     //     // remove records when the employee was 18 years old
@@ -36,10 +36,10 @@ class SalaryEstimationService
     //     // give 1 points to general bachelor
     //     // One year full time study (100%) gives 120 points from September 1st till June 1st the next year. If the study is taken over a longer term, the study percentage will then be reduced.
     //     // if the emplyee gains more than 7 points, that education periods should be recorded as experiance. The experience record's work_percentage should be the same percentage as recorded in the study.
-    //     $educationData = $employeeCV->education;
-    //     $workExperienceData = $employeeCV->work_experience ?? [];
-    //     $eighteenYearsAgo = Carbon::parse($employeeCV->birth_date)->subYears(18);
-    //     $workStartDate = Carbon::parse($employeeCV->work_start_date);
+    //     $educationData = $application->education;
+    //     $workExperienceData = $application->work_experience ?? [];
+    //     $eighteenYearsAgo = Carbon::parse($application->birth_date)->subYears(18);
+    //     $workStartDate = Carbon::parse($application->work_start_date);
 
     //     $adjustedEducationData = [];
     //     $competencePoints = 0;
@@ -102,24 +102,25 @@ class SalaryEstimationService
     //     }
 
     //     // Update the employeeCV object with the adjusted data
-    //     $employeeCV->education = $adjustedEducationData;
-    //     $employeeCV->work_experience = $workExperienceData;
+    //     $application->education = $adjustedEducationData;
+    //     $application->work_experience = $workExperienceData;
 
-    //     return $employeeCV;
+    //     return $application;
     // }
 
     // ## CHATGPT START
     // Main method remains unchanged.
-    public function adjustEducationAndWork($employeeCV)
+    public function adjustEducationAndWork($application)
     {
-        $birthDate = Carbon::parse($employeeCV->birth_date);
+
+        $birthDate = Carbon::parse($application->birth_date);
 
         $adjustedEducation = [];
-        $adjustedWorkExperience = $employeeCV->work_experience ?? [];
+        $adjustedWorkExperience = $application->work_experience ?? [];
         $competencePoints = 0;
 
         // Process education
-        foreach ($employeeCV->education as $education) {
+        foreach ($application->education as $education) {
             $eduStartDate = Carbon::parse($education['start_date']);
 
             // Skip if employee was under 18
@@ -143,11 +144,12 @@ class SalaryEstimationService
             $adjustedEducation[] = $education;
         }
 
-        $employeeGroup = EmployeeCV::positionsLaddersGroups[$employeeCV->job_title];
+        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         // Cap competence points at 7
         if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true) && $competencePoints > 7) {
             $adjustedEducation = $this->moveExcessEducationToWork(
+                7,
                 $adjustedEducation,
                 $adjustedWorkExperience,
                 $competencePoints
@@ -155,19 +157,22 @@ class SalaryEstimationService
 
         } elseif ($employeeGroup['ladder'] === 'C' && $employeeGroup['group'] === 2 && $competencePoints > 5) {
             $adjustedEducation = $this->moveExcessEducationToWork(
+                5,
                 $adjustedEducation,
                 $adjustedWorkExperience,
                 $competencePoints
             );
-            $employeeCV->competence_points = min($competencePoints, 5);
+            $application->competence_points = min($competencePoints, 5);
         } elseif ($employeeGroup['ladder'] === 'C' && $employeeGroup['group'] === 1 && $competencePoints > 2) {
             $adjustedEducation = $this->moveExcessEducationToWork(
+                2,
                 $adjustedEducation,
                 $adjustedWorkExperience,
                 $competencePoints
             );
         } elseif ($employeeGroup['ladder'] === 'D' && $competencePoints > 4) {
             $adjustedEducation = $this->moveExcessEducationToWork(
+                4,
                 $adjustedEducation,
                 $adjustedWorkExperience,
                 $competencePoints
@@ -175,13 +180,13 @@ class SalaryEstimationService
         }
         // adjust competence points
         if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
-            $employeeCV->competence_points = min($competencePoints, 7);
+            $application->competence_points = min($competencePoints, 7);
         } elseif ($employeeGroup['ladder'] === 'C' && $employeeGroup['group'] === 2) {
-            $employeeCV->competence_points = min($competencePoints, 5);
+            $application->competence_points = min($competencePoints, 5);
         } elseif ($employeeGroup['ladder'] === 'C' && $employeeGroup['group'] === 1) {
-            $employeeCV->competence_points = min($competencePoints, 2);
+            $application->competence_points = min($competencePoints, 2);
         } elseif ($employeeGroup['ladder'] === 'D') {
-            $employeeCV->competence_points = min($competencePoints, 4);
+            $application->competence_points = min($competencePoints, 4);
         }
 
         // Adjust work experience for overlaps
@@ -191,10 +196,10 @@ class SalaryEstimationService
         $adjustedWorkExperience = $this->removeDuplicates($adjustedWorkExperience);
 
         // Set adjusted values
-        $employeeCV->education_adjusted = $adjustedEducation;
-        $employeeCV->work_experience_adjusted = $adjustedWorkExperience;
+        $application->education_adjusted = $adjustedEducation;
+        $application->work_experience_adjusted = $adjustedWorkExperience;
 
-        return $employeeCV;
+        return $application;
     }
 
     private function convertEducationToWork($education)
@@ -219,21 +224,45 @@ class SalaryEstimationService
 
         switch (@$education['highereducation']) {
             case 'bachelor':
-                return $education['relevance'] ? 4 : 1;
+                if ($education['study_points'] >= 180) {
+                    return $education['relevance'] ? 3 : 1;
+                }
             case 'master':
-                return 3;
+                if ($education['study_points'] >= 120) {
+                    return 3;
+                }
             default:
-                return 1;
+                if ($education['study_points'] >= 60) {
+                    return 1;
+                }
         }
     }
 
-    private function moveExcessEducationToWork(&$education, &$workExperience, &$competencePoints)
+    private function moveExcessEducationToWork($maxCompetencePoints, &$education, &$workExperience, &$competencePoints)
     {
-        $remainingPoints = 7;
+        $remainingPoints = $maxCompetencePoints;
         $newEducation = [];
 
-        foreach ($education as $edu) {
-            $points = $this->calculateCompetencePoints($edu);
+        $sortedEducation = collect($education)->sort(function ($a, $b) {
+            // Step 1: Compare competence_points (descending).
+            if ($a['competence_points'] != $b['competence_points']) {
+                return $b['competence_points'] <=> $a['competence_points'];
+            }
+
+            // Step 2: Compare relevance (descending).
+            if ($a['relevance'] != $b['relevance']) {
+                return $b['relevance'] <=> $a['relevance'];
+            }
+
+            // Step 3: Compare study_points (converted, descending).
+            $pointsA = ($a['study_points'] === 'bestått') ? 999 : (int) $a['study_points'];
+            $pointsB = ($b['study_points'] === 'bestått') ? 999 : (int) $b['study_points'];
+
+            return $pointsB <=> $pointsA;
+        })->values()->all();
+
+        foreach ($sortedEducation as $edu) {
+            $points = $edu['competence_points'];
 
             if ($remainingPoints - $points >= 0) {
                 $remainingPoints -= $points;
@@ -243,15 +272,12 @@ class SalaryEstimationService
             }
         }
 
-        $competencePoints = 7;
-
         return $newEducation;
     }
 
     private function adjustWorkExperience($workExperience, $education)
     {
         $adjustedWork = [];
-        $processedRanges = [];
 
         foreach ($workExperience as $work) {
             $workStart = Carbon::parse($work['start_date']);

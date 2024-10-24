@@ -15,7 +15,7 @@
         <strong>Ansiennitet beregnet fra:</strong> {{ $ansiennitetFromDate }}<br />
     </div>
     <div class="m-2">
-        <strong>Ansettelese fra:</strong> {{ $employeeCV->work_start_date }}<br />
+        <strong>Ansettelese fra:</strong> {{ $application->work_start_date }}<br />
     </div>
     <div class="m-2">
         <strong>Lønnsstige:</strong> {{ $ladder }}<br />
@@ -29,10 +29,10 @@
         <strong>Lønnsplassering før gitt kompetansepoeng:</strong> {{ $salaryPlacement }}<br />
     </div>
     <div class="m-2">
-        <strong>Kompetansepoeng:</strong> {{ $employeeCV->competence_points }}<br />
+        <strong>Kompetansepoeng:</strong> {{ $application->competence_points }}<br />
     </div>
     <div class="m-2">
-        <strong>Lønnsplassering med kompetansepoeng:</strong> {{ $salaryPlacement + $employeeCV->competence_points }}<br />
+        <strong>Lønnsplassering med kompetansepoeng:</strong> {{ $salaryPlacement + $application->competence_points }}<br />
     </div>
     <div class="m-2">
         <a href="{{ route('export-as-xls') }}" class="btn btn-success btn-lg">Last ned Utfylt lønnsplasseringsskjema i Excel</a>

@@ -27,143 +27,44 @@
     </script>
 
     <script src='{{ url('js/_hyperscript.min.js') }}'></script>
-    <style>
-        .table-container {
-            width: 100% !important;
-            overflow-x: auto !important;
-        }
-
-        table {
-            width: max-content !important;
-            border-collapse: collapse !important;
-        }
-
-        th:first-child,
-        td:first-child {
-            position: sticky !important;
-            left: 0 !important;
-            /* background-color: white !important; */
-        }
-
-        .callout {
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid var(--bs-border-color);
-            /* Use Bootstrap's border color */
-            border-left-width: 5px;
-            border-radius: 3px;
-            background-color: var(--bs-body-bg);
-            /* Default background */
-        }
-
-        .callout h4 {
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-
-        .callout-primary {
-            background-color: var(--bs-primary-subtle);
-            /* Bootstrap's subtle primary background */
-            border-left-color: var(--bs-primary);
-        }
-
-        .callout-success {
-            background-color: var(--bs-success-subtle);
-            /* Subtle success background */
-            border-left-color: var(--bs-success);
-        }
-
-        .callout-danger {
-            background-color: var(--bs-danger-subtle);
-            /* Subtle danger background */
-            border-left-color: var(--bs-danger);
-        }
-
-        .callout-info {
-            background-color: var(--bs-info-subtle);
-            /* Subtle info background */
-            border-left-color: var(--bs-info);
-        }
-
-        .callout-warning {
-            background-color: var(--bs-warning-subtle);
-            /* Subtle warning background */
-            border-left-color: var(--bs-warning);
-        }
-    </style>
+    @yield('head')
 </head>
 
 <body>
     <div id="app" class="container">
-        <nav class="navbar navbar-expand-md shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <div class="container">
+            <div class="px-2 py-2 bg-primary-subtle border border-secondary border-2 border-top-0 border-start-0 border-end-0">
+                <div class="row align-items-center">
+                    <!-- Title Section -->
+                    <div class="col-md-6 col-12">
+                        <h4>{{ config('app.name', 'Laravel') }}</h4>
+                    </div>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item mr-auto">
-                                    <a class="nav-link" href="{{ route('login') }}">
-                                        <span class="iconify" data-icon="mdi:login"></span>
-                                        @lang('Login')
-                                    </a>
-                                </li>
-                            @endif
-
-                            <li class="navUnreadNotifications-item nav-item mr-auto dropdown text-start" style="">
-
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                                    <li class="nav-item mr-auto @if (request()->routeIs('privacy_policy')) active-menu @endif">
-                                        <a class="dropdown-item" href="{{ route('welcome') }}">
-                                            @lang('My privacy')
-                                        </a>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="{{ route('welcome') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            @lang('Logout')
-                                        </a></li>
-
-                                </ul>
-                                <form id="logout-form" action="{{ route('welcome') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </li>
-
-                        @endguest
-                    </ul>
+                    <!-- Button Section -->
+                    <div class="col-md-auto col-12 mt-2 mt-md-0 text-md-end text-center">
+                        @if (session('applicationId'))
+                            <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#yourModal">
+                                Lagre dette skjemaet.
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </nav>
-        <div class="container mb-0 pb-0 mt-3">
-            {{-- {{ ($breadcrumb = Breadcrumbs::current()) ? Breadcrumbs::render(Route::currentRouteName()) : '' }} --}}
+
+            <main class="mb-4">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                @yield('content')
+            </main>
         </div>
-        <main class="mb-4">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            @yield('content')
-        </main>
-    </div>
+
 </body>
 
 </html>

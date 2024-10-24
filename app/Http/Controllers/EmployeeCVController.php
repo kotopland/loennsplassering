@@ -9,9 +9,7 @@ use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -25,9 +23,9 @@ class EmployeeCVController extends Controller
         return view('welcome');
     }
 
-    public function openApplication(EmployeeCV $employeeCV)
+    public function openApplication(EmployeeCV $application)
     {
-        session(['applicationId' => $employeeCV->id]);
+        session(['applicationId' => $application->id]);
         session()->flash('message', 'Dine lagrede opplysninger er lastet inn.');
         session()->flash('alert-class', 'alert-success');
 
@@ -39,6 +37,7 @@ class EmployeeCVController extends Controller
         $validatedData = $request->validate([
             'email_address' => 'email|required',
         ]);
+
         $subject = 'Lenke til foreløpig lønnsberegning';
         $body = 'Denne lenken går til dine registrerte opplysninger <a href="'.route('open-application', session('applicationId')).'">'.route('open-application', session('applicationId')).'</a>';
         Mail::to($validatedData['email_address'])->send(new SimpleEmail($subject, $body));
@@ -49,110 +48,126 @@ class EmployeeCVController extends Controller
 
     }
 
-    public function EnterEmploymentInformation()
+    public function enterEmploymentInformation(?EmployeeCV $application)
     {
-        // dd(session('applicationId'));
-        if (! session('applicationId')) {
-            $employeeCV = EmployeeCV::create();
-            session(['applicationId' => $employeeCV->id]);
-        } else {
-            $employeeCV = EmployeeCV::find(session('applicationId'));
-        }
-        $employeeCV->job_title = $employeeCV->job_title ?? 'Menighet: Menighetsarbeider';
-        $employeeCV->work_start_date = $employeeCV->work_start_date ?? '2024-11-02';
-        $employeeCV->birth_date = $employeeCV->birth_date ?? '1990-10-02';
-        $employeeCV->save();
+        $this->checkForSavedApplication($application);
+
+        $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
+        $application->work_start_date = $application->work_start_date ?? '2024-11-02';
+        $application->birth_date = $application->birth_date ?? '1990-10-02';
+        $application->save();
 
         $positionsLaddersGroups = EmployeeCV::positionsLaddersGroups;
         ksort($positionsLaddersGroups);
 
-        return view('enter-employment-information', compact('employeeCV', 'positionsLaddersGroups'));
+        return view('enter-employment-information', compact('application', 'positionsLaddersGroups'));
     }
 
-    public function PostEmploymentInformation(Request $request)
+    private function checkForSavedApplication($application)
     {
-        $validatedData = $request->validate([
+        if (is_null($application->id)) {
+            if (! session('applicationId') && ! request()->filled('applicationId')) {
+                $application = EmployeeCV::create();
+                session(['applicationId' => $application->id]);
+
+                return redirect()->route('enter-employment-information', $application->id);
+            } else {
+                if (session('applicationId')) {
+                    $application = EmployeeCV::find(session('applicationId'));
+                } else {
+                    $application = EmployeeCV::find(request()->applicationId);
+                }
+
+                return redirect()->route('enter-employment-information', $application->id);
+            }
+        }
+    }
+
+    public function postEmploymentInformation(Request $request)
+    {
+        $request->validate([
             'job_title' => 'required',
             'birth_date' => 'required|date',
         ]);
-        $employeeCV = EmployeeCV::find(session('applicationId'));
-        $employeeCV->job_title = $validatedData['job_title'];
-        $employeeCV->birth_date = $validatedData['birth_date'];
-        $employeeCV->save();
+        $application = EmployeeCV::find(session('applicationId'));
+        $application->job_title = $request->job_title;
+        $application->birth_date = $request->birth_date;
+        $application->save();
 
-        return redirect()->route('enter-education-information', compact('employeeCV'));
+        return redirect()->route('enter-education-information', compact('application'));
     }
 
-    public function EnterEducationInformation()
+    public function enterEducationInformation(EmployeeCV $application)
     {
-
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
             session()->flash('alert-class', 'alert-danger');
 
             return redirect()->route('welcome');
         }
-        $employeeCV = EmployeeCV::find(session('applicationId'));
-        // dd($employeeCV->education);
-        // $employeeCV->education = null;
-        if ($employeeCV->education == null) {
-            $jsonData = [
-                1 => [
-                    'topic_and_school' => 'Bachelor i Teologi',
-                    'start_date' => '2013-09-01',
-                    'end_date' => '2016-06-01',
-                    'study_points' => 180,
-                    'study_percentage' => 100,
-                    'highereducation' => 'bachelor',
-                    'relevance' => 1,
-                ],
-                2 => [
-                    'topic_and_school' => 'Master i Teologi',
-                    'start_date' => '2016-09-01',
-                    'end_date' => '2019-06-01',
-                    'study_points' => 120,
-                    'study_percentage' => 100,
-                    'highereducation' => 'master',
-                    'relevance' => 1,
-                ],
-                3 => [
-                    'topic_and_school' => 'Bibelskole',
-                    'start_date' => '2012-09-01',
-                    'end_date' => '2013-06-01',
-                    'study_percentage' => 100,
-                    'study_points' => 'bestått',
-                    'highereducation' => null,
-                    'relevance' => 1,
-                ],
-                4 => [
-                    'topic_and_school' => 'Videregående skole',
-                    'start_date' => '2008-09-01',
-                    'end_date' => '2011-06-01',
-                    'study_percentage' => 100,
-                    'study_points' => 'bestått',
-                    'highereducation' => null,
-                    'relevance' => 0,
-                ],
-                5 => [
-                    'topic_and_school' => 'Ledelse og Teologi',
-                    'start_date' => '2020-08-15',
-                    'end_date' => '2022-06-15',
-                    'study_points' => 60,
-                    'study_percentage' => 50,
-                    'highereducation' => 'master',
-                    'relevance' => 1,
-                ],
-            ];
-            $employeeCV->education = $jsonData;
-            $employeeCV->save();
-        }
+        $this->checkForSavedApplication($application);
 
-        // dd($employeeCV);
+        $application = EmployeeCV::find(session('applicationId'));
+        // dd($application->education);
+        // $application->education = null;
+        // if ($application->education == null) {
+        //     $jsonData = [
+        //         1 => [
+        //             'topic_and_school' => 'Bachelor i Teologi',
+        //             'start_date' => '2013-09-01',
+        //             'end_date' => '2016-06-01',
+        //             'study_points' => 180,
+        //             'study_percentage' => 100,
+        //             'highereducation' => 'bachelor',
+        //             'relevance' => 1,
+        //         ],
+        //         2 => [
+        //             'topic_and_school' => 'Master i Teologi',
+        //             'start_date' => '2016-09-01',
+        //             'end_date' => '2019-06-01',
+        //             'study_points' => 120,
+        //             'study_percentage' => 100,
+        //             'highereducation' => 'master',
+        //             'relevance' => 1,
+        //         ],
+        //         3 => [
+        //             'topic_and_school' => 'Bibelskole',
+        //             'start_date' => '2012-09-01',
+        //             'end_date' => '2013-06-01',
+        //             'study_percentage' => 100,
+        //             'study_points' => 'bestått',
+        //             'highereducation' => null,
+        //             'relevance' => 1,
+        //         ],
+        //         4 => [
+        //             'topic_and_school' => 'Videregående skole',
+        //             'start_date' => '2008-09-01',
+        //             'end_date' => '2011-06-01',
+        //             'study_percentage' => 100,
+        //             'study_points' => 'bestått',
+        //             'highereducation' => null,
+        //             'relevance' => 0,
+        //         ],
+        //         5 => [
+        //             'topic_and_school' => 'Ledelse og Teologi',
+        //             'start_date' => '2020-08-15',
+        //             'end_date' => '2022-06-15',
+        //             'study_points' => 60,
+        //             'study_percentage' => 50,
+        //             'highereducation' => 'master',
+        //             'relevance' => 1,
+        //         ],
+        //     ];
+        //     $application->education = $jsonData;
+        //     $application->save();
+        // }
 
-        return view('enter-education-information', compact('employeeCV'));
+        // dd($application);
+
+        return view('enter-education-information', compact('application'));
     }
 
-    public function PostEducationInformation(Request $request)
+    public function postEducationInformation(Request $request)
     {
 
         $request->validate(
@@ -179,9 +194,9 @@ class EmployeeCVController extends Controller
             ]
         );
 
-        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $application = EmployeeCV::find(session('applicationId'));
         $relevance = $request->relevance === 'true' ? 1 : 0;
-        $education = $employeeCV->education ?? [];
+        $education = $application->education ?? [];
 
         if (strtolower($request->study_points) === 'bestått') {
             $studyPercentage = '100';
@@ -189,7 +204,6 @@ class EmployeeCVController extends Controller
 
             $studyPercentage = SalaryEstimationService::calculateStudyPercentage($request->start_date, $request->end_date, intval($request->study_points));
         }
-        // dd($validatedData['start_date'], $validatedData['end_date'], '60', $studyPercentage);
 
         $education[] = [
             'topic_and_school' => $request->topic_and_school,
@@ -200,13 +214,72 @@ class EmployeeCVController extends Controller
             'highereducation' => $request->highereducation,
             'relevance' => $relevance,
         ];
-        $employeeCV->education = $education;
-        $employeeCV->save();
+        $application->education = $education;
+        $application->save();
 
-        return redirect()->route('enter-education-information', compact('employeeCV'));
+        return redirect()->route('enter-education-information', compact('application'));
     }
 
-    public function EnterExperienceInformation()
+    public function updateSingleEducationInformation(Request $request)
+    {
+
+        $request->validate(
+            [
+                'edit' => 'numeric|required',
+                'topic_and_school' => 'string|required',
+                'start_date' => 'date|required',
+                'end_date' => 'date|required',
+                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required', // Changed to numeric and in
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master', // Added in validation
+                'relevance' => 'in:true,false|nullable', // Removed required
+            ],
+            [
+                'edit.required' => 'Mangler id',
+                'topic_and_school.required' => 'Vennligst fyll inn navnet på studiet og skolen.',
+                'topic_and_school.string' => 'Navnet på studiet må være tekst.',
+                'start_date.required' => 'Vennligst velg en startdato.',
+                'start_date.date' => 'Ugyldig dato format.',
+                'end_date.required' => 'Vennligst velg en sluttdato.',
+                'end_date.date' => 'Ugyldig dato format.',
+                'study_points.required' => 'Vennligst velg antall studiepoeng.',
+                'study_points.numeric' => 'Studiepoeng må være et tall.',
+                'study_points.in' => 'Ugyldig antall studiepoeng.',
+                'highereducation.in' => 'Ugyldig type studie.',
+                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+            ]
+        );
+
+        $application = EmployeeCV::find(session('applicationId'));
+        $relevance = $request->relevance === 'true' ? 1 : 0;
+        $educationData = $application->education;
+
+        if (strtolower($request->study_points) === 'bestått') {
+            $studyPercentage = '100';
+        } else {
+            $studyPercentage = SalaryEstimationService::calculateStudyPercentage($request->start_date, $request->end_date, intval($request->study_points));
+        }
+
+        $educationItem = $educationData[$request->edit];
+
+        $educationItem = [
+            'topic_and_school' => $request->topic_and_school,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'study_points' => $request->study_points,
+            'study_percentage' => $studyPercentage,
+            'highereducation' => $request->highereducation,
+            'relevance' => $relevance,
+        ];
+
+        // Update the model and save
+        $educationData[$request->edit] = $educationItem;
+        $application->education = $educationData;
+        $application->save();
+
+        return redirect()->route('enter-education-information', compact('application'));
+    }
+
+    public function enterExperienceInformation(EmployeeCV $application)
     {
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
@@ -214,43 +287,45 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $this->checkForSavedApplication($application);
 
-        if ($employeeCV->work_experience == null) {
-            $jsonData = [
-                2 => [
-                    'title_workplace' => 'Butikkmedarbeider Rema',
-                    'workplace_type' => null,
-                    'work_percentage' => 20,
-                    'start_date' => '2006-09-01',
-                    'end_date' => '2018-07-01',
-                    'relevance' => 0,
-                ],
-                3 => [
-                    'title_workplace' => 'Ungdomsarbeider',
-                    'work_percentage' => 50,
-                    'start_date' => '2012-09-01',
-                    'end_date' => '2017-07-01',
-                    'workplace_type' => 'freechurch',
-                    'relevance' => 1,
-                ],
-                4 => [
-                    'title_workplace' => 'Speiderleder',
-                    'work_percentage' => 40,
-                    'start_date' => '2015-08-01',
-                    'end_date' => '2020-08-01',
-                    'workplace_type' => 'other_christian',
-                    'relevance' => 1,
-                ],
-            ];
-            $employeeCV->work_experience = $jsonData;
-            $employeeCV->save();
-        }
+        $application = EmployeeCV::find(session('applicationId'));
 
-        return view('enter-experience-information', compact('employeeCV'));
+        // if ($application->work_experience == null) {
+        //     $jsonData = [
+        //         2 => [
+        //             'title_workplace' => 'Butikkmedarbeider Rema',
+        //             'workplace_type' => null,
+        //             'work_percentage' => 20,
+        //             'start_date' => '2006-09-01',
+        //             'end_date' => '2018-07-01',
+        //             'relevance' => 0,
+        //         ],
+        //         3 => [
+        //             'title_workplace' => 'Ungdomsarbeider',
+        //             'work_percentage' => 50,
+        //             'start_date' => '2012-09-01',
+        //             'end_date' => '2017-07-01',
+        //             'workplace_type' => 'freechurch',
+        //             'relevance' => 1,
+        //         ],
+        //         4 => [
+        //             'title_workplace' => 'Speiderleder',
+        //             'work_percentage' => 40,
+        //             'start_date' => '2015-08-01',
+        //             'end_date' => '2020-08-01',
+        //             'workplace_type' => 'other_christian',
+        //             'relevance' => 1,
+        //         ],
+        //     ];
+        //     $application->work_experience = $jsonData;
+        //     $application->save();
+        // }
+
+        return view('enter-experience-information', compact('application'));
     }
 
-    public function PostExperienceInformation(Request $request)
+    public function postExperienceInformation(Request $request)
     {
 
         $validatedData = $request->validate([
@@ -271,9 +346,9 @@ class EmployeeCVController extends Controller
                 'workplace_type.in' => 'Ugyldig type type arbeidssted.',
                 'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
             ]);
-        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $application = EmployeeCV::find(session('applicationId'));
         $relevance = $validatedData['relevance'] ?? 0;
-        $work_experience = $employeeCV->work_experience ?? [];
+        $work_experience = $application->work_experience ?? [];
         $work_experience[] = [
             'title_workplace' => $validatedData['title_workplace'],
             'work_percentage' => $validatedData['work_percentage'],
@@ -282,13 +357,57 @@ class EmployeeCVController extends Controller
             'workplace_type' => $validatedData['workplace_type'],
             'relevance' => $relevance,
         ];
-        $employeeCV->work_experience = $work_experience;
-        $employeeCV->save();
+        $application->work_experience = $work_experience;
+        $application->save();
 
-        return redirect()->route('enter-experience-information', compact('employeeCV'));
+        return redirect()->route('enter-experience-information', compact('application'));
     }
 
-    public function previewAndEstimatedSalary(SalaryEstimationService $salaryEstimationService)
+    public function updateSingleExperienceInformation(Request $request)
+    {
+        $validatedData = $request->validate([
+            'edit' => 'numeric|required',
+            'title_workplace' => 'string|required',
+            'work_percentage' => 'required|numeric|between:0,100',
+            'start_date' => 'date|required',
+            'end_date' => 'date|required',
+            'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
+            'relevance' => 'in:true,false|nullable',
+        ],
+            [
+                'edit.required' => 'Mangler id',
+                'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
+                'title_workplace.string' => 'Navnet må være tekst.',
+                'start_date.required' => 'Vennligst velg en startdato.',
+                'start_date.date' => 'Ugyldig dato format.',
+                'end_date.required' => 'Vennligst velg en sluttdato.',
+                'end_date.date' => 'Ugyldig dato format.',
+                'workplace_type.in' => 'Ugyldig type type arbeidssted.',
+                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+            ]);
+
+        $application = EmployeeCV::find(session('applicationId'));
+        $relevance = $validatedData['relevance'] ?? 0;
+        $workExperienceData = $application->work_experience ?? [];
+        $workExperienceItem = $workExperienceData[$request->edit];
+
+        $workExperienceItem = [
+            'title_workplace' => $validatedData['title_workplace'],
+            'work_percentage' => $validatedData['work_percentage'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'workplace_type' => $validatedData['workplace_type'],
+            'relevance' => $relevance,
+        ];
+
+        $workExperienceData[$request->edit] = $workExperienceItem;
+        $application->work_experience = $workExperienceData;
+        $application->save();
+
+        return redirect()->route('enter-experience-information', compact('application'));
+    }
+
+    public function previewAndEstimatedSalary(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
@@ -296,32 +415,37 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $employeeCV = EmployeeCV::find(session('applicationId'));
 
-        $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($employeeCV);
+        $this->checkForSavedApplication($application);
 
-        // dd($adjustedDataset);
-        // dd($test->education, $test->work_experience, $test->education_adjusted, $test->work_experience_adjusted);
+        $application = EmployeeCV::find(session('applicationId'));
+        if (is_null($application->education) || is_null($application->work_experience)) {
+            $message = 'Vi kan ikke beregne en midlertidig lønnsplassering før følgende er fylt ut: ';
+            $message .= is_null($application->education) ? 'kompetanse' : '';
+            $message .= is_null($application->work_experience) ? ' - ansiennitet' : '';
 
-        // $salaryEstimation = $salaryEstimationService->getSalaryEstimation();
+            session()->flash('message', $message);
+            session()->flash('alert-class', 'alert-danger');
 
-        // dd($employeeCV);
-        // dd($employeeCV->work_experience, $employeeCV->work_experience_adjusted);
+            return redirect()->route('enter-employment-information');
+        }
+        $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
+
         $timelineData = $this->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
         $timelineData_adjusted = $this->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
 
-        $workStartDate = Carbon::parse($employeeCV->work_start_date);
+        $workStartDate = Carbon::parse($application->work_start_date);
         $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
 
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$employeeCV->job_title];
+        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval($this->getYearsDifferenceWithDecimals(
-            $this->addMonthsWithDecimals(Carbon::parse($employeeCV->work_start_date), $calculatedTotalWorkExperienceMonths),
+            $this->addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
             Carbon::now())
         );
 
         return view('preview-and-estimated-salary', [
-            'employeeCV' => $employeeCV,
+            'application' => $application,
             'adjustedDataset' => $adjustedDataset,
             'timeline' => $timelineData['timeline'],
             'tableData' => $timelineData['tableData'],
@@ -411,12 +535,12 @@ class EmployeeCVController extends Controller
             $data = Excel::toArray([], $file)[0]; // Get the first sheet
             // Optional: Log or view the extracted data (useful for debugging)
             // Log::info($data);
-            $employeeCV = EmployeeCV::create();
-            session(['applicationId' => $employeeCV->id]);
+            $application = EmployeeCV::create();
+            session(['applicationId' => $application->id]);
 
-            $employeeCV->birth_date = Date::excelToDateTimeObject($data[6][4])->format('Y-m-d');
-            $employeeCV->job_title = $data[7][4];
-            $employeeCV->work_start_date = Date::excelToDateTimeObject($data[8][4])->format('Y-m-d');
+            $application->birth_date = Date::excelToDateTimeObject($data[6][4])->format('Y-m-d');
+            $application->job_title = $data[7][4];
+            $application->work_start_date = Date::excelToDateTimeObject($data[8][4])->format('Y-m-d');
 
             $education = [];
             $work_experience = [];
@@ -435,13 +559,13 @@ class EmployeeCVController extends Controller
 
                 if ($row >= 27 && $row <= 41) {
                     if (! empty(trim($column[1]))) {
-                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => floatval($column[15]) * 100, 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
+                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '', 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
                     }
                 }
             }
-            $employeeCV->education = $education;
-            $employeeCV->work_experience = $work_experience;
-            $employeeCV->save();
+            $application->education = $education;
+            $application->work_experience = $work_experience;
+            $application->save();
 
             // Example: Perform calculations based on the extracted data
             // $results = $this->performCalculations($data);
@@ -461,17 +585,17 @@ class EmployeeCVController extends Controller
     public function destroyEducationInformation(Request $request)
     {
         $itemId = $request->input('id');
-        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $application = EmployeeCV::find(session('applicationId'));
 
-        if ($employeeCV) {
-            $educationData = $employeeCV->education;
+        if ($application) {
+            $educationData = $application->education;
 
             // Remove the item with the matching ID (key)
             unset($educationData[$itemId]);
 
             // Update the model and save
-            $employeeCV->education = $educationData;
-            $employeeCV->save();
+            $application->education = $educationData;
+            $application->save();
 
             return redirect()->back();
         }
@@ -482,17 +606,17 @@ class EmployeeCVController extends Controller
     public function destroyWorkExperienceInformation(Request $request)
     {
         $itemId = $request->input('id');
-        $employeeCV = EmployeeCV::find(session('applicationId'));
+        $application = EmployeeCV::find(session('applicationId'));
 
-        if ($employeeCV) {
-            $workExperienceData = $employeeCV->work_experience;
+        if ($application) {
+            $workExperienceData = $application->work_experience;
 
             // Remove the item with the matching ID (key)
             unset($workExperienceData[$itemId]);
 
             // Update the model and save
-            $employeeCV->work_experience = $workExperienceData;
-            $employeeCV->save();
+            $application->work_experience = $workExperienceData;
+            $application->save();
 
             return redirect()->back();
         }
@@ -510,21 +634,21 @@ class EmployeeCVController extends Controller
             return redirect()->route('welcome');
         }
         set_time_limit(300);
-        $employeeCV = EmployeeCV::find(session('applicationId'));
-        $employeeCV = $salaryEstimationService->adjustEducationAndWork($employeeCV);
+        $application = EmployeeCV::find(session('applicationId'));
+        $application = $salaryEstimationService->adjustEducationAndWork($application);
 
-        $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($employeeCV->work_experience_adjusted);
+        $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
 
         // Prepare the data to be inserted
         $data = [
-            ['row' => 8, 'column' => 'E', 'value' => $employeeCV->job_title, 'datatype' => 'text'],
-            ['row' => 7, 'column' => 'E', 'value' => $employeeCV->birth_date, 'datatype' => 'date'],
-            ['row' => 9, 'column' => 'E', 'value' => $employeeCV->work_start_date, 'datatype' => 'date'],
-            // ['row' => 9, 'column' => 'R', 'value' => $employeeCV->work_start_date, 'datatype' => 'date'],
+            ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
+            ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
+            ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
+            // ['row' => 9, 'column' => 'R', 'value' => $application->work_start_date, 'datatype' => 'date'],
         ];
 
         $row = 15;
-        foreach ($employeeCV->education_adjusted as $item) {
+        foreach ($application->education_adjusted as $item) {
 
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
@@ -533,29 +657,25 @@ class EmployeeCVController extends Controller
             $data[] = ['row' => $row, 'column' => 'AA', 'value' => $item['highereducation'].($item['relevance'] ? 'relevant' : ''), 'datatype' => 'text'];
             $row++;
         }
-        session()->flash('message', 'Kan dessverre ikke generere en Excel fil da det er for mange linjer med kompetanse og/eller ansiennitets.');
-        session()->flash('alert-class', 'alert-danger');
 
-        return redirect()->back();
-
-        if ($employeeCV->education_adjusted <= 11 && $employeeCV->work_experience <= 15) {
+        if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
             // short education / experience lines
             // Define the path to the original file and the modified file
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
             $row = 28;
-        } elseif ($employeeCV->education_adjusted > 11 || $employeeCV->work_experience > 15) {
+        } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
             // long education / experience lines
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-expanded.xlsx'; // New modified file path
             $row = 39;
-        } elseif ($employeeCV->education_adjusted > 21 || $employeeCV->work_experience > 29) {
+        } elseif (count($application->education_adjusted) > 21 || count($application->work_experience) > 29) {
             session()->flash('message', 'Kan ikke generere Excel fil da det er for mange linjer med kompetanse og/eller ansiennitets.');
             session()->flash('alert-class', 'alert-danger');
 
             return redirect()->back();
         }
-        foreach ($employeeCV->work_experience as $enteredItem) {
+        foreach ($application->work_experience as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
@@ -565,7 +685,7 @@ class EmployeeCVController extends Controller
             $row++;
         }
 
-        foreach ($employeeCV->work_experience_adjusted as $adjustedItem) {
+        foreach ($application->work_experience_adjusted as $adjustedItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
@@ -575,19 +695,19 @@ class EmployeeCVController extends Controller
             $row++;
         }
 
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$employeeCV->job_title];
+        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
-        if ($employeeCV->education_adjusted <= 11 && $employeeCV->work_experience <= 15) {
+        if ($application->education_adjusted <= 11 && $application->work_experience <= 15) {
             // short education / experience lines
             $row = 62;
-        } elseif ($employeeCV->education_adjusted > 11 || $employeeCV->work_experience > 15) {
+        } elseif ($application->education_adjusted > 11 || $application->work_experience > 15) {
             // long education / experience lines
             $row = 88;
         }
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval($this->getYearsDifferenceWithDecimals(
-            $this->addMonthsWithDecimals(Carbon::parse($employeeCV->work_start_date), $calculatedTotalWorkExperienceMonths),
+            $this->addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
             Carbon::now())
         );
 
@@ -597,7 +717,7 @@ class EmployeeCVController extends Controller
         $data[] = ['row' => $row, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
         $data[] = ['row' => $row + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
         $data[] = ['row' => $row + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 9, 'column' => 'S', 'value' => $employeeCV->competence_points, 'datatype' => 'text'];
+        $data[] = ['row' => $row + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
 
         $export = new ExistingSheetExport($data, $originalFilePath);
 

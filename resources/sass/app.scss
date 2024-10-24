@@ -166,13 +166,13 @@ td:first-child {
     overflow-x: auto !important;
 }
 
-table {
+.table-timeline {
     width: max-content !important;
     border-collapse: collapse !important;
 }
 
-th:first-child,
-td:first-child {
+.table-timeline th:first-child,
+.table-timeline td:first-child {
     position: sticky !important;
     left: 0 !important;
     /* background-color: white !important; */

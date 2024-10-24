@@ -1,7 +1,7 @@
 @extends('layouts.app')
-
+@section('head')
+@endsection
 @section('content')
-    <h1>Lønnsplassering</h1>
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -14,59 +14,144 @@
     <div class="my-2 py-3">
         <h2>Utdanning</h2>
         <div class="vstack gap-3">
-            @isset($employeeCV->education)
-                <div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Utdanning</th>
-                                <th scope="col">Fra</th>
-                                <th scope="col">Til</th>
-                                <th scope="col">Studiepoeng/Bestått/Ikke fullført</th>
-                                <th scope="col">Studert i</th>
-                                <th scope="col">Grad</th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($employeeCV->education as $id => $item)
+            @isset($application->education)
+                <table class="table table-sm w-100">
+                    <thead>
+                        <tr>
+                            <th scope="col">Utdanning</th>
+                            <th scope="col">Fra</th>
+                            <th scope="col">Til</th>
+                            <th scope="col">Studiepoeng</th>
+                            <th scope="col">% Studie</th>
+                            <th scope="col">Grad</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($application->education as $id => $item)
+                            @if (request()->has('edit') && request()->edit == $id)
                                 <tr>
-                                    <th id="topic_and_school-{{ $id }}" scope="row">{{ $item['topic_and_school'] }}</th>
+                                    <td colspan="10">
+                                        <form action="{{ route('update-single-education-information', ['edit' => $id]) }}" method="POST" id="salary_form">
+                                            @csrf
+
+                                            <div class="row g-3 mb-2 border border-secondary border-1 bg-primary-subtle my-2 p-2">
+                                                <h5>Endre kompetanse</h5>
+                                                <!-- Topic and School -->
+                                                <div class="col-6 col-md-3">
+                                                    <label for="topic_and_school" class="form-check-label">Studienavn og sted</label>
+                                                    <input type="text" id="topic_and_school" name="topic_and_school" value="{{ old('topic_and_school', $item['topic_and_school']) }}" class="form-control @error('topic_and_school') is-invalid @enderror">
+                                                    @error('topic_and_school')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <div class="row justify-content-center">
+                                                        <!-- Start Date -->
+                                                        <div class="col-6 col-md-auto">
+                                                            <label for="start_date" class="form-check-label">Studiestart</label>
+                                                            <input type="date" id="start_date" name="start_date" min="2000-01-01" value="{{ old('start_date', $item['start_date']) }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            @error('start_date')
+                                                                <div class="alert alert-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+
+                                                        <!-- End Date -->
+                                                        <div class="col-6 col-md-auto">
+                                                            <label for="end_date" class="form-check-label">Studieslutt</label>
+                                                            <input type="date" id="end_date" name="end_date" min="2000-01-01" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            @error('end_date')
+                                                                <div class="alert alert-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Study Points -->
+                                                <div class="col-4 col-md-4">
+                                                    <label for="study_points" class="form-check-label">Studiepoeng</label>
+                                                    <select id="study_points" name="study_points" class="form-select @error('study_points') is-invalid @enderror" style="max-width: 100px">
+                                                        <option value="">Velg</option>
+                                                        @foreach ([10, 20, 30, 60, 120, 180, 240, 300, 360, 420] as $points)
+                                                            <option value="{{ $points }}" @if (old('study_points', $item['study_points']) == $points) selected @endif>
+                                                                {{ $points }}
+                                                            </option>
+                                                        @endforeach
+                                                        <option value="bestått" @if (old('study_points', $item['study_points']) === 'bestått') selected @endif>
+                                                            Bestått
+                                                        </option>
+                                                    </select>
+                                                    @error('study_points')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <!-- Degree Section -->
+                                                <div class="col-12 d-flex flex-wrap">
+                                                    <div class="pe-4">Fullført grad:</div>
+                                                    <div class="form-check pe-4">
+                                                        <input type="radio" id="no_degree" name="highereducation" value="" class="form-check-input @error('highereducation') is-invalid @enderror" @if (empty(old('highereducation', $item['highereducation'] ?? ''))) checked @endif>
+                                                        <label for="no_degree" class="form-check-label">Normalt studie, ingen grad</label>
+                                                    </div>
+                                                    <div class="form-check pe-4">
+                                                        <input type="radio" id="bachelor" name="highereducation" value="bachelor" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'bachelor') checked @endif>
+                                                        <label for="bachelor" class="form-check-label">Høgskolenivå (4 år) eller bachelorgrad</label>
+                                                    </div>
+                                                    <div class="form-check pe-4">
+                                                        <input type="radio" id="master" name="highereducation" value="master" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'master') checked @endif>
+                                                        <label for="master" class="form-check-label">Mastergradsnivå, siviltittel med videre</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Relevance and Submit Button -->
+                                                <div class="col-12 d-flex flex-wrap align-items-center">
+                                                    <input type="hidden" name="relevance" value="false">
+                                                    <div class="form-check pe-4">
+                                                        <input type="checkbox" id="relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
+                                                        <label for="relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
+                                                    </div>
+                                                    <input type="submit" id="btn-update" name="submit" value="Oppdater utdanning" class="btn btn-sm btn-primary @if (null === old('topic_and_school', $item['topic_and_school'])) disabled @endif">
+                                                </div>
+
+                                            </div>
+                                        </form>
+
+                                    </td>
+                                </tr>
+                            @else
+                                <tr>
+                                    <th id="topic_and_school-{{ $id }}" scope="row">{{ strlen($item['topic_and_school']) > 30 ? substr($item['topic_and_school'], 0, 30) . '...' : $item['topic_and_school'] }}</th>
                                     <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
                                     <td id="study_points-{{ $id }}">{{ $item['study_points'] }}</td>
-                                    <td id="study_percentage-{{ $id }}">{{ @$item['study_percentage'] }}%</td>
+                                    <td id="study_percentage-{{ $id }}">{{ @$item['study_percentage'] }} {{ is_numeric($item['study_percentage']) ? '%' : '' }}</td>
                                     <td id="highereducation-{{ $id }}">{{ @$item['highereducation'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
-                                    <td><a href="{{ route('destroy-education-information', ['id' => $id]) }}"">Slett linje</a></td>
-                                    <td><a href="#" _="on click
-                                                        set the value of #topic_and_school to the innerText of #topic_and_school-{{ $id }} then
-                                                        set  the value of #start_date to the innerText of #start_date-{{ $id }} then
-                                                        set  the value of #end_date to the innerText of #end_date-{{ $id }} then
-                                                        {{-- set the value of #study_points to the innerText of #study_points-{{ $id }} then --}}
-                                                        {{-- set the value of #study_percentage to the innerText of #study_percentage-{{ $id }} then --}}
-                                                        {{-- set the value of #relevance to the innerText of #relevance-{{ $id }} then --}}
-                                                            add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
+                                    <td><a class="btn btn-sm btn-outline-primary" href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}"">Endre</a></td>
+                                    <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #topic_and_school to the innerText of #topic_and_school-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
+                                    <td><a class="btn btn-sm btn-outline-danger" href="{{ route('destroy-education-information', ['id' => $id]) }}"">Slett linje</a></td>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
             @endisset
             <div>
                 <form action="{{ route('post-education-information') }}" method="POST" id="salary_form">
                     @csrf
 
-                    <div class="row g-3 mb-2 border border-1 m-2 p-2">
+                    <div class="row g-3 mb-2 border border-secondary border-1 bg-secondary-subtle m-2 p-2">
+                        <h5 class="mb-4">Legg til kompetanse:</h5>
                         <div class="row">
                             <div class="col-auto">
                                 <input type="text" id="topic_and_school" name="topic_and_school" value="{{ old('topic_and_school') }}" placeholder="Navn på studiet og studiested" _="on keyup
-              if my.value is not empty
-                 add .disabled to #btn-next then remove .disabled from #btn-submit
-              else
-                 remove .disabled from #btn-next then add .disabled to #btn-submit
-           end" class="form-control @error('topic_and_school') is-invalid @enderror">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    if my.value is not empty
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        add .disabled to #btn-next then remove .disabled from #btn-submit
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    else
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        remove .disabled from #btn-next then add .disabled to #btn-submit
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                end" class="form-control @error('topic_and_school') is-invalid @enderror">
                                 @error('topic_and_school')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
@@ -98,7 +183,7 @@
                                     <option value="300" @if (old('study_points') === '300') selected @endif>300</option>
                                     <option value="360" @if (old('study_points') === '360') selected @endif>360</option>
                                     <option value="420" @if (old('study_points') === '420') selected @endif>420</option>
-                                    <option value="bestått">Bestått</option>
+                                    <option value="bestått" @if (old('study_points') === 'bestått') selected @endif>Bestått</option>
                                 </select>
                                 @error('study_points')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -131,8 +216,8 @@
         </div>
     </div>
 
-    <a href={{ route('enter-employment-information') }} class="btn btn-sm btn-secondary">Forrige: Informasjon om stillingen</a>
-    <a href="{{ route('enter-experience-information') }}" class="btn btn-success" id="btn-next">
+    <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">Forrige: Informasjon om stillingen</a>
+    <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-success" id="btn-next">
         Neste: Din ansiennitet
     </a>
 @endsection
