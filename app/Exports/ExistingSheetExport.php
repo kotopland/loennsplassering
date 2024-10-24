@@ -20,6 +20,10 @@ class ExistingSheetExport
 
     public function modifyAndSave(string $newFilePath)
     {
+        \PhpOffice\PhpSpreadsheet\Calculation\Functions::setCompatibilityMode(
+            \PhpOffice\PhpSpreadsheet\Calculation\Functions::COMPATIBILITY_EXCEL
+        );
+
         // Load the existing spreadsheet using PhpSpreadsheet
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
         $spreadsheet = $reader->load(storage_path('app/public/'.$this->filePath));

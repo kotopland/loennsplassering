@@ -168,7 +168,7 @@
                                     </div>
                                     <div class="col-auto pe-4">
                                         <label class="form-check-label" for="end_date">Ansatt til:</label>
-                                        <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date') }}" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock" style="max-width: 150px;">
+                                        <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date') }}" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date') }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock" style="max-width: 150px;">
                                         <div id="endDateHelpBlock" class="form-text">(er du fortsatt i stillingen skriver du dato for tiltredelse i ny stilling)</div>
                                         @error('end_date')
                                             <div class="alert alert-danger">{{ $message }}</div>

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\ExistingSheetExport;
-use App\Mail\SimpleEmail;
-use App\Models\EmployeeCV; // We'll create this import class later
+use App\Jobs\ExportExcelJob;
+use App\Mail\SimpleEmail; // We'll create this import class later
+use App\Models\EmployeeCV;
 use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -435,12 +434,12 @@ class EmployeeCVController extends Controller
         $timelineData_adjusted = $this->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
 
         $workStartDate = Carbon::parse($application->work_start_date);
-        $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
+        $calculatedTotalWorkExperienceMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
 
         $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
-        $ladderPosition = intval($this->getYearsDifferenceWithDecimals(
-            $this->addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
+        $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
+            SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
             Carbon::now())
         );
 
@@ -451,7 +450,7 @@ class EmployeeCVController extends Controller
             'tableData' => $timelineData['tableData'],
             'timeline_adjusted' => $timelineData_adjusted['timeline'],
             'tableData_adjusted' => $timelineData_adjusted['tableData'],
-            'calculatedTotalWorkExperienceMonths' => $this->calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted),
+            'calculatedTotalWorkExperienceMonths' => SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted),
             'ansiennitetFromDate' => $workStartDate->subMonths($calculatedTotalWorkExperienceMonths)->format('Y-m-d'),
             'ladder' => $salaryCategory['ladder'],
             'group' => $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '',
@@ -500,24 +499,6 @@ class EmployeeCVController extends Controller
             'timeline' => $timeline,
             'tableData' => $allData,
         ];
-    }
-
-    public function calculateTotalWorkExperienceMonths($workExperienceData)
-    {
-        $totalMonths = 0;
-
-        foreach ($workExperienceData as $workExperience) {
-            $startDate = new DateTime($workExperience['start_date']);
-            $endDate = new DateTime($workExperience['end_date']);
-
-            // Calculate the difference in months
-            $diffInMonths = ($endDate->format('Y') - $startDate->format('Y')) * 12 + $endDate->format('n') - $startDate->format('n') + 1;
-
-            // Multiply by work percentage and add to the total
-            $totalMonths += ($diffInMonths * $workExperience['work_percentage']) / 100;
-        }
-
-        return $totalMonths;
     }
 
     public function loadExcel(Request $request)
@@ -626,132 +607,22 @@ class EmployeeCVController extends Controller
 
     public function exportAsXls(SalaryEstimationService $salaryEstimationService, Excel $excel)
     {
-
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
             session()->flash('alert-class', 'alert-danger');
 
             return redirect()->route('welcome');
         }
-        set_time_limit(300);
-        $application = EmployeeCV::find(session('applicationId'));
-        $application = $salaryEstimationService->adjustEducationAndWork($application);
 
-        $calculatedTotalWorkExperienceMonths = $this->calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
+        // Get the user's email from the request
+        $email = request()->input('email');
 
-        // Prepare the data to be inserted
-        $data = [
-            ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
-            ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
-            ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
-            // ['row' => 9, 'column' => 'R', 'value' => $application->work_start_date, 'datatype' => 'date'],
-        ];
+        // Dispatch the job
+        ExportExcelJob::dispatch(session('applicationId'), $email);
+        session()->flash('message', 'En epost med et excel dokument blir sendt i løpet av et par minutter.');
+        session()->flash('alert-class', 'alert-success');
 
-        $row = 15;
-        foreach ($application->education_adjusted as $item) {
+        return redirect()->back();
 
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $item['highereducation'].($item['relevance'] ? 'relevant' : ''), 'datatype' => 'text'];
-            $row++;
-        }
-
-        if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
-            // short education / experience lines
-            // Define the path to the original file and the modified file
-            $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
-            $row = 28;
-        } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
-            // long education / experience lines
-            $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema-expanded.xlsx'; // New modified file path
-            $row = 39;
-        } elseif (count($application->education_adjusted) > 21 || count($application->work_experience) > 29) {
-            session()->flash('message', 'Kan ikke generere Excel fil da det er for mange linjer med kompetanse og/eller ansiennitets.');
-            session()->flash('alert-class', 'alert-danger');
-
-            return redirect()->back();
-        }
-        foreach ($application->work_experience as $enteredItem) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => $enteredItem['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Opprinnelig registrert', 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AC', 'value' => @$enteredItem['relevance'] ? 'relevant' : '', 'datatype' => 'text'];
-            $row++;
-        }
-
-        foreach ($application->work_experience_adjusted as $adjustedItem) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt modifisert', 'datatype' => 'text'];
-            $row++;
-        }
-
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
-
-        if ($application->education_adjusted <= 11 && $application->work_experience <= 15) {
-            // short education / experience lines
-            $row = 62;
-        } elseif ($application->education_adjusted > 11 || $application->work_experience > 15) {
-            // long education / experience lines
-            $row = 88;
-        }
-
-        // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
-        $ladderPosition = intval($this->getYearsDifferenceWithDecimals(
-            $this->addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
-            Carbon::now())
-        );
-
-        $ladder = $salaryCategory['ladder'];
-        $group = $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '';
-        $salaryPlacement = EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][$ladderPosition];
-        $data[] = ['row' => $row, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
-
-        $export = new ExistingSheetExport($data, $originalFilePath);
-
-        // Modify and save the Excel file
-        $export->modifyAndSave($modifiedFilePath);
-
-        // Download the saved file
-        return response()->download(storage_path('app/public/'.$modifiedFilePath));
-
-    }
-
-    public function addMonthsWithDecimals(Carbon $date, float $totalMonths): Carbon
-    {
-        // Separate the integer and fractional parts of the total months
-        $integerMonths = (int) $totalMonths;
-        $fractionalMonths = $totalMonths - $integerMonths;
-
-        // Add the integer part to the date
-        $newDate = $date->copy()->subMonths($integerMonths);
-
-        // Calculate the days to add for the fractional part
-        $daysInMonth = $newDate->daysInMonth; // Get the number of days in the current month
-        $fractionalDays = ceil($fractionalMonths * $daysInMonth); // Round up fractional days
-
-        // Add the fractional days
-        return $newDate->subDays($fractionalDays);
-    }
-
-    public function getYearsDifferenceWithDecimals(Carbon $startDate, Carbon $endDate): float
-    {
-        // Get the total number of days between the two dates
-        $totalDays = $startDate->diffInDays($endDate);
-
-        // Convert days to years (with decimals)
-        return $totalDays / 365.25; // Accounting for leap years
     }
 }

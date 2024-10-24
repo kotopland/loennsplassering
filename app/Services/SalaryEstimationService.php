@@ -461,4 +461,48 @@ class SalaryEstimationService
         // Round to the nearest multiple of 10
         return (int) ceil($percentage / 10) * 10;
     }
+
+    public static function calculateTotalWorkExperienceMonths($workExperienceData)
+    {
+        $totalMonths = 0;
+
+        foreach ($workExperienceData as $workExperience) {
+            $startDate = Carbon::parse($workExperience['start_date']);
+            $endDate = Carbon::parse($workExperience['end_date']);
+
+            // Calculate the difference in months
+            $diffInMonths = ($endDate->format('Y') - $startDate->format('Y')) * 12 + $endDate->format('n') - $startDate->format('n') + 1;
+
+            // Multiply by work percentage and add to the total
+            $totalMonths += ($diffInMonths * $workExperience['work_percentage']) / 100;
+        }
+
+        return $totalMonths;
+    }
+
+    public static function getYearsDifferenceWithDecimals(Carbon $startDate, Carbon $endDate): float
+    {
+        // Get the total number of days between the two dates
+        $totalDays = $startDate->diffInDays($endDate);
+
+        // Convert days to years (with decimals)
+        return $totalDays / 365.25; // Accounting for leap years
+    }
+
+    public static function addMonthsWithDecimals(Carbon $date, float $totalMonths): Carbon
+    {
+        // Separate the integer and fractional parts of the total months
+        $integerMonths = (int) $totalMonths;
+        $fractionalMonths = $totalMonths - $integerMonths;
+
+        // Add the integer part to the date
+        $newDate = $date->copy()->subMonths($integerMonths);
+
+        // Calculate the days to add for the fractional part
+        $daysInMonth = $newDate->daysInMonth; // Get the number of days in the current month
+        $fractionalDays = ceil($fractionalMonths * $daysInMonth); // Round up fractional days
+
+        // Add the fractional days
+        return $newDate->subDays($fractionalDays);
+    }
 }
