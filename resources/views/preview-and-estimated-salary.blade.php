@@ -34,8 +34,18 @@
     <div class="m-2">
         <strong>Lønnsplassering med kompetansepoeng:</strong> {{ $salaryPlacement + $application->competence_points }}<br />
     </div>
+    <div class="my-4"></div>
+    <h3>Motta utfylt lønnsskjema med beregning av lønnsplassering på e-post</h3>
+    <p>Adressen lagret ikke, men blir brukt for å sende excel skjemaet.</p>
     <div class="m-2">
-        <a href="{{ route('export-as-xls') }}" class="btn btn-success btn-lg">Last ned Utfylt lønnsplasseringsskjema i Excel</a>
+        <form action="{{ route('export-as-xls') }}" method="get" id="salary_form">
+            @csrf
+            <div class="col-auto pe-4 w-25">
+                <label for="email" class="form-label">E-post adresse</label>
+                <input type="email" class="form-control" id="email" name="email_address" aria-describedby="emailHelp">
+            </div>
+            <input type="submit" name="submit" value="Send lønnsplasseringsskjema pr e-post" class="btn btn-success">
+        </form>
     </div>
 
     <h2>Din tidslinje over utdannelse og ansiennitet</h2>

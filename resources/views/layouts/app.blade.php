@@ -64,7 +64,32 @@
                 @yield('content')
             </main>
         </div>
+        <div class="modal fade" id="yourModal" tabindex="-1" aria-labelledby="yourModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
 
+                        <h1 class="modal-title fs-5" id="yourModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Du kan enten, <a href="{{ route('open-application', session('applicationId')) }}">lagre denne lenken</a> eller få lenken sendt til din e-post adresse.
+
+                        <div class="input-group">
+                            <label for="email" class="form-label">Epost addresse</label>
+                            <input type="email" class="form-control" id="email" name="email_address" aria-describedby="emailHelp">
+                            <div id="emailHelp" class="form-text">Din adressen blir ikke lagret.</div>
+                        </div>
+                        <div class="pt-2 ps-2" id="email-result"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result">Send</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>
 
 </html>
