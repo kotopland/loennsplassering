@@ -31,7 +31,7 @@ class ExportExcelJob implements ShouldQueue
     public function __construct($applicationId, $email)
     {
         $this->applicationId = $applicationId;
-        $this->email = $email ?? 'knutola@topland.net';
+        $this->email = $email;
     }
 
     /**
