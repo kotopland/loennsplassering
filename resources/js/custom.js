@@ -28,3 +28,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+/* Cookie Concent */
+document.addEventListener('DOMContentLoaded', function () {
+    const banner = document.getElementById('cookie-banner');
+    const acceptButton = document.getElementById('accept-cookies');
+    const rejectButton = document.getElementById('reject-cookies');
+
+    // Check if the cookie consent has been set
+    const cookieConsent = document.cookie.split('; ').find(row => row.startsWith('cookie_consent='));
+    if (!cookieConsent) {
+        banner.style.display = 'block'; // Show the banner if consent is not set
+    }
+
+    // Set consent when the user clicks "Accept"
+    acceptButton.addEventListener('click', function () {
+        document.cookie = "cookie_consent=accepted; path=/; max-age=31536000"; // 1 year expiry
+        banner.style.display = 'none';
+    });
+
+    // Set consent when the user clicks "Reject"
+    rejectButton.addEventListener('click', function () {
+        document.cookie = "cookie_consent=rejected; path=/; max-age=31536000"; // 1 year expiry
+        banner.style.display = 'none';
+    });
+});
+
+/* END Cookie Concent */

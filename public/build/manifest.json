@@ -1,13 +1,13 @@
 {
   "resources/js/app.css": {
-    "file": "assets/app-3c409877.css",
+    "file": "assets/app-8109ea70.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
     "css": [
-      "assets/app-3c409877.css"
+      "assets/app-8109ea70.css"
     ],
-    "file": "assets/app-d6e9ba20.js",
+    "file": "assets/app-94f4fb1b.js",
     "imports": [
       "resources/js/custom.js"
     ],
@@ -15,7 +15,7 @@
     "src": "resources/js/app.js"
   },
   "resources/js/custom.js": {
-    "file": "assets/custom-b5c37ef4.js",
+    "file": "assets/custom-a83fc762.js",
     "isEntry": true,
     "src": "resources/js/custom.js"
   }

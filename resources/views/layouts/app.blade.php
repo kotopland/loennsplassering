@@ -90,6 +90,16 @@
                 </div>
             </div>
         </div>
+        <div id="cookie-banner" class="cookie-banner">
+            <p>
+                Dette nettstedet bruker informasjonskapsler for å sikre at du får den beste opplevelsen på nettstedet vårt.
+                <a href="/privacy-policy" target="_blank">Finn ut mer</a>
+            </p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-success my-3 me-4">Aksept</button>
+                <button id="reject-cookies" class="btn btn-danger my-3">Avvis</button>
+            </div>
+        </div>
 </body>
 
 </html>
