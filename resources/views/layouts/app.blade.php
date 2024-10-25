@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <main class="mb-4">
+            <main class="my-4">
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul>
@@ -63,6 +63,7 @@
                 @endif
                 @yield('content')
             </main>
+
         </div>
         <div class="modal fade" id="yourModal" tabindex="-1" aria-labelledby="yourModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">

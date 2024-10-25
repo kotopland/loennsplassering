@@ -72,7 +72,7 @@ class ExportExcelJob implements ShouldQueue
             $export->modifyAndSave($modifiedFilePath);
             Log::info("Excel file saved successfully for Application ID: {$this->applicationId}");
 
-            Log::info("Trying to send email to:: {$this->email}");
+            Log::info('Trying to send the email');
             $subject = 'Foreløpig beregning av din lønnsplassering';
             $body = 'Denne eposten ble generert på nettstedet '.config('app.name');
             $body .= (! is_null($data)) ? 'Vedlagt ligger en maskinberegnet lønnsplassering (Med sannysnligheter for feil).' : 'Det ble generert altfor mange linjer og det ble ikke plass i Excel skjemaet. Bruk derfor nettsiden til å se din beregning.';
@@ -107,15 +107,38 @@ class ExportExcelJob implements ShouldQueue
 
         $row = 15;
         foreach ($application->education_adjusted as $item) {
-
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $item['highereducation'].($item['relevance'] ? 'relevant' : ''), 'datatype' => 'text'];
+            $text = 'Registrert av bruker';
+            $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
+            $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
+            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $text, 'datatype' => 'text'];
             $row++;
         }
+        $adjusted = collect($application->education_adjusted);
+        $original = collect($application->education);
+        $existingTopics = $adjusted->pluck('topic_and_school')->toArray();
 
+        // Filter the original education to only include those not present in the adjusted.
+        $nonDuplicateOriginal = $original->filter(function ($item) use ($existingTopics) {
+            return ! in_array($item['topic_and_school'], $existingTopics);
+        });
+
+        foreach ($nonDuplicateOriginal as $item) {
+            $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $text = 'Registrert av bruker';
+            $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
+            $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
+            $text .= '. Maskinelt registrert som ansiennitet under og gir derfor ikke kompetansepoeng.';
+            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $text, 'datatype' => 'text'];
+
+            $row++;
+        }
         if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
             // short education / experience lines
             $row = 28;
@@ -130,8 +153,9 @@ class ExportExcelJob implements ShouldQueue
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'R', 'value' => $enteredItem['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Opprinnelig registrert', 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AC', 'value' => @$enteredItem['relevance'] ? 'relevant' : '', 'datatype' => 'text'];
+            $text = 'Registrert av bruker ';
+            $text .= @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
             $row++;
         }
 
@@ -141,7 +165,7 @@ class ExportExcelJob implements ShouldQueue
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'R', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt modifisert', 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt behandlet felt', 'datatype' => 'text'];
             $row++;
         }
 

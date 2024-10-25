@@ -25,9 +25,13 @@
             <input type="date" class="form-control" name="work_start_date" id="work_start_date" required value="{{ old('work_start_date', $application['work_start_date']) }}">
         </div>
         </div>
-        <a class="btn btn-outline-secondary " href="{{ url('/') }}" _="on click
-                     if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse.')
-                     halt">Start helt på nytt</a>
-        <button type="submit" class="btn btn-success">Neste: Din utdanning</button>
+        <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
+            <a class="btn btn-outline-secondary " href="{{ url('/') }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse.') halt">
+                Start helt på nytt
+            </a>
+            <button type="submit" class="btn btn-success">
+                Neste: Din utdanning
+            </button>
+        </div>
     </form>
 @endsection

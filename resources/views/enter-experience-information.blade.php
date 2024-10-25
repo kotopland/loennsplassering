@@ -215,9 +215,12 @@
         <h4>Kurs, verv og frivillig arbeid, relevant for stillingen. </h4>
         <p>Denne kalkulatoren kan ikke beregne frivillig arbeid automatsik. Normalt sett gies det bare ansiennitet eller kompetansetillegg i særtilfeller der det er brukt mye tid utover normal menighets- og organisasjonsliv. Er du eldste eller har vært kan du skrives det som en 25% stilling.</p>
     </div>
-    <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">Forrige: Informasjon om stillingen</a>
-    <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success" id="btn-next">
-        Neste: Sammendrag og estimert lønnsplassering
-    </a>
+    <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
+        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">
+            Forrige: Informasjon om stillingen
+        </a>
+        <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success" id="btn-next">
+            Neste: Sammendrag og estimert lønnsplassering
+        </a>
     </div>
 @endsection

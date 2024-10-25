@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Beregning av lønnsplassering</h1>
+    <h1>Lønnsberegning</h1>
     @if (session()->has('message'))
         <p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
     @endif
@@ -16,12 +16,22 @@
                     <label for="email" class="form-label">E-post adresse</label>
                     <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
                 </div>
-                <input type="submit" name="submit" value="Send lønnsplasseringsskjema pr e-post" class="btn btn-success my-2">
+                <button type="submit" name="submit" value="" class="btn btn-success my-2">Send beregnet lønnsplassering på e-post</button>
             </form>
         </div>
     </div>
-    <button class="btn btn-primary" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">Se beregnet lønnsplassering</button>
-    <button class="btn btn-primary" _="on click remove .d-none from #beregning then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">Se tidslinje over din kompetanse og ansiennitet</button>
+    <div class="text-md-end text-center pb-1">
+        <button class="btn btn-primary my-2" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            Nøkkeltall: Lønnsplassering
+        </button>
+        <button class="btn btn-primary my-2" _="on click remove .d-none from #beregning then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            Tidslinje over karriere
+        </button>
+        <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary">
+            Gjør endringer i skjemaet
+        </a>
+
+    </div>
     <div class="callout callout-primary d-none" id="beregning">
         <h3>Her er din beregnede lønnsplassering.</h3> at det er en feilmargin på pluss minus 1-2 lønnstrinn. Siden utdanning, arbeidserfaring og også frivillig innsats er komplisert kan det ha blitt beregnet feil. Usikkerhetsmonn er hva av utdanning og arbeid som arbeidsgiver mener er relevant. Relevanse kan bety en eller to ekstra eller mindre på f.eks en bachelor eller master.
         <div class="m-2">
