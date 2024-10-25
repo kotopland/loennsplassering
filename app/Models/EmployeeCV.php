@@ -12,11 +12,14 @@ class EmployeeCV extends Model
 
     protected $protected = [];
 
+    protected $guarded = [];
+
     protected $table = 'employee_cvs';
 
     protected $casts = [
         'education' => 'json',
         'work_experience' => 'json',
+        'last_viewed' => 'datetime',
     ];
 
     public const positionsLaddersGroups = [
