@@ -44,7 +44,7 @@
                     <div class="col-md-auto col-12 mt-2 mt-md-0 text-md-end text-center">
                         @if (session('applicationId'))
                             <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#yourModal">
-                                Lagre dette skjemaet.
+                                Lagre skjemaet.
                             </a>
                         @endif
                     </div>
@@ -74,18 +74,17 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Du kan enten, <a href="{{ route('open-application', session('applicationId')) }}">lagre denne lenken</a> eller få lenken sendt til din e-post adresse.
-
-                        <div class="input-group">
-                            <label for="email" class="form-label">Epost addresse</label>
-                            <input type="email" class="form-control" id="email" name="email_address" aria-describedby="emailHelp">
-                            <div id="emailHelp" class="form-text">Vi lagrer ikke adressen din.</div>
+                        Du kan enten, <a href="{{ route('open-application', session('applicationId')) }}">lagre denne lenken</a> eller få lenken sendt til din e-postadresse.
+                        <div class=" my-4">
+                            <label for="email" class="form-label">Send til e-postaddressen:</label>
+                            <input type="email" class="form-control" id="email" name="email_address" placeholder="skriv inn en e-postadresse"="emailHelp">
+                            <div id="emailHelp" class="form-text">Vi lagrer ikke e-postadressen din.</div>
                         </div>
                         <div class="pt-2 ps-2 text-primary" id="email-result"></div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result">Send</button>
+                        <button type="button" class="btn btn-success" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result">Send</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>

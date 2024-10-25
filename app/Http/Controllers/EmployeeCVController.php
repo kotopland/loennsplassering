@@ -17,7 +17,6 @@ class EmployeeCVController extends Controller
 {
     public function index()
     {
-        session()->forget('applicationId');
 
         return view('welcome');
     }
@@ -55,6 +54,10 @@ class EmployeeCVController extends Controller
 
     public function enterEmploymentInformation(?EmployeeCV $application)
     {
+        if (request()->createNew) {
+            session()->forget('applicationId');
+        }
+
         $this->checkForSavedApplication($application);
 
         $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
@@ -64,6 +67,8 @@ class EmployeeCVController extends Controller
 
         $positionsLaddersGroups = EmployeeCV::positionsLaddersGroups;
         ksort($positionsLaddersGroups);
+
+        $hasNull = false; // Initialize the flag to false
 
         return view('enter-employment-information', compact('application', 'positionsLaddersGroups'));
     }
@@ -113,63 +118,24 @@ class EmployeeCVController extends Controller
         $this->checkForSavedApplication($application);
 
         $application = EmployeeCV::find(session('applicationId'));
-        // dd($application->education);
-        // $application->education = null;
-        // if ($application->education == null) {
-        //     $jsonData = [
-        //         1 => [
-        //             'topic_and_school' => 'Bachelor i Teologi',
-        //             'start_date' => '2013-09-01',
-        //             'end_date' => '2016-06-01',
-        //             'study_points' => 180,
-        //             'study_percentage' => 100,
-        //             'highereducation' => 'bachelor',
-        //             'relevance' => 1,
-        //         ],
-        //         2 => [
-        //             'topic_and_school' => 'Master i Teologi',
-        //             'start_date' => '2016-09-01',
-        //             'end_date' => '2019-06-01',
-        //             'study_points' => 120,
-        //             'study_percentage' => 100,
-        //             'highereducation' => 'master',
-        //             'relevance' => 1,
-        //         ],
-        //         3 => [
-        //             'topic_and_school' => 'Bibelskole',
-        //             'start_date' => '2012-09-01',
-        //             'end_date' => '2013-06-01',
-        //             'study_percentage' => 100,
-        //             'study_points' => 'bestått',
-        //             'highereducation' => null,
-        //             'relevance' => 1,
-        //         ],
-        //         4 => [
-        //             'topic_and_school' => 'Videregående skole',
-        //             'start_date' => '2008-09-01',
-        //             'end_date' => '2011-06-01',
-        //             'study_percentage' => 100,
-        //             'study_points' => 'bestått',
-        //             'highereducation' => null,
-        //             'relevance' => 0,
-        //         ],
-        //         5 => [
-        //             'topic_and_school' => 'Ledelse og Teologi',
-        //             'start_date' => '2020-08-15',
-        //             'end_date' => '2022-06-15',
-        //             'study_points' => 60,
-        //             'study_percentage' => 50,
-        //             'highereducation' => 'master',
-        //             'relevance' => 1,
-        //         ],
-        //     ];
-        //     $application->education = $jsonData;
-        //     $application->save();
-        // }
 
-        // dd($application);
+        $hasErrors = false; // Initialize the flag to false
+        foreach (@$application->education as $item) {
+            if (in_array(null, [
+                @$item['topic_and_school'],
+                @$item['start_date'],
+                @$item['end_date'],
+                @$item['study_points'],
+                @$item['study_percentage'],
+                @$item['relevance'],
+            ], true)) {
 
-        return view('enter-education-information', compact('application'));
+                $hasErrors = true; // Set the flag if any null is found
+                break; // Exit the loop early since we found a null value
+            }
+        }
+
+        return view('enter-education-information', compact('application', 'hasErrors'));
     }
 
     public function postEducationInformation(Request $request)
@@ -296,38 +262,22 @@ class EmployeeCVController extends Controller
 
         $application = EmployeeCV::find(session('applicationId'));
 
-        // if ($application->work_experience == null) {
-        //     $jsonData = [
-        //         2 => [
-        //             'title_workplace' => 'Butikkmedarbeider Rema',
-        //             'workplace_type' => null,
-        //             'work_percentage' => 20,
-        //             'start_date' => '2006-09-01',
-        //             'end_date' => '2018-07-01',
-        //             'relevance' => 0,
-        //         ],
-        //         3 => [
-        //             'title_workplace' => 'Ungdomsarbeider',
-        //             'work_percentage' => 50,
-        //             'start_date' => '2012-09-01',
-        //             'end_date' => '2017-07-01',
-        //             'workplace_type' => 'freechurch',
-        //             'relevance' => 1,
-        //         ],
-        //         4 => [
-        //             'title_workplace' => 'Speiderleder',
-        //             'work_percentage' => 40,
-        //             'start_date' => '2015-08-01',
-        //             'end_date' => '2020-08-01',
-        //             'workplace_type' => 'other_christian',
-        //             'relevance' => 1,
-        //         ],
-        //     ];
-        //     $application->work_experience = $jsonData;
-        //     $application->save();
-        // }
+        $hasErrors = false; // Initialize the flag to false
+        foreach (@$application->work_experience as $item) {
+            if (in_array(null, [
+                @$item['title_workplace'],
+                @$item['work_percentage'],
+                @$item['work_percentage'],
+                @$item['start_date'],
+                @$item['end_date'],
+                @$item['relevance'],
+            ], true)) {
+                $hasErrors = true; // Set the flag if any null is found
+                break; // Exit the loop early since we found a null value
+            }
+        }
 
-        return view('enter-experience-information', compact('application'));
+        return view('enter-experience-information', compact('application', 'hasErrors'));
     }
 
     public function postExperienceInformation(Request $request)

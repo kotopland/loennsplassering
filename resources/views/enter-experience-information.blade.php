@@ -1,18 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+
+    <h2>
+        Arbeidserfaring</h2>
+
+    @if ($hasErrors)
+        <div class="callout callout-danger bg-danger-subtle">
+            Det er noen mangler i registrerte opplysninger. Vennligst oppdater dem.
         </div>
     @endif
 
-    <div class="my-2 py-3">
-        <h2>Arbeidserfaring</h2>
+    <div class="mb-2 py-3">
         <div class="vstack gap-3">
 
             @isset($application->work_experience)
@@ -129,7 +128,15 @@
                                     <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
-                                    <td><a class="btn btn-sm btn-outline-primary" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}"">Endre</a></td>
+                                    <td>
+                                        <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['work_percentage'], @$item['work_percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}"">
+                                            @if (in_array(null, [@$item['title_workplace'], @$item['work_percentage'], @$item['work_percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true))
+                                                Vennligst oppdater
+                                            @else
+                                                Endre
+                                            @endif
+                                        </a>
+                                    </td>
                                     <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then {{-- set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then --}} set the value of #work_percentage to the innerText of #work_percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then {{-- set the value of #study_points to the innerText of #study_points-{{ $id }} then --}} {{-- set the value of #study_percentage to the innerText of #study_percentage-{{ $id }} then --}} {{-- set the value of #relevance to the innerText of #relevance-{{ $id }} then --}} add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
                                     <td><a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
                                 </tr>
@@ -216,11 +223,18 @@
         <p>Denne kalkulatoren kan ikke beregne frivillig arbeid automatsik. Normalt sett gies det bare ansiennitet eller kompetansetillegg i særtilfeller der det er brukt mye tid utover normal menighets- og organisasjonsliv. Er du eldste eller har vært kan du skrives det som en 25% stilling.</p>
     </div>
     <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
-        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">
-            Forrige: Informasjon om stillingen
+        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary my-2">
+            Forrige side
         </a>
-        <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success" id="btn-next">
-            Neste: Sammendrag og estimert lønnsplassering
-        </a>
+        @if ($hasErrors)
+            <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2 disabled" id="btn-next">
+                Neste: Estimering
+            </a><br />
+            Vennligst oppdater felt med mangler
+        @else
+            <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2" id="btn-next">
+                Neste: Estimering
+            </a>
+        @endif
     </div>
 @endsection

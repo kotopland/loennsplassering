@@ -7,9 +7,7 @@
 
     <form action="{{ route('post-employment-information', $application) }}" method="POST" id="salary_form">
         @csrf
-        <div class="col-12 col-md-6">
-            <h2>Informasjon om stillingen</h2>
-        </div>
+        <h2>Informasjon om stillingen</h2>
         <label class="form-label" for="job_title">Job Title:</label>
         <select class="form-control" name="job_title" id="job_title">
             @foreach ($positionsLaddersGroups as $position => $positionArray)
@@ -26,8 +24,8 @@
         </div>
         </div>
         <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
-            <a class="btn btn-outline-secondary " href="{{ url('/') }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse.') halt">
-                Start helt på nytt
+            <a class="btn btn-outline-secondary " href="{{ url('/') }}">
+                Til forsiden
             </a>
             <button type="submit" class="btn btn-success">
                 Neste: Din utdanning

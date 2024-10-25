@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\EmployeeCVController;
 
-Route::view('/', 'empty')->name('empty');
+Route::get('/', function () {
+    return redirect()->route('welcome');
+});
 Route::get('/salary', [EmployeeCVController::class, 'index'])->name('welcome');
 Route::post('/salary/upload-excel', [EmployeeCVController::class, 'loadExcel'])->name('loadExcel');
 Route::get('/open-application/{application?}', [EmployeeCVController::class, 'openApplication'])->name('open-application');
