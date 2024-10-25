@@ -52,13 +52,13 @@ class EmployeeCVController extends Controller
 
     }
 
-    public function enterEmploymentInformation(?EmployeeCV $application)
+    public function enterEmploymentInformation(?EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (request()->createNew) {
             session()->forget('applicationId');
         }
 
-        $this->checkForSavedApplication($application);
+        $salaryEstimationService->checkForSavedApplication($application);
 
         $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
         $application->work_start_date = $application->work_start_date ?? '2024-11-02';
@@ -71,26 +71,6 @@ class EmployeeCVController extends Controller
         $hasNull = false; // Initialize the flag to false
 
         return view('enter-employment-information', compact('application', 'positionsLaddersGroups'));
-    }
-
-    private function checkForSavedApplication($application)
-    {
-        if (is_null($application->id)) {
-            if (! session('applicationId') && ! request()->filled('applicationId')) {
-                $application = EmployeeCV::create();
-                session(['applicationId' => $application->id]);
-
-                return redirect()->route('enter-employment-information', $application->id);
-            } else {
-                if (session('applicationId')) {
-                    $application = EmployeeCV::find(session('applicationId'));
-                } else {
-                    $application = EmployeeCV::find(request()->applicationId);
-                }
-
-                return redirect()->route('enter-employment-information', $application->id);
-            }
-        }
     }
 
     public function postEmploymentInformation(Request $request)
@@ -107,7 +87,7 @@ class EmployeeCVController extends Controller
         return redirect()->route('enter-education-information', compact('application'));
     }
 
-    public function enterEducationInformation(EmployeeCV $application)
+    public function enterEducationInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
@@ -115,12 +95,13 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $this->checkForSavedApplication($application);
+        $salaryEstimationService->checkForSavedApplication($application);
 
         $application = EmployeeCV::find(session('applicationId'));
 
         $hasErrors = false; // Initialize the flag to false
-        foreach (@$application->education as $item) {
+
+        foreach ($application->education ?? [] as $item) {
             if (in_array(null, [
                 @$item['topic_and_school'],
                 @$item['start_date'],
@@ -250,7 +231,7 @@ class EmployeeCVController extends Controller
         return redirect()->route('enter-education-information', compact('application'));
     }
 
-    public function enterExperienceInformation(EmployeeCV $application)
+    public function enterExperienceInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
@@ -258,12 +239,13 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $this->checkForSavedApplication($application);
+        $salaryEstimationService->checkForSavedApplication($application);
 
         $application = EmployeeCV::find(session('applicationId'));
 
         $hasErrors = false; // Initialize the flag to false
-        foreach (@$application->work_experience as $item) {
+
+        foreach ($application->work_experience ?? [] as $item) {
             if (in_array(null, [
                 @$item['title_workplace'],
                 @$item['work_percentage'],
@@ -371,23 +353,14 @@ class EmployeeCVController extends Controller
             return redirect()->route('welcome');
         }
 
-        $this->checkForSavedApplication($application);
+        $salaryEstimationService->checkForSavedApplication($application);
 
         $application = EmployeeCV::find(session('applicationId'));
-        if (is_null($application->education) || is_null($application->work_experience)) {
-            $message = 'Vi kan ikke beregne en midlertidig lønnsplassering før følgende er fylt ut: ';
-            $message .= is_null($application->education) ? 'kompetanse' : '';
-            $message .= is_null($application->work_experience) ? ' - ansiennitet' : '';
 
-            session()->flash('message', $message);
-            session()->flash('alert-class', 'alert-danger');
-
-            return redirect()->route('enter-employment-information');
-        }
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
 
-        $timelineData = $this->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
-        $timelineData_adjusted = $this->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
+        $timelineData = $salaryEstimationService->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
+        $timelineData_adjusted = $salaryEstimationService->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
 
         $workStartDate = Carbon::parse($application->work_start_date);
         $calculatedTotalWorkExperienceMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
@@ -412,49 +385,6 @@ class EmployeeCVController extends Controller
             'group' => $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '',
             'salaryPlacement' => EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][$ladderPosition],
         ]);
-    }
-
-    private function createTimelineData($educationData, $workExperienceData)
-    {
-        $allData = [];
-        foreach ($educationData as $education) {
-            $allData[] = [
-                'title' => $education['topic_and_school'],
-                'start_date' => $education['start_date'],
-                'end_date' => $education['end_date'],
-                'percentage' => $education['study_percentage'],
-                'type' => 'education',
-            ];
-        }
-        foreach ($workExperienceData as $workExperience) {
-            $allData[] = [
-                'title' => $workExperience['title_workplace'],
-                'start_date' => $workExperience['start_date'],
-                'end_date' => $workExperience['end_date'],
-                'percentage' => $workExperience['work_percentage'],
-                'type' => 'work',
-            ];
-        }
-
-        // 2. Determine the timeline
-
-        $earliestMonth = min(array_map(function ($item) {
-            return strtotime($item['start_date']);
-        }, $allData));
-        $latestMonth = max(array_map(function ($item) {
-            return strtotime($item['end_date']);
-        }, $allData));
-        $timeline = [];
-        $currentMonth = $earliestMonth;
-        while ($currentMonth <= $latestMonth) {
-            $timeline[] = date('Y-m', $currentMonth);
-            $currentMonth = strtotime('+1 month', $currentMonth);
-        }
-
-        return [
-            'timeline' => $timeline,
-            'tableData' => $allData,
-        ];
     }
 
     public function loadExcel(Request $request)
@@ -482,7 +412,7 @@ class EmployeeCVController extends Controller
             $education = [];
             $work_experience = [];
 
-            foreach ($data as $row => $column) {
+            foreach ($data ?? [] as $row => $column) {
                 if ($row >= 14 && $row <= 24) {
                     if (! empty(trim($column[1]))) {
                         if (strtolower($column[20]) == 'bestått') {

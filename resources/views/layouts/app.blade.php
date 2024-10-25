@@ -33,11 +33,11 @@
 <body>
     <div id="app" class="container">
         <div class="container">
-            <div class="px-2 py-2 bg-primary-subtle border border-secondary border-2 border-top-0 border-start-0 border-end-0">
+            <div class="px-2 py-2 bg-primary-subtle border border-secondary border-4 border-top-0 border-start-0 border-end-0">
                 <div class="row align-items-center">
                     <!-- Title Section -->
                     <div class="col-md-6 col-12">
-                        <h4>{{ config('app.name', 'Laravel') }}</h4>
+                        <h4 style="line-height:0em;" class="pt-2"><strong>{{ config('app.name', 'Laravel') }}</strong></h4>
                     </div>
 
                     <!-- Button Section -->

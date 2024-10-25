@@ -106,7 +106,7 @@ class ExportExcelJob implements ShouldQueue
         ];
 
         $row = 15;
-        foreach ($application->education_adjusted as $item) {
+        foreach ($application->education_adjusted ?? [] as $item) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
@@ -126,7 +126,7 @@ class ExportExcelJob implements ShouldQueue
             return ! in_array($item['topic_and_school'], $existingTopics);
         });
 
-        foreach ($nonDuplicateOriginal as $item) {
+        foreach ($nonDuplicateOriginal ?? [] as $item) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
@@ -148,7 +148,7 @@ class ExportExcelJob implements ShouldQueue
         } elseif (count($application->education_adjusted) > 21 || count($application->work_experience) > 29) {
             return null;
         }
-        foreach ($application->work_experience as $enteredItem) {
+        foreach ($application->work_experience ?? [] as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
@@ -159,7 +159,7 @@ class ExportExcelJob implements ShouldQueue
             $row++;
         }
 
-        foreach ($application->work_experience_adjusted as $adjustedItem) {
+        foreach ($application->work_experience_adjusted ?? [] as $adjustedItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];

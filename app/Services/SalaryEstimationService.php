@@ -7,106 +7,25 @@ use Carbon\Carbon;
 
 class SalaryEstimationService
 {
-    // private array $salaryEstimation;
+    public function checkForSavedApplication($application)
+    {
+        if (is_null($application->id)) {
+            if (! session('applicationId') && ! request()->filled('applicationId')) {
+                $application = EmployeeCV::create();
+                session(['applicationId' => $application->id]);
 
-    // public function __construct()
-    // {
-    //     $this->salaryEstimation = [];
-    // }
+                return redirect()->route('enter-employment-information', $application->id);
+            } else {
+                if (session('applicationId')) {
+                    $application = EmployeeCV::find(session('applicationId'));
+                } else {
+                    $application = EmployeeCV::find(request()->applicationId);
+                }
 
-    // public function getSalaryEstimation(): array
-    // {
-    //     return $this->salaryEstimation;
-    // }
-
-    /**
-     * Method to process the employee's educatoin based on a ruleset
-     */
-    // public function processEducation(EmployeeCV $application)
-    // {
-
-    //     // remove records when the employee was 18 years old
-    //     // convert records not finished before employment start to work experience
-    //     // For A,B,E,F
-    //     // give 1 point to relevant bestått education (1 or 2 years)
-    //     // give 1 point to relevant bestått education (1 or 2 years)
-    //     // give 6 points to relevant master and bachelor
-    //     // give 3 points to relevant bachelor
-    //     // give 3 points to general master
-    //     // give 1 points to general bachelor
-    //     // One year full time study (100%) gives 120 points from September 1st till June 1st the next year. If the study is taken over a longer term, the study percentage will then be reduced.
-    //     // if the emplyee gains more than 7 points, that education periods should be recorded as experiance. The experience record's work_percentage should be the same percentage as recorded in the study.
-    //     $educationData = $application->education;
-    //     $workExperienceData = $application->work_experience ?? [];
-    //     $eighteenYearsAgo = Carbon::parse($application->birth_date)->subYears(18);
-    //     $workStartDate = Carbon::parse($application->work_start_date);
-
-    //     $adjustedEducationData = [];
-    //     $competencePoints = 0;
-
-    //     foreach ($educationData as $id => $education) {
-    //         $educationStartDate = Carbon::parse($education['start_date']);
-    //         $educationEndDate = Carbon::parse($education['end_date']);
-
-    //         // Rule 1: Remove records when the employee was 18 years old or younger
-    //         if ($educationEndDate->lte($eighteenYearsAgo)) {
-    //             continue; // Skip this record
-    //         }
-
-    //         // Rule 2: Convert records not finished before employment start to work experience
-    //         if ($educationEndDate->gte($workStartDate)) {
-    //             $workExperienceData[] = [
-    //                 'title_workplace' => $education['topic_and_school'],
-    //                 'workplace_type' => null, // Assuming workplace type is not relevant here
-    //                 'work_percentage' => $education['study_percentage'],
-    //                 'start_date' => $education['start_date'],
-    //                 'end_date' => $education['end_date'],
-    //                 'relevance' => $education['relevance'],
-    //             ];
-
-    //             continue; // Skip this record in education
-    //         }
-
-    //         // Calculate competence points based on rules 3 to 7
-    //         if ($education['relevance']) {
-    //             if ($education['study_points'] === 'passed') {
-    //                 $competencePoints += 1; // Rules 2 and 3
-    //             } elseif ($education['highereducation'] === 'master') {
-    //                 $competencePoints += 3; // Rule 4
-    //             } elseif ($education['highereducation'] === 'bachelor') {
-    //                 $competencePoints += 3; // Rule 5
-    //             }
-    //         } else {
-    //             if ($education['highereducation'] === 'master') {
-    //                 $competencePoints += 3; // Rule 6
-    //             } elseif ($education['highereducation'] === 'bachelor') {
-    //                 $competencePoints += 1; // Rule 7
-    //             }
-    //         }
-
-    //         // Rule 8: Convert excess education to work experience if competence points exceed 7
-    //         if ($competencePoints > 7) {
-    //             $workExperienceData[] = [
-    //                 'title_workplace' => $education['topic_and_school'],
-    //                 'workplace_type' => null,
-    //                 'work_percentage' => $education['study_percentage'],
-    //                 'start_date' => $education['start_date'],
-    //                 'end_date' => $education['end_date'],
-    //                 'relevance' => $education['relevance'],
-    //             ];
-    //             $competencePoints -= ($education['highereducation'] === 'master') ? 3 : 1; // Deduct points based on education level
-    //         } else {
-    //             $adjustedEducationData[$id] = $education;
-    //             $adjustedEducationData[$id]['competence_points'] = ($education['highereducation'] === 'master' || $education['highereducation'] === 'bachelor') ? 3 : 1;
-    //         }
-    //     }
-
-    //     // Update the employeeCV object with the adjusted data
-    //     $application->education = $adjustedEducationData;
-    //     $application->work_experience = $workExperienceData;
-
-    //     return $application;
-    // }
+                return redirect()->route('enter-employment-information', $application->id);
+            }
+        }
+    }
 
     // ## CHATGPT START
     // Main method remains unchanged.
@@ -120,7 +39,7 @@ class SalaryEstimationService
         $competencePoints = 0;
 
         // Process education
-        foreach ($application->education as $education) {
+        foreach ($application->education ?? [] as $education) {
             $eduStartDate = Carbon::parse($education['start_date']);
 
             // Skip if employee was under 18
@@ -261,7 +180,7 @@ class SalaryEstimationService
             return $pointsB <=> $pointsA;
         })->values()->all();
 
-        foreach ($sortedEducation as $edu) {
+        foreach ($sortedEducation ?? [] as $edu) {
             $points = $edu['competence_points'];
 
             if ($remainingPoints - $points >= 0) {
@@ -279,12 +198,12 @@ class SalaryEstimationService
     {
         $adjustedWork = [];
 
-        foreach ($workExperience as $work) {
+        foreach ($workExperience ?? [] as $work) {
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
             $currentStart = $workStart;  // Track the current start date.
 
-            foreach ($education as $edu) {
+            foreach ($education ?? [] as $edu) {
                 $eduStart = Carbon::parse($edu['start_date']);
                 $eduEnd = Carbon::parse($edu['end_date']);
 
@@ -324,7 +243,7 @@ class SalaryEstimationService
         $splitWork = [];
 
         // Step 2: Split work experiences month-by-month.
-        foreach ($sortedWork as $work) {
+        foreach ($sortedWork ?? [] as $work) {
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
 
@@ -376,7 +295,7 @@ class SalaryEstimationService
         $mergedWork = [];
         $previous = null;
 
-        foreach ($workSegments as $current) {
+        foreach ($workSegments ?? [] as $current) {
             if (
                 $previous &&
                 $previous['title_workplace'] === $current['title_workplace'] &&
@@ -466,7 +385,7 @@ class SalaryEstimationService
     {
         $totalMonths = 0;
 
-        foreach ($workExperienceData as $workExperience) {
+        foreach ($workExperienceData ?? [] as $workExperience) {
             $startDate = Carbon::parse($workExperience['start_date']);
             $endDate = Carbon::parse($workExperience['end_date']);
 
@@ -504,5 +423,51 @@ class SalaryEstimationService
 
         // Add the fractional days
         return $newDate->subDays($fractionalDays);
+    }
+
+    public function createTimelineData($educationData, $workExperienceData)
+    {
+        $allData = [];
+        $timeline = [];
+        foreach ($educationData ?? [] as $education) {
+            $allData[] = [
+                'title' => $education['topic_and_school'],
+                'start_date' => $education['start_date'],
+                'end_date' => $education['end_date'],
+                'percentage' => $education['study_percentage'],
+                'type' => 'education',
+            ];
+        }
+        foreach ($workExperienceData ?? [] as $workExperience) {
+            $allData[] = [
+                'title' => $workExperience['title_workplace'],
+                'start_date' => $workExperience['start_date'],
+                'end_date' => $workExperience['end_date'],
+                'percentage' => $workExperience['work_percentage'],
+                'type' => 'work',
+            ];
+        }
+
+        if (count($allData) !== 0) {
+
+            // 2. Determine the timeline
+            $earliestMonth = min(array_map(function ($item) {
+                return strtotime($item['start_date']);
+            }, $allData));
+            $latestMonth = max(array_map(function ($item) {
+                return strtotime($item['end_date']);
+            }, $allData));
+
+            $currentMonth = $earliestMonth;
+            while ($currentMonth <= $latestMonth) {
+                $timeline[] = date('Y-m', $currentMonth);
+                $currentMonth = strtotime('+1 month', $currentMonth);
+            }
+        }
+
+        return [
+            'timeline' => $timeline,
+            'tableData' => $allData,
+        ];
     }
 }
