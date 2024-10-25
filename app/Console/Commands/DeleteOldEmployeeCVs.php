@@ -15,14 +15,14 @@ class DeleteOldEmployeeCVs extends Command
      *
      * @var string
      */
-    protected $signature = 'employee-cvs:delete-old';
+    protected $signature = 'employee-cvs:delete-old-viewed';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Delete EmployeeCV records older than 1 year';
+    protected $description = 'Delete EmployeeCV records viewed older than 1 year';
 
     /**
      * Execute the console command.
@@ -33,9 +33,9 @@ class DeleteOldEmployeeCVs extends Command
         $cutoffDate = Carbon::now()->subYear();
 
         // Delete old EmployeeCV records and log the count.
-        $deletedCount = EmployeeCV::where('created_at', '<', $cutoffDate)->delete();
+        $deletedCount = EmployeeCV::where('last_viewed', '<', $cutoffDate)->delete();
 
         // Output the result.
-        $this->info("Deleted {$deletedCount} EmployeeCV records older than 1 year.");
+        $this->info("Deleted {$deletedCount} EmployeeCV records viewed older than 1 year.");
     }
 }
