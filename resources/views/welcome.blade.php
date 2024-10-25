@@ -26,7 +26,7 @@
 
     <div class="callout callout-primary bg-primary-subtle">
         <h3 style="margin-top:0!important;">Har allerede et tidligere utfylt lønnsplasseringsskjema?</h3>
-        Hvis du har et lønnsskjema i samme format som du finner på Frikirkens websider kan du laste det opp slik at du kan arbeide videre med det og gjøre en beregning av lønnsplasseringen din.
+        Hvis du har et lønnsskjema i samme format som du finner på Frikirkens websider kan du laste det opp slik at du kan arbeide videre med det og gjøre en beregning av lønnsplasseringen din. Vi lagrer ikke dokumentet og bare stilling, fødselsdato, tiltredelsesdato, kompetanse og ansiennitet blir benyttet.
     </div>
     <form action="{{ route('loadExcel') }}" method="POST" enctype="multipart/form-data">
         @csrf

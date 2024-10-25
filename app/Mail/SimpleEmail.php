@@ -17,15 +17,18 @@ class SimpleEmail extends Mailable implements ShouldQueue
 
     public $body;
 
+    public $filePath;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($subject, $body)
+    public function __construct($subject, $body, $filePath)
     {
         $this->subject = $subject;
         $this->body = $body;
+        $this->filePath = $filePath;
     }
 
     /**
@@ -63,7 +66,7 @@ class SimpleEmail extends Mailable implements ShouldQueue
      */
     public function attachments()
     {
-        $attachments = [];
+        $attachments = [storage_path('app/public/'.$this->filePath)];
 
         return $attachments;
     }

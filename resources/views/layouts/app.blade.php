@@ -78,9 +78,9 @@
                         <div class="input-group">
                             <label for="email" class="form-label">Epost addresse</label>
                             <input type="email" class="form-control" id="email" name="email_address" aria-describedby="emailHelp">
-                            <div id="emailHelp" class="form-text">Din adressen blir ikke lagret.</div>
+                            <div id="emailHelp" class="form-text">Vi lagrer ikke adressen din.</div>
                         </div>
-                        <div class="pt-2 ps-2" id="email-result"></div>
+                        <div class="pt-2 ps-2 text-primary" id="email-result"></div>
 
                     </div>
                     <div class="modal-footer">

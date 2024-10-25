@@ -40,6 +40,12 @@ class EmployeeCVController extends Controller
         $subject = 'Lenke til foreløpig lønnsberegning';
         $body = 'Denne lenken går til dine registrerte opplysninger <a href="'.route('open-application', session('applicationId')).'">'.route('open-application', session('applicationId')).'</a>';
         Mail::to($validatedData['email_address'])->send(new SimpleEmail($subject, $body));
+
+        // Remeber that an email has been sent
+        $application = EmployeeCV::find(session('applicationId'));
+        $application->email_sent = true;
+        $application->save();
+
         session()->flash('message', 'Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.');
         session()->flash('alert-class', 'alert-success');
 
@@ -605,7 +611,7 @@ class EmployeeCVController extends Controller
         return redirect()->back();
     }
 
-    public function exportAsXls(SalaryEstimationService $salaryEstimationService, Excel $excel)
+    public function exportAsXls()
     {
         if (! session('applicationId')) {
             session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
@@ -614,8 +620,17 @@ class EmployeeCVController extends Controller
             return redirect()->route('welcome');
         }
 
+        request()->validate([
+            'email' => 'email|required',
+        ]);
+
         // Get the user's email from the request
-        $email = request()->input('email');
+        $email = request()->email;
+
+        // Remeber that an email has been sent
+        $application = EmployeeCV::find(session('applicationId'));
+        $application->email_sent = true;
+        $application->save();
 
         // Dispatch the job
         ExportExcelJob::dispatch(session('applicationId'), $email);

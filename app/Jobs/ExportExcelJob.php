@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Exports\ExistingSheetExport;
 use App\Mail\ExcelGeneratedMail;
+use App\Mail\SimpleEmail;
 use App\Models\EmployeeCV;
 use App\Services\SalaryEstimationService;
 use Exception;
@@ -60,6 +61,9 @@ class ExportExcelJob implements ShouldQueue
 
             // Prepare data for Excel
             $data = $this->prepareExcelData($application, $calculatedTotalWorkExperienceMonths);
+            if (is_null($data)) {
+                Log::error("Too much data and the excel file could not be generated. Application ID: {$this->applicationId}");
+            }
             // Create the Excel file and save it
             $originalFilePath = '14lonnsskjema.xlsx';
             $modifiedFilePath = 'modified_14lonnsskjema.xlsx';
@@ -68,8 +72,15 @@ class ExportExcelJob implements ShouldQueue
             $export->modifyAndSave($modifiedFilePath);
             Log::info("Excel file saved successfully for Application ID: {$this->applicationId}");
 
+            Log::info("Trying to send email to:: {$this->email}");
+            $subject = 'Foreløpig beregning av din lønnsplassering';
+            $body = 'Denne eposten ble generert på nettstedet '.config('app.name');
+            $body .= (! is_null($data)) ? 'Vedlagt ligger en maskinberegnet lønnsplassering (Med sannysnligheter for feil).' : 'Det ble generert altfor mange linjer og det ble ikke plass i Excel skjemaet. Bruk derfor nettsiden til å se din beregning.';
+            $body .= 'Du kan se og endre ditt skjema ved å trykke på denne linken: <a href="'.route('open-application', $this->applicationId).'">'.route('open-application', $this->applicationId).'</a>. Skjemaer slettes ett år etter at det er blitt åpnet.';
+            Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
+
             // Send the email with the Excel file as an attachment
-            Mail::to($this->email)->send(new ExcelGeneratedMail($modifiedFilePath));
+            // Mail::to($this->email)->send(new ExcelGeneratedMail($modifiedFilePath));
             Log::info("Email sent successfully to {$this->email} for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
             // Log the error message and stack trace
@@ -107,20 +118,12 @@ class ExportExcelJob implements ShouldQueue
 
         if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
             // short education / experience lines
-            // Define the path to the original file and the modified file
-            $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
             $row = 28;
         } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
             // long education / experience lines
-            $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema-expanded.xlsx'; // New modified file path
             $row = 39;
         } elseif (count($application->education_adjusted) > 21 || count($application->work_experience) > 29) {
-            session()->flash('message', 'Kan ikke generere Excel fil da det er for mange linjer med kompetanse og/eller ansiennitets.');
-            session()->flash('alert-class', 'alert-danger');
-
-            return redirect()->back();
+            return null;
         }
         foreach ($application->work_experience as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
@@ -144,10 +147,10 @@ class ExportExcelJob implements ShouldQueue
 
         $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
-        if ($application->education_adjusted <= 11 && $application->work_experience <= 15) {
+        if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
             // short education / experience lines
             $row = 62;
-        } elseif ($application->education_adjusted > 11 || $application->work_experience > 15) {
+        } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
             // long education / experience lines
             $row = 88;
         }
