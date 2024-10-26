@@ -61,7 +61,13 @@
                         </ul>
                     </div>
                 @endif
-                @yield('content')
+                {{-- @dd(request()->cookie('cookie_consent')) --}}
+                @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
+                    @yield('content')
+                @else
+                    Du kan ikke bruke denne webappen uten å akseptere informasjonskapsler (cookies).
+                    Dersom du ønsker å bruke webappen, kan du ombestemme deg og <div class="cookie-buttons"><button id="accept-cookies" class="btn btn-outline-primary my-3 me-4" _="on click wait 500ms then reload() the location of the window">akseptere nødvendige informasjonskapsler.</button></div>
+                @endif
             </main>
 
         </div>
@@ -97,7 +103,7 @@
             </p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-success my-3 me-4">Aksept</button>
-                <button id="reject-cookies" class="btn btn-danger my-3">Avvis</button>
+                <button id="reject-cookies" class="btn btn-danger my-3" _="on click wait 500ms then reload() the location of the window">Avvis</button>
             </div>
         </div>
 </body>

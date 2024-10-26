@@ -24,7 +24,7 @@
         <button class="btn btn-primary my-2" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
             Nøkkeltall: Lønnsplassering
         </button>
-        <button class="btn btn-primary my-2" _="on click remove .d-none from #beregning then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+        <button class="btn btn-primary my-2" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
             Tidslinje over karriere
         </button>
         <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary">
