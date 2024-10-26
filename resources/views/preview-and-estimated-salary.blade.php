@@ -69,7 +69,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <h2>Hva du har registrert</h2>
+                            <h5>Hva du har registrert</h5>
                         </th>
                     </tr>
                 </thead>
@@ -108,7 +108,7 @@
                 </tbody>
                 <thead>
                     <tr>
-                        <td><strong>Sum over total studie/ansiennitet (maks 100% gir uttelling)</strong></td>
+                        <td><strong>Sum over total studie/ansiennitet</strong></td>
                         @foreach ($timeline as $month)
                             @php
                                 $monthlySum = 0;
@@ -140,7 +140,7 @@
                     </tr>
                     <tr class="">
                         <th>
-                            <h2>Maskinbehandlet med regler fra lønnsavtalen</h2>
+                            <h5>Maskinbehandlet</h5>
                         </th>
                     </tr>
                 </thead>
@@ -179,7 +179,7 @@
                 </tbody>
                 <thead>
                     <tr>
-                        <td><strong>Sum over total studie/ansiennitet (maks 100% gir uttelling)</strong></td>
+                        <td><strong>Sum over total studie/ansiennitet</strong></td>
                         @foreach ($timeline as $month)
                             @php
                                 $monthlySum = 0;
