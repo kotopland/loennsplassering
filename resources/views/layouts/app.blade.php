@@ -106,6 +106,11 @@
                 <button id="reject-cookies" class="btn btn-danger my-3" _="on click wait 500ms then reload() the location of the window">Avvis</button>
             </div>
         </div>
+        <div class="px-2 py-2 bg-primary-subtle border border-secondary border-4 border-bottom-0 border-start-0 border-end-0 text-center mb-5">
+            <a href="{{ route('privacy-policy') }}">Personvernerklæring</a>
+            -
+            <a href="{{ url('www.frikirken.no') }}">www.frikirken.no</a>
+        </div>
 </body>
 
 </html>

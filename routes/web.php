@@ -5,6 +5,7 @@ use App\Http\Controllers\EmployeeCVController;
 Route::get('/', function () {
     return redirect()->route('welcome');
 });
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/lonnsberegner', [EmployeeCVController::class, 'index'])->name('welcome');
 Route::post('/lonnsberegner/upload-excel', [EmployeeCVController::class, 'loadExcel'])->name('loadExcel');
 Route::get('/open-application/{application?}', [EmployeeCVController::class, 'openApplication'])->name('open-application');
