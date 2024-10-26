@@ -20,15 +20,16 @@
             </form>
         </div>
     </div>
-    <div class="text-md-end text-center pb-1">
-        <button class="btn btn-primary my-2" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
-            Nøkkeltall: Lønnsplassering
+    <div class="text-center pb-1">
+        <button class="btn btn-success my-3 me-3" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            Nøkkeltall: Se beregnet Lønnsplassering
         </button>
-        <button class="btn btn-primary my-2" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
-            Tidslinje over karriere
+        <button class="btn btn-success my-3" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            Se en tidslinje over karriere og etter beregninger
         </button>
-        <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary">
-            Gjør endringer i skjemaet
+        <br />
+        <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary my-3">
+            Gå tilbake og gjør endringer i skjemaet
         </a>
 
     </div>
