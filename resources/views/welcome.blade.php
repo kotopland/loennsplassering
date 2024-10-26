@@ -7,7 +7,15 @@
 
     <div class="callout callout-primary bg-primary-subtle">
         <h3 style="margin-top:0!important;">Hva gjør dette verktøyet?</h3>
-        Alle ansettelser i Frikirken følger lønnsavtalen vedtatt av synodestyret (<a href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>). Sekretæren for lønnsutvalget foretar lønnsplasseringer i henhold til lønnsavtalen, arbeidsgivers forventninger til stillingen og den ansattes kvalifikasjoner. Dette er en tidkrevende prosess, og det er derfor vanlig praksis å foreta lønnsplasseringen etter ansettelsen. Dette kan oppleves som ugunstig for ansatte, og vi har derfor utviklet et verktøy som kan beregne en sannsynlig lønnsplassering. Ved å bruke dette verktøyet får du beregnet kompetansepoeng, ansiennitet og plassering i statens lønnstabell.
+        Alle ansettelser i Frikirken følger lønnsavtalen vedtatt av synodestyret (<a href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>).
+        Sekretæren for lønnsutvalget foretar lønnsplasseringer i henhold til lønnsavtalen, arbeidsgivers forventninger til stillingen og den ansattes kvalifikasjoner.
+        Dette er en tidkrevende prosess, og det er derfor vanlig praksis å foreta lønnsplasseringen etter ansettelsen.
+        Dette kan oppleves som ugunstig for ansatte, og vi har derfor utviklet et verktøy som kan beregne en sannsynlig lønnsplassering.
+        Ved å bruke dette verktøyet får du
+        <li>beregnet kompetansepoeng, ansiennitet og plassering i statens lønnstabell</li>
+        <li>se en tidslinje over din kompetanse og ansiennitet</li>
+        <li>se en tidslinje over maskinberegnet kompetanse og ansiennitet etter regler fra lønnsavtalen</li>
+        <li>få en ferdig utfylt og med beregnet lønnsplassering i form av et Excel vedlegg på e-post</li>
         <h3>Begrensninger i verktøyet</h3>
         Verktøyet tar ikke hensyn til arbeidsgivers forventninger og vurderinger av relevant kompetanse og ansiennitet for stillingen. Dette skaper usikkerhet i plasseringen. Plasseringen verktøyet gir er derfor ikke endelig og kan ikke brukes som argumentasjon dersom lønnsplasseringen ikke samsvarer med den ansattes forventninger. Det kan forekomme avvik på 1-2 lønnstrinn, både opp og ned.
         <h3>Håndtering av dine data</h3>
