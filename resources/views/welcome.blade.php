@@ -20,7 +20,7 @@
             <a href="{{ route('enter-employment-information', ['createNew' => true]) }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse ved å trykke på knappen øverst på denne siden') halt" class="btn btn-lg btn-secondary my-2">Start med et tomt skjema</a>
         </div>
     @else
-        <a href="{{ route('enter-employment-information', ['createNew' => true]) }}" class="btn btn-lg btn-success">Start her for å beregne lønnsplassering</a>
+        <a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}" class="btn btn-lg btn-success @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start her for å beregne lønnsplassering</a>
     @endif
 
     <div class="mb-5"></div>
@@ -28,14 +28,14 @@
     <div class="callout callout-secondary">
         <h3 style="margin-top:0!important;">Har allerede et tidligere utfylt lønnsplasseringsskjema?</h3>
         Hvis du har et lønnsskjema i samme format som du finner på Frikirkens websider kan du laste det opp slik at du kan arbeide videre med det og gjøre en beregning av lønnsplasseringen din. Vi lagrer ikke dokumentet og bare stilling, fødselsdato, tiltredelsesdato, kompetanse og ansiennitet blir benyttet.
-        <form action="{{ route('loadExcel') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="my-3">
                 <label for="excelFile" class="form-label">Last opp et allerede fylt ut Frikirkens lønnsskjema (Excel fil)</label>
                 <input type="file" name="excel_file" id="excelFile" required class="form-control">
             </div>
             <div class="text-md-end text-center pb-1">
-                <button type="submit" class="btn btn-lg btn-primary">Last inn og fortsett utfylling</button>
+                <button type="submit" class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Last inn og fortsett utfylling</button>
             </div>
         </form>
     </div>
