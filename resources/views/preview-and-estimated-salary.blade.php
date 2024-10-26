@@ -85,7 +85,7 @@
                 <tbody>
                     @foreach ($tableData as $item)
                         <tr>
-                            <td>{{ $item['title'] }}</td>
+                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
                             @foreach ($timeline as $month)
                                 @php
                                     $itemStart = strtotime($item['start_date']);
@@ -156,7 +156,7 @@
                 <tbody>
                     @foreach ($tableData_adjusted as $item)
                         <tr>
-                            <td>{{ $item['title'] }}</td>
+                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
                             @foreach ($timeline_adjusted as $month)
                                 @php
                                     $itemStart = strtotime($item['start_date']);

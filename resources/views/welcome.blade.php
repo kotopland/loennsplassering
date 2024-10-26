@@ -35,7 +35,13 @@
                 <input type="file" name="excel_file" id="excelFile" required class="form-control">
             </div>
             <div class="text-md-end text-center pb-1">
-                <button type="submit" class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Last inn og fortsett utfylling</button>
+                <button type="submit" class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
+                    @if (session('applicationId'))
+                        Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
+                    @else
+                        Last inn og fortsett utfylling
+                    @endif
+                </button>
             </div>
         </form>
     </div>

@@ -77,7 +77,7 @@
                                                                 {{ $points }}
                                                             </option>
                                                         @endforeach
-                                                        <option value="bestått" @if (old('study_points', $item['study_points']) === 'bestått') selected @endif>
+                                                        <option value="bestått" @if (old('study_points', strtolower($item['study_points'])) === 'bestått') selected @endif>
                                                             Bestått
                                                         </option>
                                                     </select>
@@ -110,7 +110,11 @@
                                                         <input type="checkbox" id="relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
                                                         <label for="relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
                                                     </div>
-                                                    <input type="submit" id="btn-update" name="submit" value="Oppdater utdanning" class="btn btn-sm btn-primary @if (null === old('topic_and_school', $item['topic_and_school'])) disabled @endif">
+                                                </div>
+
+                                                <div class="col-12 d-flex flex-wrap align-items-center">
+                                                    <input type="submit" id="btn-update" name="submit" value="Oppdater utdanning" class="btn btn-success me-2 @if (null === old('topic_and_school', $item['topic_and_school'])) disabled @endif">
+                                                    <a href="{{ route('enter-education-information') }}" class="btn btn-sm btn-outline-secondary">Tilbake</a>
                                                 </div>
 
                                             </div>
@@ -136,7 +140,7 @@
                                             @endif
                                         </a>
                                     </td>
-                                    <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #topic_and_school to the innerText of #topic_and_school-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
+                                    {{-- <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #topic_and_school to the innerText of #topic_and_school-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td> --}}
                                     <td><a class="btn btn-sm btn-outline-danger" href="{{ route('destroy-education-information', ['id' => $id]) }}"">Slett linje</a></td>
                                 </tr>
                             @endif
@@ -218,7 +222,7 @@
         </div>
     </div>
 
-    <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
+    <div class="text-md-end text-center pb-1">
         <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">
             Forrige: Informasjon om stillingen
         </a>
@@ -226,7 +230,7 @@
             <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-success disabled" id="btn-next">
                 Neste: Din ansiennitet
             </a><br />
-            Vennligst oppdater felt med mangler
+            <span class="badge text-bg-danger">Du må oppdatere felt med mangler før du kan gå videre</span>
         @else
             <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-success" id="btn-next">
                 Neste: Din ansiennitet

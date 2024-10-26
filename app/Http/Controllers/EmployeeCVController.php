@@ -34,6 +34,9 @@ class EmployeeCVController extends Controller
     {
         $validatedData = $request->validate([
             'email_address' => 'email|required',
+        ], [
+            'email_address.email' => 'E-postadressen må være en gyldig e-postadresse.',
+            'email_address.required' => 'E-postadressefeltet er obligatorisk.',
         ]);
 
         $subject = 'Lenke til foreløpig lønnsberegning';
@@ -78,6 +81,10 @@ class EmployeeCVController extends Controller
         $request->validate([
             'job_title' => 'required',
             'birth_date' => 'required|date',
+        ], [
+            'job_title.required' => 'Stillingstittelfeltet er obligatorisk.',
+            'birth_date.required' => 'Fødselsdato er obligatorisk.',
+            'birth_date.date' => 'Fødselsdato må være en gyldig dato.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
         $application->job_title = $request->job_title;
@@ -127,22 +134,21 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required', // Changed to numeric and in
-                'highereducation' => 'string|sometimes|nullable|in:bachelor,master', // Added in validation
-                'relevance' => 'in:true,false|nullable', // Removed required
+                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required',
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
+                'relevance' => 'in:true,false|nullable',
             ],
             [
                 'topic_and_school.required' => 'Vennligst fyll inn navnet på studiet og skolen.',
-                'topic_and_school.string' => 'Navnet på studiet må være tekst.',
+                'topic_and_school.string' => 'Navnet på studiet og skolen må være tekst.',
                 'start_date.required' => 'Vennligst velg en startdato.',
-                'start_date.date' => 'Ugyldig dato format.',
+                'start_date.date' => 'Startdato må være en gyldig dato.',
                 'end_date.required' => 'Vennligst velg en sluttdato.',
-                'end_date.date' => 'Ugyldig dato format.',
+                'end_date.date' => 'Sluttdato må være en gyldig dato.',
                 'study_points.required' => 'Vennligst velg antall studiepoeng.',
-                'study_points.numeric' => 'Studiepoeng må være et tall.',
-                'study_points.in' => 'Ugyldig antall studiepoeng.',
-                'highereducation.in' => 'Ugyldig type studie.',
-                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+                'study_points.in' => 'Ugyldig antall studiepoeng. Velg et av de tilgjengelige alternativene.',
+                'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
+                'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
         );
 
@@ -181,23 +187,23 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required', // Changed to numeric and in
-                'highereducation' => 'string|sometimes|nullable|in:bachelor,master', // Added in validation
-                'relevance' => 'in:true,false|nullable', // Removed required
+                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required',
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
+                'relevance' => 'in:true,false|nullable',
             ],
             [
-                'edit.required' => 'Mangler id',
+                'edit.required' => 'ID mangler.', // Litt mer presis
+                'edit.numeric' => 'ID må være et tall.', // Ny valideringsmelding
                 'topic_and_school.required' => 'Vennligst fyll inn navnet på studiet og skolen.',
-                'topic_and_school.string' => 'Navnet på studiet må være tekst.',
+                'topic_and_school.string' => 'Navnet på studiet og skolen må være tekst.',
                 'start_date.required' => 'Vennligst velg en startdato.',
-                'start_date.date' => 'Ugyldig dato format.',
+                'start_date.date' => 'Startdato må være en gyldig dato.',
                 'end_date.required' => 'Vennligst velg en sluttdato.',
-                'end_date.date' => 'Ugyldig dato format.',
+                'end_date.date' => 'Sluttdato må være en gyldig dato.',
                 'study_points.required' => 'Vennligst velg antall studiepoeng.',
-                'study_points.numeric' => 'Studiepoeng må være et tall.',
-                'study_points.in' => 'Ugyldig antall studiepoeng.',
-                'highereducation.in' => 'Ugyldig type studie.',
-                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
+                'study_points.in' => 'Ugyldig antall studiepoeng. Velg et av de tilgjengelige alternativene.',
+                'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
+                'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
         );
 
@@ -272,17 +278,19 @@ class EmployeeCVController extends Controller
             'end_date' => 'date|required',
             'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
             'relevance' => 'in:true,false|nullable',
-        ],
-            [
-                'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
-                'title_workplace.string' => 'Navnet må være tekst.',
-                'start_date.required' => 'Vennligst velg en startdato.',
-                'start_date.date' => 'Ugyldig dato format.',
-                'end_date.required' => 'Vennligst velg en sluttdato.',
-                'end_date.date' => 'Ugyldig dato format.',
-                'workplace_type.in' => 'Ugyldig type type arbeidssted.',
-                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
-            ]);
+        ], [
+            'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
+            'title_workplace.string' => 'Tittel og arbeidssted må være tekst.',
+            'work_percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
+            'work_percentage.numeric' => 'Arbeidsprosent må være et tall.',
+            'work_percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
+            'start_date.required' => 'Vennligst velg en startdato.',
+            'start_date.date' => 'Startdato må være en gyldig dato.',
+            'end_date.required' => 'Vennligst velg en sluttdato.',
+            'end_date.date' => 'Sluttdato må være en gyldig dato.',
+            'workplace_type.in' => 'Ugyldig type arbeidssted. Velg et av de tilgjengelige alternativene.',
+            'relevance.in' => 'Ugyldig verdi for relevans.',
+        ]);
         $application = EmployeeCV::find(session('applicationId'));
         $relevance = $validatedData['relevance'] ?? 0;
         $work_experience = $application->work_experience ?? [];
@@ -310,18 +318,21 @@ class EmployeeCVController extends Controller
             'end_date' => 'date|required',
             'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
             'relevance' => 'in:true,false|nullable',
-        ],
-            [
-                'edit.required' => 'Mangler id',
-                'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
-                'title_workplace.string' => 'Navnet må være tekst.',
-                'start_date.required' => 'Vennligst velg en startdato.',
-                'start_date.date' => 'Ugyldig dato format.',
-                'end_date.required' => 'Vennligst velg en sluttdato.',
-                'end_date.date' => 'Ugyldig dato format.',
-                'workplace_type.in' => 'Ugyldig type type arbeidssted.',
-                'relevance.boolean' => 'Relevanse må være avkrysset eller ikke avkrysset.',
-            ]);
+        ], [
+            'edit.required' => 'ID mangler.',
+            'edit.numeric' => 'ID må være et tall.',
+            'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
+            'title_workplace.string' => 'Tittel og arbeidssted må være tekst.',
+            'work_percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
+            'work_percentage.numeric' => 'Arbeidsprosent må være et tall.',
+            'work_percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
+            'start_date.required' => 'Vennligst velg en startdato.',
+            'start_date.date' => 'Startdato må være en gyldig dato.',
+            'end_date.required' => 'Vennligst velg en sluttdato.',
+            'end_date.date' => 'Sluttdato må være en gyldig dato.',
+            'workplace_type.in' => 'Ugyldig type arbeidssted. Velg et av de tilgjengelige alternativene.',
+            'relevance.in' => 'Ugyldig verdi for relevans.',
+        ]);
 
         $application = EmployeeCV::find(session('applicationId'));
         $relevance = $validatedData['relevance'] ?? 0;
@@ -392,6 +403,10 @@ class EmployeeCVController extends Controller
         // Validate that an Excel file is provided
         $request->validate([
             'excel_file' => 'required|file|mimes:xlsx,xls,csv',
+        ], [
+            'excel_file.required' => 'Du må velge en fil.',
+            'excel_file.file' => 'Den opplastede filen må være en fil.', // Dette er litt redundant, men kan være nyttig
+            'excel_file.mimes' => 'Filen må være en Excel-fil (xlsx, xls) eller en CSV-fil (csv).',
         ]);
 
         try {
@@ -405,9 +420,9 @@ class EmployeeCVController extends Controller
             $application = EmployeeCV::create();
             session(['applicationId' => $application->id]);
 
-            $application->birth_date = Date::excelToDateTimeObject($data[6][4])->format('Y-m-d');
+            $application->birth_date = $this->isValidExcelDate($data[6][4]) ? Date::excelToDateTimeObject($data[6][4])->format('Y-m-d') : '';
             $application->job_title = $data[7][4];
-            $application->work_start_date = Date::excelToDateTimeObject($data[8][4])->format('Y-m-d');
+            $application->work_start_date = $this->isValidExcelDate($data[8][4]) ? Date::excelToDateTimeObject($data[8][4])->format('Y-m-d') : '';
 
             $education = [];
             $work_experience = [];
@@ -418,15 +433,19 @@ class EmployeeCVController extends Controller
                         if (strtolower($column[20]) == 'bestått') {
                             $studyPercentage = '100';
                         } else {
-                            $studyPercentage = SalaryEstimationService::calculateStudyPercentage(Date::excelToDateTimeObject($column[18])->format('Y-m-d'), Date::excelToDateTimeObject($column[19])->format('Y-m-d'), intval($column[20]));
+                            if ($this->isValidExcelDate($column[18]) && $this->isValidExcelDate($column[19]) && is_numeric($column[20])) {
+                                $studyPercentage = SalaryEstimationService::calculateStudyPercentage(Date::excelToDateTimeObject($column[18])->format('Y-m-d'), Date::excelToDateTimeObject($column[19])->format('Y-m-d'), intval($column[20]));
+                            } else {
+                                $studyPercentage = '';
+                            }
                         }
-                        $education[] = ['topic_and_school' => $column[1], 'start_date' => Date::excelToDateTimeObject($column[18])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[19])->format('Y-m-d'), 'study_points' => $column[20], 'study_percentage' => $studyPercentage];
+                        $education[] = ['topic_and_school' => $column[1], 'start_date' => $this->isValidExcelDate($column[18]) ? Date::excelToDateTimeObject($column[18])->format('Y-m-d') : '', 'end_date' => $this->isValidExcelDate($column[19]) ? Date::excelToDateTimeObject($column[19])->format('Y-m-d') : '', 'study_points' => $column[20], 'study_percentage' => $studyPercentage];
                     }
                 }
 
                 if ($row >= 27 && $row <= 41) {
                     if (! empty(trim($column[1]))) {
-                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '', 'start_date' => Date::excelToDateTimeObject($column[16])->format('Y-m-d'), 'end_date' => Date::excelToDateTimeObject($column[17])->format('Y-m-d')];
+                        $work_experience[] = ['title_workplace' => $column[1], 'work_percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '', 'start_date' => $this->isValidExcelDate($column[16]) ? Date::excelToDateTimeObject($column[16])->format('Y-m-d') : '', 'end_date' => $this->isValidExcelDate($column[17]) ? Date::excelToDateTimeObject($column[17])->format('Y-m-d') : ''];
                     }
                 }
             }
@@ -502,6 +521,9 @@ class EmployeeCVController extends Controller
 
         request()->validate([
             'email' => 'email|required',
+        ], [
+            'email.required' => 'E-postadressefeltet er obligatorisk.',
+            'email.email' => 'E-postadressen må være en gyldig e-postadresse.',
         ]);
 
         // Get the user's email from the request
@@ -519,5 +541,10 @@ class EmployeeCVController extends Controller
 
         return redirect()->back();
 
+    }
+
+    private function isValidExcelDate($dateString)
+    {
+        return is_numeric($dateString);
     }
 }

@@ -111,9 +111,11 @@
                                                                 Særdeles høy relevanse for stillingen du skal inn i?
                                                             </label>
                                                         </div>
-
+                                                    </div>
+                                                    <div class="row p-2">
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="submit" id="btn-submit" name="submit" value="Registrer erfaring" class="btn btn-sm btn-primary @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif">
+                                                            <input type="submit" id="btn-submit" name="submit" value="Oppdater erfaring" class="btn btn-success me-2 @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif">
+                                                            <a href="{{ route('enter-experience-information') }}" class="btn btn-sm btn-outline-secondary">Tilbake</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -123,7 +125,7 @@
                                 @endif
 
                                 <tr>
-                                    <th id="title_workplace-{{ $id }}" scope="row">{{ $item['title_workplace'] }}</th>
+                                    <th id="title_workplace-{{ $id }}" scope="row">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
                                     <td id="work_percentage-{{ $id }}">{{ $item['work_percentage'] }}{{ is_numeric($item['work_percentage']) ? '%' : '' }}</td>
                                     <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
@@ -137,7 +139,7 @@
                                             @endif
                                         </a>
                                     </td>
-                                    <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then {{-- set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then --}} set the value of #work_percentage to the innerText of #work_percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then {{-- set the value of #study_points to the innerText of #study_points-{{ $id }} then --}} {{-- set the value of #study_percentage to the innerText of #study_percentage-{{ $id }} then --}} {{-- set the value of #relevance to the innerText of #relevance-{{ $id }} then --}} add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td>
+                                    {{-- <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #work_percentage to the innerText of #work_percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td> --}}
                                     <td><a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
                                 </tr>
                             @endforeach
@@ -222,7 +224,7 @@
         <h4>Kurs, verv og frivillig arbeid, relevant for stillingen. </h4>
         <p>Denne kalkulatoren kan ikke beregne frivillig arbeid automatsik. Normalt sett gies det bare ansiennitet eller kompetansetillegg i særtilfeller der det er brukt mye tid utover normal menighets- og organisasjonsliv. Er du eldste eller har vært kan du skrives det som en 25% stilling.</p>
     </div>
-    <div class="fixed-bottom sticky-top text-md-end text-center pb-1">
+    <div class="text-md-end text-center pb-1">
         <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary my-2">
             Forrige side
         </a>
@@ -230,7 +232,7 @@
             <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2 disabled" id="btn-next">
                 Neste: Estimering
             </a><br />
-            Vennligst oppdater felt med mangler
+            <span class="badge text-bg-danger">Du må oppdatere felt med mangler før du kan gå videre</span>
         @else
             <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2" id="btn-next">
                 Neste: Estimering
