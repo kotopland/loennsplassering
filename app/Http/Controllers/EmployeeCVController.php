@@ -250,7 +250,6 @@ class EmployeeCVController extends Controller
             if (in_array(null, [
                 @$item['title_workplace'],
                 @$item['work_percentage'],
-                @$item['work_percentage'],
                 @$item['start_date'],
                 @$item['end_date'],
                 @$item['relevance'],
@@ -365,7 +364,6 @@ class EmployeeCVController extends Controller
 
         $timelineData = $salaryEstimationService->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
         $timelineData_adjusted = $salaryEstimationService->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
-
         $workStartDate = Carbon::parse($application->work_start_date);
         $calculatedTotalWorkExperienceMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
 

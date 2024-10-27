@@ -30,7 +30,7 @@ class SalaryEstimationService
     public function adjustEducationAndWork($application)
     {
 
-        $birthDate = Carbon::parse($application->birth_date);
+        $dateAge18 = Carbon::parse($application->birth_date)->addYears(18);
 
         $adjustedEducation = [];
         $adjustedWorkExperience = $application->work_experience ?? [];
@@ -39,19 +39,22 @@ class SalaryEstimationService
         // Process education
         foreach ($application->education ?? [] as $education) {
             $eduStartDate = Carbon::parse($education['start_date']);
+            $eduEndDate = Carbon::parse($education['end_date']);
 
-            // Skip if employee was under 18
-            if ($birthDate->diffInYears($eduStartDate) < 18) {
-
+            // If both start and end dates are before birthDate, skip it.
+            if ($eduEndDate->lessThan($dateAge18)) {
                 continue;
             }
 
-            // Transfer to work if overlapping employment start
-            // if ($eduEndDate->greaterThan($workStartDate)) {
-            //     $adjustedWorkExperience[] = $this->convertEducationToWork($education);
+            // If start date is before birthDate and end date is after, adjust start date.
+            if ($eduStartDate->lessThan($dateAge18) && $eduEndDate->greaterThanOrEqualTo($dateAge18)) {
+                $education['start_date'] = $dateAge18->toDateString();
+            }
 
-            //     continue;
-            // }
+            // Skip if employee was under 18 at adjusted start date.
+            if ($dateAge18->diffInYears(Carbon::parse($education['start_date'])) < 0) {
+                continue;
+            }
 
             $competencePoint = $this->calculateCompetencePoints($education);
             $competencePoints += $competencePoint;
@@ -61,6 +64,33 @@ class SalaryEstimationService
             $adjustedEducation[] = $education;
         }
 
+        // Process work_experience
+        foreach ($application->work_experience ?? [] as $id => $work) {
+            $workStartDate = Carbon::parse($work['start_date']);
+            $workEndDate = Carbon::parse($work['end_date']);
+
+            // If both start and end dates are before birthDate, skip it.
+            if ($workEndDate->lessThan($dateAge18)) {
+                continue;
+            }
+
+            // If start date is before birthDate and end date is after, adjust start date.
+            if ($workStartDate->lessThan($dateAge18) && $workEndDate->greaterThanOrEqualTo($dateAge18)) {
+                $this->removeDuplicates($adjustedWorkExperience);
+
+                // $work['start_date'] = $dateAge18->addMonth()->toDateString();
+                $adjustedWorkExperience[$id]['start_date'] = $dateAge18->addMonth()->toDateString();
+
+                continue;
+            }
+
+            // Skip if employee was under 18 at adjusted start date.
+            if ($dateAge18->diffInYears(Carbon::parse($work['start_date'])) < 0) {
+                continue;
+            }
+
+            // $adjustedWorkExperience[] = $work;
+        }
         $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         // Cap competence points at 7
@@ -199,15 +229,23 @@ class SalaryEstimationService
         foreach ($workExperience ?? [] as $work) {
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
-            $currentStart = $workStart;  // Track the current start date.
+            $currentStart = $workStart;
+
+            // Adjust work_percentage for "freechurch" type after May 1, 2014.
+            if ($work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
+                $work['work_percentage'] = 100;
+            }
 
             foreach ($education ?? [] as $edu) {
                 $eduStart = Carbon::parse($edu['start_date']);
                 $eduEnd = Carbon::parse($edu['end_date']);
 
-                // If the work period overlaps with the education period, split it.
-                if ($this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
-                    // Create a segment before the education starts (if applicable).
+                // Check if the work overlaps with education and meets the special conditions.
+                $overlapAllowed = in_array($work['workplace_type'], ['freechurch', 'other_christian']) &&
+                                  $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01'));
+
+                if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
+                    // Create a segment before the education starts.
                     if ($currentStart->lessThan($eduStart)) {
                         $adjustedWork[] = array_merge($work, [
                             'start_date' => $currentStart->toDateString(),
@@ -215,12 +253,12 @@ class SalaryEstimationService
                         ]);
                     }
 
-                    // Update the current start date to the day after this education ends.
+                    // Update the current start date to the day after education ends.
                     $currentStart = $eduEnd->addDay();
                 }
             }
 
-            // Add the remaining part of the work period (if any).
+            // Add the remaining part of the work period.
             if ($currentStart->lessThanOrEqualTo($workEnd)) {
                 $adjustedWork[] = array_merge($work, [
                     'start_date' => $currentStart->toDateString(),
