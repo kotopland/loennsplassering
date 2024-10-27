@@ -9,22 +9,20 @@ class SalaryEstimationService
 {
     public function checkForSavedApplication($application)
     {
-        if (is_null($application->id)) {
-            if (! session('applicationId') && ! request()->filled('applicationId')) {
-                $application = EmployeeCV::create();
-                session(['applicationId' => $application->id]);
-
-                return redirect()->route('enter-employment-information', $application->id);
-            } else {
-                if (session('applicationId')) {
-                    $application = EmployeeCV::find(session('applicationId'));
-                } else {
-                    $application = EmployeeCV::find(request()->applicationId);
-                }
-
-                return redirect()->route('enter-employment-information', $application->id);
-            }
+        if ($application->id) {
+            return $application;
         }
+
+        $applicationId = session('applicationId') ?? request('applicationId');
+
+        if ($applicationId) {
+            return EmployeeCV::find($applicationId);
+        }
+
+        $newApplication = EmployeeCV::create();
+        session(['applicationId' => $newApplication->id]);
+
+        return $newApplication;
     }
 
     // ## CHATGPT START

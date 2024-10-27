@@ -61,8 +61,7 @@ class EmployeeCVController extends Controller
             session()->forget('applicationId');
         }
 
-        $salaryEstimationService->checkForSavedApplication($application);
-
+        $application = $salaryEstimationService->checkForSavedApplication($application);
         $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
         $application->work_start_date = $application->work_start_date ?? '2024-11-02';
         $application->birth_date = $application->birth_date ?? '1990-10-02';
@@ -102,9 +101,7 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $salaryEstimationService->checkForSavedApplication($application);
-
-        $application = EmployeeCV::find(session('applicationId'));
+        $application = $salaryEstimationService->checkForSavedApplication($application);
 
         $hasErrors = false; // Initialize the flag to false
 
@@ -134,7 +131,7 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required',
+                'study_points' => 'string|in:bestått,5,10,20,30,60,120,180,240,300,0|required',
                 'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
                 'relevance' => 'in:true,false|nullable',
             ],
@@ -187,7 +184,7 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,10,20,30,60,120,180,240,300,0|required',
+                'study_points' => 'string|in:bestått,5,10,20,30,60,120,180,240,300,0|required',
                 'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
                 'relevance' => 'in:true,false|nullable',
             ],
@@ -245,9 +242,7 @@ class EmployeeCVController extends Controller
 
             return redirect()->route('welcome');
         }
-        $salaryEstimationService->checkForSavedApplication($application);
-
-        $application = EmployeeCV::find(session('applicationId'));
+        $application = $salaryEstimationService->checkForSavedApplication($application);
 
         $hasErrors = false; // Initialize the flag to false
 
@@ -364,9 +359,7 @@ class EmployeeCVController extends Controller
             return redirect()->route('welcome');
         }
 
-        $salaryEstimationService->checkForSavedApplication($application);
-
-        $application = EmployeeCV::find(session('applicationId'));
+        $application = $salaryEstimationService->checkForSavedApplication($application);
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
 
@@ -419,7 +412,6 @@ class EmployeeCVController extends Controller
             // Log::info($data);
             $application = EmployeeCV::create();
             session(['applicationId' => $application->id]);
-
             $application->birth_date = $this->isValidExcelDate($data[6][4]) ? Date::excelToDateTimeObject($data[6][4])->format('Y-m-d') : '';
             $application->job_title = $data[7][4];
             $application->work_start_date = $this->isValidExcelDate($data[8][4]) ? Date::excelToDateTimeObject($data[8][4])->format('Y-m-d') : '';

@@ -72,14 +72,14 @@
                                                     <label for="study_points" class="form-check-label">Studiepoeng</label>
                                                     <select id="study_points" name="study_points" class="form-select @error('study_points') is-invalid @enderror" style="max-width: 100px">
                                                         <option value="">Velg</option>
-                                                        @foreach ([10, 20, 30, 60, 120, 180, 240, 300, 360, 420] as $points)
+                                                        <option value="bestått" @if (old('study_points', strtolower($item['study_points'])) === 'bestått') selected @endif>
+                                                            Bestått
+                                                        </option>
+                                                        @foreach ([5, 10, 20, 30, 60, 120, 180, 240, 300, 360, 420] as $points)
                                                             <option value="{{ $points }}" @if (old('study_points', $item['study_points']) == $points) selected @endif>
                                                                 {{ $points }}
                                                             </option>
                                                         @endforeach
-                                                        <option value="bestått" @if (old('study_points', strtolower($item['study_points'])) === 'bestått') selected @endif>
-                                                            Bestått
-                                                        </option>
                                                     </select>
                                                     @error('study_points')
                                                         <div class="alert alert-danger">{{ $message }}</div>
