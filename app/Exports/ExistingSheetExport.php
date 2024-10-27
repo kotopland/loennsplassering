@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExistingSheetExport
@@ -40,6 +41,7 @@ class ExistingSheetExport
             }
 
             $sheet->setCellValue($cell, $value);
+            // $sheet->getStyle('A2')->getFont()->getColor()->setARGB(Color::COLOR_BLUE);
         }
 
         // Save the modified spreadsheet

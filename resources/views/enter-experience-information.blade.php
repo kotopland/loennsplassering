@@ -59,7 +59,7 @@
                                                                 <!-- Start Date -->
                                                                 <div class="col-6 col-md-auto">
                                                                     <label for="start_date" class="form-check-label">Ansatt fra:</label>
-                                                                    <input type="date" id="start_date" name="start_date" min="2000-01-01" max="{{ date('Y-m-d') }}" value="{{ old('start_date', $item['start_date']) }}" class="form-control @error('start_date') is-invalid @enderror">
+                                                                    <input type="date" id="start_date" name="start_date" min="1950-01-01" max="{{ date('Y-m-d') }}" value="{{ old('start_date', $item['start_date']) }}" class="form-control @error('start_date') is-invalid @enderror">
                                                                     @error('start_date')
                                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                                     @enderror
@@ -68,7 +68,7 @@
                                                                 <!-- End Date -->
                                                                 <div class="col-6 col-md-auto">
                                                                     <label for="end_date" class="form-check-label">Ansatt til:</label>
-                                                                    <input type="date" id="end_date" name="end_date" min="2000-01-01" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock">
+                                                                    <input type="date" id="end_date" name="end_date" min="1950-01-01" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock">
                                                                     <div id="endDateHelpBlock" class="form-text">
                                                                         (Er du fortsatt i stillingen, skriv dato for tiltredelse i ny stilling)
                                                                     </div>
@@ -106,7 +106,7 @@
                                                     <!-- Relevance Checkbox and Submit Button -->
                                                     <div class="row p-2">
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="checkbox" id="relevance" name="relevance" value="true" class="form-check-input" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif>
+                                                            <input type="checkbox" id="relevance" name="relevance" value="true" class="form-check-input" @if (old('relevance', $item['relevance'] ?? '') == 'true') checked @endif>
                                                             <label for="relevance" class="form-check-label">
                                                                 Særdeles høy relevanse for stillingen du skal inn i?
                                                             </label>

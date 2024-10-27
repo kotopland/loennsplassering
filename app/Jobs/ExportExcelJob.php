@@ -6,13 +6,13 @@ use App\Exports\ExistingSheetExport;
 use App\Mail\SimpleEmail;
 use App\Models\EmployeeCV;
 use App\Services\SalaryEstimationService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -20,14 +20,14 @@ class ExportExcelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $applicationId;
+    private string $applicationId;
 
-    public $email;
+    private string $email;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($applicationId, $email)
+    public function __construct(string $applicationId, string $email)
     {
         $this->applicationId = $applicationId;
         $this->email = $email;
@@ -36,71 +36,98 @@ class ExportExcelJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(SalaryEstimationService $salaryEstimationService)
+    public function handle(SalaryEstimationService $salaryEstimationService): void
     {
         try {
-            // Log the start of the process
             Log::info("Starting Excel generation for Application ID: {$this->applicationId}");
 
-            // Fetch the application and process the data
-
-            $application = EmployeeCV::find($this->applicationId);
-            if (! $application) {
-                throw new Exception("Application not found for ID: {$this->applicationId}");
-            }
-
+            $application = $this->fetchApplication();
             $application = $salaryEstimationService->adjustEducationAndWork($application);
-            Log::info("Application data adjusted successfully for ID: {$this->applicationId}");
-            // Calculate total work experience in months
-            $calculatedTotalWorkExperienceMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
-            Log::info("Total work experience calculated for ID: {$this->applicationId}");
+            $totalMonths = $this->calculateTotalWorkExperienceMonths($application);
+            $data = $this->prepareExcelData($application, $totalMonths);
 
-            Log::info("Excel data prepared for Application ID: {$this->applicationId}");
+            $this->generateAndSendExcel($data, $application);
 
-            // Prepare data for Excel
-            $data = $this->prepareExcelData($application, $calculatedTotalWorkExperienceMonths);
-            if (is_null($data)) {
-                Log::error("Too much data and the excel file could not be generated. Application ID: {$this->applicationId}");
-            }
-            // Create the Excel file and save it
-            $originalFilePath = '14lonnsskjema.xlsx';
-            $modifiedFilePath = 'modified_14lonnsskjema.xlsx';
-            $export = new ExistingSheetExport($data, $originalFilePath);
-
-            $export->modifyAndSave($modifiedFilePath);
-            Log::info("Excel file saved successfully for Application ID: {$this->applicationId}");
-
-            Log::info('Trying to send the email');
-            $subject = 'Foreløpig beregning av din lønnsplassering';
-            $body = 'Denne eposten ble generert på nettstedet '.config('app.name');
-            $body .= (! is_null($data)) ? 'Vedlagt ligger en maskinberegnet lønnsplassering (Med sannysnligheter for feil).' : 'Det ble generert altfor mange linjer og det ble ikke plass i Excel skjemaet. Bruk derfor nettsiden til å se din beregning.';
-            $body .= 'Du kan se og endre ditt skjema ved å trykke på denne linken: <a href="'.route('open-application', $this->applicationId).'">'.route('open-application', $this->applicationId).'</a>. Skjemaer slettes ett år etter at det er blitt åpnet.';
-            Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
-
-            // Send the email with the Excel file as an attachment
-            // Mail::to($this->email)->send(new ExcelGeneratedMail($modifiedFilePath));
             Log::info("Email sent successfully to {$this->email} for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
-            // Log the error message and stack trace
             Log::error("Error processing Application ID: {$this->applicationId} - ".$e->getMessage(), [
                 'stack' => $e->getTraceAsString(),
             ]);
-            // Optionally, rethrow the exception to mark the job as failed
             throw $e;
         }
     }
 
     /**
+     * Fetch the application by ID.
+     */
+    private function fetchApplication(): EmployeeCV
+    {
+        $application = EmployeeCV::find($this->applicationId);
+
+        if (! $application) {
+            throw new Exception("Application not found for ID: {$this->applicationId}");
+        }
+
+        Log::info("Application fetched successfully for ID: {$this->applicationId}");
+
+        return $application;
+    }
+
+    /**
+     * Calculate total work experience in months.
+     */
+    private function calculateTotalWorkExperienceMonths(EmployeeCV $application): int
+    {
+        $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
+        Log::info("Total work experience calculated for ID: {$this->applicationId}: {$totalMonths}");
+
+        return $totalMonths;
+    }
+
+    /**
+     * Generate the Excel file and send it via email.
+     */
+    private function generateAndSendExcel(?array $data, EmployeeCV $application): void
+    {
+        $originalFilePath = $data['filepaths']['originalFilePath'];
+        $modifiedFilePath = $data['filepaths']['modifiedFilePath'];
+
+        $export = new ExistingSheetExport($data['data'], $originalFilePath);
+        $export->modifyAndSave($modifiedFilePath);
+
+        Log::info("Excel file saved successfully for Application ID: {$this->applicationId}");
+
+        $subject = 'Foreløpig beregning av din lønnsplassering';
+        $body = $this->generateEmailBody($data['data'], $application);
+        Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
+    }
+
+    /**
+     * Generate the email body.
+     */
+    private function generateEmailBody(?array $data, EmployeeCV $application): string
+    {
+        $body = 'Denne eposten ble generert på nettstedet '.config('app.name');
+        $body .= $data
+            ? ' Vedlagt ligger en maskinberegnet lønnsplassering (Med sannsynligheter for feil).'
+            : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke genereres. Se nettsiden for beregning.';
+        $body .= ' Du kan se og endre ditt skjema ved å trykke på denne linken: <a href="'.
+                 route('open-application', $this->applicationId).'">'.
+                 route('open-application', $this->applicationId).'</a>.';
+        $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
+
+        return $body;
+    }
+
+    /**
      * Prepare the data for Excel export.
      */
-    private function prepareExcelData($application, $calculatedTotalWorkExperienceMonths)
+    private function prepareExcelData(EmployeeCV $application, int $totalMonths): ?array
     {
-
         $data = [
             ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
             ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
             ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
-            // ['row' => 9, 'column' => 'R', 'value' => $application->work_start_date, 'datatype' => 'date'],
         ];
 
         $row = 15;
@@ -137,15 +164,19 @@ class ExportExcelJob implements ShouldQueue
 
             $row++;
         }
-        if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
+        $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
+        if (count($application->education) <= 11 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 15) {
             // short education / experience lines
             $row = 28;
-        } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
+            $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
+        } elseif (count($application->education) > 11 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 15) {
             // long education / experience lines
             $row = 39;
-        } elseif (count($application->education_adjusted) > 21 || count($application->work_experience) > 29) {
+            $modifiedFilePath = 'modified_14lonnsskjema-expanded.xlsx'; // New modified file path
+        } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
             return null;
         }
+
         foreach ($application->work_experience ?? [] as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
@@ -169,17 +200,17 @@ class ExportExcelJob implements ShouldQueue
 
         $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
-        if (count($application->education_adjusted) <= 11 && count($application->work_experience) <= 15) {
+        if (count($application->education) <= 11 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 15) {
             // short education / experience lines
             $row = 62;
-        } elseif (count($application->education_adjusted) > 11 || count($application->work_experience) > 15) {
+        } elseif (count($application->education) > 11 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 15) {
             // long education / experience lines
             $row = 88;
         }
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
-            SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
+            SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $totalMonths),
             Carbon::now())
         );
 
@@ -191,6 +222,8 @@ class ExportExcelJob implements ShouldQueue
         $data[] = ['row' => $row + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
         $data[] = ['row' => $row + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
 
-        return $data;
+        return ['filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
+            'data' => $data,
+        ];
     }
 }
