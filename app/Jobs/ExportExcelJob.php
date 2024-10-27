@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Exports\ExistingSheetExport;
-use App\Mail\ExcelGeneratedMail;
 use App\Mail\SimpleEmail;
 use App\Models\EmployeeCV;
 use App\Services\SalaryEstimationService;
@@ -16,7 +15,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ExportExcelJob implements ShouldQueue
 {

@@ -50,7 +50,7 @@
                                                         <!-- Start Date -->
                                                         <div class="col-6 col-md-auto">
                                                             <label for="start_date" class="form-check-label">Studiestart</label>
-                                                            <input type="date" id="start_date" name="start_date" min="2000-01-01" value="{{ old('start_date', $item['start_date']) }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            <input type="date" id="start_date" name="start_date" min="1950-01-01" value="{{ old('start_date', $item['start_date']) }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
                                                             @error('start_date')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -59,7 +59,7 @@
                                                         <!-- End Date -->
                                                         <div class="col-6 col-md-auto">
                                                             <label for="end_date" class="form-check-label">Studieslutt</label>
-                                                            <input type="date" id="end_date" name="end_date" min="2000-01-01" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" style="max-width: 150px;">
                                                             @error('end_date')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -163,13 +163,13 @@
                                 @enderror
                             </div>
                             <div class="col-2">
-                                <input type="date" id="start_date" name="start_date" min="2000-01-01" value="{{ old('start_date') }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror">
+                                <input type="date" id="start_date" name="start_date" min="1900-01-01" value="{{ old('start_date') }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror">
                                 @error('start_date')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-2">
-                                <input type="date" id="end_date" name="end_date" min="2000-01-01" value="{{ old('end_date') }}" class="form-control @error('end_date') is-invalid @enderror">
+                                <input type="date" id="end_date" name="end_date" min="1900-01-01" value="{{ old('end_date') }}" class="form-control @error('end_date') is-invalid @enderror">
                                 @error('end_date')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
