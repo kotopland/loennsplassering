@@ -38,8 +38,8 @@
                                                 <h5>Endre kompetanse</h5>
                                                 <!-- Topic and School -->
                                                 <div class="col-6 col-md-3">
-                                                    <label for="topic_and_school" class="form-check-label">Studienavn og sted</label>
-                                                    <input type="text" id="topic_and_school" name="topic_and_school" value="{{ old('topic_and_school', $item['topic_and_school']) }}" class="form-control @error('topic_and_school') is-invalid @enderror">
+                                                    <label for="update_topic_and_school" class="form-check-label">Studienavn og sted</label>
+                                                    <input type="text" id="update_topic_and_school" name="topic_and_school" value="{{ old('topic_and_school', $item['topic_and_school']) }}" class="form-control @error('topic_and_school') is-invalid @enderror">
                                                     @error('topic_and_school')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
@@ -49,8 +49,8 @@
                                                     <div class="row justify-content-center">
                                                         <!-- Start Date -->
                                                         <div class="col-6 col-md-auto">
-                                                            <label for="start_date" class="form-check-label">Studiestart</label>
-                                                            <input type="date" id="start_date" name="start_date" min="1950-01-01" value="{{ old('start_date', $item['start_date']) }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            <label for="update_start_date" class="form-check-label">Studiestart</label>
+                                                            <input type="date" id="update_start_date" name="start_date" min="1950-01-01" value="{{ old('start_date', $item['start_date']) }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
                                                             @error('start_date')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -58,8 +58,8 @@
 
                                                         <!-- End Date -->
                                                         <div class="col-6 col-md-auto">
-                                                            <label for="end_date" class="form-check-label">Studieslutt</label>
-                                                            <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" style="max-width: 150px;">
+                                                            <label for="update_end_date" class="form-check-label">Studieslutt</label>
+                                                            <input type="date" id="update_end_date" name="end_date" min="1950-01-01" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" style="max-width: 150px;">
                                                             @error('end_date')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -69,8 +69,8 @@
 
                                                 <!-- Study Points -->
                                                 <div class="col-4 col-md-4">
-                                                    <label for="study_points" class="form-check-label">Studiepoeng</label>
-                                                    <select id="study_points" name="study_points" class="form-select @error('study_points') is-invalid @enderror" style="max-width: 100px">
+                                                    <label for="update_study_points" class="form-check-label">Studiepoeng</label>
+                                                    <select id="update_study_points" name="study_points" class="form-select @error('study_points') is-invalid @enderror" style="max-width: 100px">
                                                         <option value="">Velg</option>
                                                         <option value="bestått" @if (old('study_points', strtolower($item['study_points'])) === 'bestått') selected @endif>
                                                             Bestått
@@ -90,30 +90,31 @@
                                                 <div class="col-12 d-flex flex-wrap">
                                                     <div class="pe-4">Fullført grad:</div>
                                                     <div class="form-check pe-4">
-                                                        <input type="radio" id="no_degree" name="highereducation" value="" class="form-check-input @error('highereducation') is-invalid @enderror" @if (empty(old('highereducation', $item['highereducation'] ?? ''))) checked @endif>
-                                                        <label for="no_degree" class="form-check-label">Normalt studie, ingen grad</label>
+                                                        <input type="radio" id="update_no_degree" name="highereducation" value="" class="form-check-input @error('highereducation') is-invalid @enderror" @if (empty(old('highereducation', $item['highereducation'] ?? ''))) checked @endif>
+                                                        <label for="update_no_degree" class="form-check-label">Normalt studie, ingen grad</label>
                                                     </div>
                                                     <div class="form-check pe-4">
-                                                        <input type="radio" id="bachelor" name="highereducation" value="bachelor" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'bachelor') checked @endif>
-                                                        <label for="bachelor" class="form-check-label">Høgskolenivå (4 år) eller bachelorgrad</label>
+                                                        <input type="radio" id="update_bachelor" name="highereducation" value="bachelor" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'bachelor') checked @endif>
+                                                        <label for="update_bachelor" class="form-check-label">Høgskolenivå (4 år) eller bachelorgrad</label>
                                                     </div>
                                                     <div class="form-check pe-4">
-                                                        <input type="radio" id="master" name="highereducation" value="master" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'master') checked @endif>
-                                                        <label for="master" class="form-check-label">Mastergradsnivå, siviltittel med videre</label>
+                                                        <input type="radio" id="update_master" name="highereducation" value="master" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'master') checked @endif>
+                                                        <label for="update_master" class="form-check-label">Mastergradsnivå, siviltittel med videre</label>
                                                     </div>
                                                 </div>
 
-                                                <!-- Relevance and Submit Button -->
-                                                <div class="col-12 d-flex flex-wrap align-items-center">
+                                                <!-- Relevance  -->
+                                                <div class="col-12 d-flex flex-wrap>
                                                     <input type="hidden" name="relevance" value="false">
-                                                    <div class="form-check pe-4">
-                                                        <input type="checkbox" id="relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
-                                                        <label for="relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
+                                                    <div class="col-auto p-2 pe-4">
+                                                        <input type="checkbox" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
+                                                        <label for="update_relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
                                                     </div>
                                                 </div>
 
+                                                <!-- Submit Button -->
                                                 <div class="col-12 d-flex flex-wrap align-items-center">
-                                                    <input type="submit" id="btn-update" name="submit" value="Oppdater utdanning" class="btn btn-success me-2 @if (null === old('topic_and_school', $item['topic_and_school'])) disabled @endif">
+                                                    <input type="submit" id="update-btn-update" name="submit" value="Oppdater utdanning" class="btn btn-success me-2 @if (null === old('topic_and_school', $item['topic_and_school'])) disabled @endif">
                                                     <a href="{{ route('enter-education-information') }}" class="btn btn-sm btn-outline-secondary">Tilbake</a>
                                                 </div>
 

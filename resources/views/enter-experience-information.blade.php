@@ -42,8 +42,8 @@
                                                     <div class="row">
                                                         <!-- Title and Workplace -->
                                                         <div class="col-6 col-md-3">
-                                                            <label for="title_workplace" class="form-check-label">Tittel og arbeidssted:</label>
-                                                            <input type="text" id="title_workplace" name="title_workplace" value="{{ old('title_workplace', $item['title_workplace']) }}" class="form-control @error('title_workplace') is-invalid @enderror" placeholder="Skriv inn tittel og arbeidssted">
+                                                            <label for="update_title_workplace" class="form-check-label">Tittel og arbeidssted:</label>
+                                                            <input type="text" id="update_title_workplace" name="title_workplace" value="{{ old('title_workplace', $item['title_workplace']) }}" class="form-control @error('title_workplace') is-invalid @enderror" placeholder="Skriv inn tittel og arbeidssted">
                                                             @error('title_workplace')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -51,15 +51,16 @@
 
                                                         <!-- Work Percentage -->
                                                         <div class="col-6 col-md-3">
-                                                            <label for="work_percentage" class="form-check-label">Stillingsprosent:</label>
-                                                            <input type="number" id="work_percentage" name="work_percentage" min="0" max="100" value="{{ old('work_percentage', $item['work_percentage']) }}" required class="form-control @error('work_percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
+                                                            <label for="update_work_percentage" class="form-check-label">Stillingsprosent:</label>
+                                                            <input type="number" id="update_work_percentage" name="work_percentage" min="0" max="100" value="{{ old('work_percentage', $item['work_percentage']) }}" required class="form-control @error('work_percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
                                                         </div>
-                                                        <div class="col-6 col-md-3">
+
+                                                        <div class="col-12 col-md-6">
                                                             <div class="row justify-content-center">
                                                                 <!-- Start Date -->
                                                                 <div class="col-6 col-md-auto">
-                                                                    <label for="start_date" class="form-check-label">Ansatt fra:</label>
-                                                                    <input type="date" id="start_date" name="start_date" min="1950-01-01" max="{{ date('Y-m-d') }}" value="{{ old('start_date', $item['start_date']) }}" class="form-control @error('start_date') is-invalid @enderror">
+                                                                    <label for="update_start_date" class="form-check-label">Ansatt fra:</label>
+                                                                    <input type="date" id="update_start_date" name="start_date" min="1950-01-01" max="{{ date('Y-m-d') }}" value="{{ old('start_date', $item['start_date']) }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px">
                                                                     @error('start_date')
                                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                                     @enderror
@@ -67,8 +68,8 @@
 
                                                                 <!-- End Date -->
                                                                 <div class="col-6 col-md-auto">
-                                                                    <label for="end_date" class="form-check-label">Ansatt til:</label>
-                                                                    <input type="date" id="end_date" name="end_date" min="1950-01-01" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock">
+                                                                    <label for="update_end_date" class="form-check-label">Ansatt til:</label>
+                                                                    <input type="date" id="update_end_date" name="end_date" min="1950-01-01" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date', $item['end_date']) }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock" style="max-width: 150px">
                                                                     <div id="endDateHelpBlock" class="form-text">
                                                                         (Er du fortsatt i stillingen, skriv dato for tiltredelse i ny stilling)
                                                                     </div>
@@ -83,38 +84,40 @@
                                                     <!-- Workplace Type Section -->
                                                     <div class="row p-2">
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="radio" id="normal" name="workplace_type" value="" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === '') checked @endif>
-                                                            <label for="normal" class="form-check-label">Ikke kristen organisasjon/kirke</label>
+                                                            <input type="radio" id="update_normal" name="workplace_type" value="" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === '') checked @endif>
+                                                            <label for="update_normal" class="form-check-label">Ikke kristen organisasjon/kirke</label>
                                                         </div>
 
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="radio" id="freechurch" name="workplace_type" value="freechurch" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'freechurch') checked @endif>
-                                                            <label for="freechurch" class="form-check-label">Frikirken</label>
+                                                            <input type="radio" id="update_freechurch" name="workplace_type" value="freechurch" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'freechurch') checked @endif>
+                                                            <label for="update_freechurch" class="form-check-label">Frikirken</label>
                                                         </div>
 
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="radio" id="other_christian" name="workplace_type" value="other_christian" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'other_christian') checked @endif>
-                                                            <label for="other_christian" class="form-check-label">Annen kristen organisasjon/kirke</label>
+                                                            <input type="radio" id="update_other_christian" name="workplace_type" value="other_christian" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'other_christian') checked @endif>
+                                                            <label for="update_other_christian" class="form-check-label">Annen kristen organisasjon/kirke</label>
                                                         </div>
 
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="radio" id="elder" name="workplace_type" value="elder" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'elder') checked @endif>
-                                                            <label for="elder" class="form-check-label">Eldste i Frikirken</label>
+                                                            <input type="radio" id="update_elder" name="workplace_type" value="elder" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === 'elder') checked @endif>
+                                                            <label for="update_elder" class="form-check-label">Eldste i Frikirken</label>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Relevance Checkbox and Submit Button -->
+                                                    <!-- Relevance  -->
                                                     <div class="row p-2">
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="checkbox" id="relevance" name="relevance" value="true" class="form-check-input" @if (old('relevance', $item['relevance'] ?? '') == 'true') checked @endif>
-                                                            <label for="relevance" class="form-check-label">
+                                                            <input type="checkbox" id="update_relevance" name="relevance" value="true" class="form-check-input" @if (old('relevance', $item['relevance'] ?? '') == 'true') checked @endif>
+                                                            <label for="update_relevance" class="form-check-label">
                                                                 Særdeles høy relevanse for stillingen du skal inn i?
                                                             </label>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Submit Button -->
                                                     <div class="row p-2">
                                                         <div class="col-auto p-2 pe-4">
-                                                            <input type="submit" id="btn-submit" name="submit" value="Oppdater erfaring" class="btn btn-success me-2 @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif">
+                                                            <input type="submit" id="update-btn-submit" name="submit" value="Oppdater erfaring" class="btn btn-success me-2 @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif">
                                                             <a href="{{ route('enter-experience-information') }}" class="btn btn-sm btn-outline-secondary">Tilbake</a>
                                                         </div>
                                                     </div>

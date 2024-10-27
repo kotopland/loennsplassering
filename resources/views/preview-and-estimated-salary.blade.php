@@ -7,8 +7,11 @@
     @endif
     <div class="my-4 border border-2 rounded rounded-2 p-3 bg-warning-subtle">
         <h3>Viktig!</h3>
-        <p>Unngå å miste beregningen. Få lenke til skjemaet samt et ferdig utfylt og beregnet lønnsplassering. Det er viktig å bemerke at dette er ikke en endelig da arbeidsgiver vil sammen med sekretær for lønnsuvalget vurderinge hva som er relevant kompetanse og ansiennitet for stilingen din .</p>
-        <p>Vi lagrer eller logger ikke e-post adressen og vi bruker den bare for å sende disse opplysningene pr e-post.</p>
+        <p><strong>En maskinell beregning av lønnsplasseringen viser lønnstrinn {{ $salaryPlacement + $application->competence_points }}.</strong><br />
+            <strong>Merk:</strong> Arbeidsgiver og sekretær for lønnsutvalget vil vurdere din kompetanse og ansiennitet før endelig lønn fastsettes. Det du har valg som relevant vil nødvendigvis ikke arbeidsgiver vektlegge.
+        </p>
+        <p>For å unngå å miste informasjonen du har fylt inn, anbefaler vi at du skriver inn e-postadressen din i feltet under. Da sender vi deg en lenke til dette skjemaet og et ferdig utfylt lønnsskjema med beregnet lønnsplassering som Excel-dokument. Din e-postadresse brukes kun til å sende deg denne informasjonen og blir ikke lagret.
+        </p>
         <div class="m-2">
             <form action="{{ route('export-as-xls') }}" method="get" id="salary_form">
                 @csrf
@@ -19,14 +22,20 @@
                 <button type="submit" name="submit" value="" class="btn btn-success my-2">Send beregnet lønnsplassering på e-post</button>
             </form>
         </div>
+        Du bør også titte på:
+        <li class="my-4">
+            <a href="#" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+                Nøkkeltall: Se beregnet Lønnsplassering
+            </a>
+        </li>
+        <li class="mb-4">
+            <a href="#" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+                Se en tidslinje over karriere og etter beregninger
+            </a>
+        </li>
     </div>
     <div class="text-center pb-1">
-        <button class="btn btn-success my-3 me-3" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
-            Nøkkeltall: Se beregnet Lønnsplassering
-        </button>
-        <button class="btn btn-success my-3" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
-            Se en tidslinje over karriere og etter beregninger
-        </button>
+
         <br />
         <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary my-3">
             Gå tilbake og gjør endringer i skjemaet
