@@ -24,22 +24,24 @@
         </div>
         Du bør også titte på:
         <li class="my-4">
-            <a href="#" _="on click remove .d-none from #beregning then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            <a href="#" _="on click remove .d-none from #beregning then wait 200ms then go to #beregning @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
                 Nøkkeltall: Se beregnet Lønnsplassering
             </a>
         </li>
         <li class="mb-4">
-            <a href="#" _="on click remove .d-none from #tidslinje then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
+            <a href="#" _="on click remove .d-none from #tidslinje then wait 200ms then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å motta beregningen og lenken til dette skjemaet via e-post') @endif">
                 Se en tidslinje over karriere og etter beregninger
+            </a>
+        </li>
+        <li class="mb-4">
+            <a href={{ route('enter-employment-information', $application) }} class="">
+                Gå tilbake og gjør endringer i skjemaet
             </a>
         </li>
     </div>
     <div class="text-center pb-1">
 
         <br />
-        <a href={{ route('enter-employment-information', $application) }} class="btn btn-secondary my-3">
-            Gå tilbake og gjør endringer i skjemaet
-        </a>
 
     </div>
     <div class="callout callout-primary d-none" id="beregning">
@@ -158,15 +160,25 @@
                 <thead>
                     <tr>
                         <th>Utdannelse/Ansiennitets opplysninger:</th>
+                        @php
+                            $monthDifference = \Carbon\Carbon::parse($timeline[0])->diffInMonths(\Carbon\Carbon::parse($timeline_adjusted[0]));
+                        @endphp
+                        @for ($i = 0; $i <= $monthDifference; $i++)
+                            <th class="table-primary border-dark border-bottom border-start-0">{{ $timeline[$i] }}</th>
+                        @endfor
                         @foreach ($timeline_adjusted as $month)
                             <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
+
                     @foreach ($tableData_adjusted as $item)
                         <tr>
                             <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
+                            @for ($i = 1; $i <= $monthDifference; $i++)
+                                <td class="table-primary"></td>
+                            @endfor
                             @foreach ($timeline_adjusted as $month)
                                 @php
                                     $itemStart = strtotime($item['start_date']);

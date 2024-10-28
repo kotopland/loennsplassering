@@ -361,7 +361,7 @@ class EmployeeCVController extends Controller
         $application = $salaryEstimationService->checkForSavedApplication($application);
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
-
+        // dd($adjustedDataset);
         $timelineData = $salaryEstimationService->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
         $timelineData_adjusted = $salaryEstimationService->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
         $workStartDate = Carbon::parse($application->work_start_date);

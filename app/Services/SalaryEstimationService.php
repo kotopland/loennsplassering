@@ -37,23 +37,28 @@ class SalaryEstimationService
         $competencePoints = 0;
 
         // Process education
-        foreach ($application->education ?? [] as $education) {
+        foreach ($application->education ?? [] as $id => $education) {
             $eduStartDate = Carbon::parse($education['start_date']);
             $eduEndDate = Carbon::parse($education['end_date']);
 
             // If both start and end dates are before birthDate, skip it.
             if ($eduEndDate->lessThan($dateAge18)) {
+                unset($adjustedEducation[$id]);
+
                 continue;
             }
 
             // If start date is before birthDate and end date is after, adjust start date.
-            if ($eduStartDate->lessThan($dateAge18) && $eduEndDate->greaterThanOrEqualTo($dateAge18)) {
+            if ($eduStartDate->lessThan($dateAge18) && $eduEndDate->greaterThanOrEqualTo($dateAge18) && ! $this->containsAnyString($education['topic_and_school'], ['videregående', 'vgs', 'fagskole'])) {
                 $education['start_date'] = $dateAge18->toDateString();
+                $adjustedEducation[$id][] = ['comments' => 'Endrer start til 18 års alder.'];
+
             }
 
             // Skip if employee was under 18 at adjusted start date.
             if ($dateAge18->diffInYears(Carbon::parse($education['start_date'])) < 0) {
                 continue;
+                unset($adjustedEducation[$id]);
             }
 
             $competencePoint = $this->calculateCompetencePoints($education);
@@ -65,12 +70,15 @@ class SalaryEstimationService
         }
 
         // Process work_experience
+
         foreach ($application->work_experience ?? [] as $id => $work) {
             $workStartDate = Carbon::parse($work['start_date']);
             $workEndDate = Carbon::parse($work['end_date']);
 
             // If both start and end dates are before birthDate, skip it.
             if ($workEndDate->lessThan($dateAge18)) {
+                unset($adjustedWorkExperience[$id]);
+
                 continue;
             }
 
@@ -80,17 +88,19 @@ class SalaryEstimationService
 
                 // $work['start_date'] = $dateAge18->addMonth()->toDateString();
                 $adjustedWorkExperience[$id]['start_date'] = $dateAge18->addMonth()->toDateString();
+                $adjustedWorkExperience[$id][] = ['comments' => 'Endrer start til etter 18 års alder.'];
 
                 continue;
             }
-
             // Skip if employee was under 18 at adjusted start date.
             if ($dateAge18->diffInYears(Carbon::parse($work['start_date'])) < 0) {
+                unset($adjustedWorkExperience[$id]);
+
                 continue;
             }
 
-            // $adjustedWorkExperience[] = $work;
         }
+        // dd($adjustedWorkExperience);
         $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         // Cap competence points at 7
@@ -147,6 +157,18 @@ class SalaryEstimationService
         $application->work_experience_adjusted = $adjustedWorkExperience;
 
         return $application;
+    }
+
+    public function containsAnyString($text, array $searchStrings): bool
+    {
+        foreach ($searchStrings as $string) {
+            if (stripos(strtolower($text), strtolower($string)) !== false) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function convertEducationToWork($education)
