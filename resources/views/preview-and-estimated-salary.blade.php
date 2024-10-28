@@ -19,7 +19,7 @@
                     <label for="email" class="form-label">E-post adresse</label>
                     <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
                 </div>
-                <button type="submit" name="submit" value="" class="btn btn-success my-2">Send beregnet lønnsplassering på e-post</button>
+                <button type="submit" name="submit" value="" class="btn btn-success my-2">Send beregnet lønnsplassering på e-post<br/><small>(kan ta opptil 2 minutter)</small></button>
             </form>
         </div>
         Du bør også titte på:
