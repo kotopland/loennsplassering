@@ -172,17 +172,17 @@ class ExportExcelJob implements ShouldQueue
             // short education / experience lines
             $row = 28;
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema.xlsx'; // New modified file path
+            $modifiedFilePath = 'modified_14lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
             // long education / experience lines
             $row = 39;
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema-expanded.xlsx'; // New modified file path
+            $modifiedFilePath = 'modified_14lonnsskjema-expanded-'.$application->id.'.xlsx'; // New modified file path
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
              // long education / experience lines
             $row = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'modified_14lonnsskjema-extraexpanded.xlsx'; // New modified file path
+            $modifiedFilePath = 'modified_14lonnsskjema-extraexpanded-'.$application->id.'.xlsx'; // New modified file path
             // return null;
         }
         else
