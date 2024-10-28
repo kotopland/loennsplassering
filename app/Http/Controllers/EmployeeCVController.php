@@ -88,10 +88,10 @@ class EmployeeCVController extends Controller
     public function postEmploymentInformation(Request $request)
     {
         $request->validate([
-            'job_title' => 'required',
+            'job_title' => 'required|string',
             'birth_date' => 'required|date',
         ], [
-            'job_title.required' => 'Stillingstittelfeltet er obligatorisk.',
+            'job_title.required' => 'Type stilling er obligatorisk.',
             'birth_date.required' => 'Fødselsdato er obligatorisk.',
             'birth_date.date' => 'Fødselsdato må være en gyldig dato.',
         ]);
@@ -503,7 +503,7 @@ class EmployeeCVController extends Controller
 
         // Example: Perform calculations based on the extracted data
         // $results = $this->performCalculations($data);
-        session()->flash('message', 'Excel dokumentet er lastet inn og du kan arbeide videre med den i her.');
+        session()->flash('message', 'Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
         session()->flash('alert-class', 'alert-success');
 
         return redirect()->route('enter-employment-information');
