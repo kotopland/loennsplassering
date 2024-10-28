@@ -72,10 +72,10 @@
                                                     <label for="update_study_points" class="form-check-label">Studiepoeng</label>
                                                     <select id="update_study_points" name="study_points" class="form-select @error('study_points') is-invalid @enderror" style="max-width: 100px">
                                                         <option value="">Velg</option>
-                                                        <option value="bestått" @if (old('study_points', strtolower($item['study_points'])) === 'bestått') selected @endif>
+                                                        <option value="bestått" @if (old('study_points', strtolower($item['study_points']) === ('bestått' ||'0') selected @endif>
                                                             Bestått
                                                         </option>
-                                                        @foreach ([5, 10, 20, 30, 60, 120, 180, 240, 300, 360, 420] as $points)
+                                                        @foreach ([5, 10, 20, 30, 60, 120, 180, 200, 240, 300, 360, 420] as $points)
                                                             <option value="{{ $points }}" @if (old('study_points', $item['study_points']) == $points) selected @endif>
                                                                 {{ $points }}
                                                             </option>
@@ -107,7 +107,7 @@
                                                 <div class="col-12 d-flex flex-wrap>
                                                     <input type="hidden" name="relevance" value="false">
                                                     <div class="col-auto p-2 pe-4">
-                                                        <input type="checkbox" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
+                                                        <input type="checkbox" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 'true') checked @endif class="form-check-input">
                                                         <label for="update_relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
                                                     </div>
                                                 </div>
@@ -180,12 +180,14 @@
                             <div class="col-auto pe-4">
                                 <select name="study_points" class="form-select @error('study_points') is-invalid @enderror">
                                     <option value="">Velg fra listen</option>
+                                    <option value="10" @if (old('study_points') === '5') selected @endif>5</option>
                                     <option value="10" @if (old('study_points') === '10') selected @endif>10</option>
                                     <option value="20" @if (old('study_points') === '20') selected @endif>20</option>
                                     <option value="30" @if (old('study_points') === '30') selected @endif>30</option>
                                     <option value="60" @if (old('study_points') === '60') selected @endif>60</option>
                                     <option value="120" @if (old('study_points') === '120') selected @endif>120</option>
                                     <option value="180" @if (old('study_points') === '180') selected @endif>180</option>
+                                    <option value="180" @if (old('study_points') === '200') selected @endif>200</option>
                                     <option value="240" @if (old('study_points') === '240') selected @endif>240</option>
                                     <option value="300" @if (old('study_points') === '300') selected @endif>300</option>
                                     <option value="360" @if (old('study_points') === '360') selected @endif>360</option>

@@ -27,3 +27,5 @@ Route::get('/lonnsberegner/destroy-experience-information', [EmployeeCVControlle
 
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'upload'])->name('lonnsberegner.upload');
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'store'])->name('lonnsberegner.calculate');
+
+Route::get('/logg-ut', [EmployeeCVController::class, 'signout'])->name('signout');

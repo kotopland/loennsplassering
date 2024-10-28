@@ -399,13 +399,11 @@ class SalaryEstimationService
         $activeStudyMonthsPerYear = 10;     // Active study months per year
         $allowedExtraMonths = 3;            // Extra months allowed without penalty
 
-        // Parse input dates using Carbon
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
-
         // Validate dates: start must be before end
         if ($start->greaterThanOrEqualTo($end)) {
-            throw new InvalidArgumentException('The start date must be before the end date.');
+            throw new \InvalidArgumentException('The start date must be before the end date.');
         }
 
         if ($studyPoints >= 60) {
