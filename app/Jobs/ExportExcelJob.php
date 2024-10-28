@@ -25,7 +25,7 @@ class ExportExcelJob implements ShouldQueue
 
     private string $email;
 
-     public $timeout = 180;
+    public $timeout = 180;
 
     /**
      * Create a new job instance.
@@ -51,13 +51,13 @@ class ExportExcelJob implements ShouldQueue
 
             $this->generateAndSendExcel($data, $application);
 
-            Log::info("Email sent successfully to {$this->email} for Application ID: {$this->applicationId}");
+            Log::info("Email sent successfully for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
             Log::error("Error processing Application ID: {$this->applicationId} - ".$e->getMessage(), [
                 'stack' => $e->getTraceAsString(),
             ]);
-             $this->sendErrorNotification($e->getMessage());  // Send email with error
-    throw $e;  // Rethrow to mark job as failed
+            $this->sendErrorNotification($e->getMessage());  // Send email with error
+            throw $e;  // Rethrow to mark job as failed
         }
     }
 
@@ -180,17 +180,15 @@ class ExportExcelJob implements ShouldQueue
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-expanded-'.$application->id.'.xlsx'; // New modified file path
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
-             // long education / experience lines
+            // long education / experience lines
             $row = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-extraexpanded-'.$application->id.'.xlsx'; // New modified file path
             // return null;
-        }
-        else
-        {
+        } else {
             throw new InvalidArgumentException('Det er for mange linjer utdannelse eller ansiennitet at det ikke passer inni lønnsskjema excel arket.');
         }
-        
+
         foreach ($application->work_experience ?? [] as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
@@ -217,7 +215,7 @@ class ExportExcelJob implements ShouldQueue
         if (count($application->education) <= 11 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 15) {
             // short education / experience lines
             $row = 62;
-         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
+        } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
             // long education / experience lines
             $row = 88;
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
@@ -243,11 +241,12 @@ class ExportExcelJob implements ShouldQueue
             'data' => $data,
         ];
     }
+
     public function sendErrorNotification(string $message): void
     {
         // Send email with error
         $subject = 'Feil ved prosessering av Lønnsplassering (Excel fil)';
         $body = $this->generateEmailBody(null);
-        Mail::to($this->email)->send(new SimpleEmail($subject, $body,null));
+        Mail::to($this->email)->send(new SimpleEmail($subject, $body, null));
     }
 }
