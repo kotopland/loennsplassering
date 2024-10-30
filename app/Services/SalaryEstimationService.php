@@ -486,19 +486,33 @@ class SalaryEstimationService
         $allData = [];
         $timeline = [];
         foreach ($educationData ?? [] as $education) {
+            $endDate = Carbon::parse($education['end_date']);
+
+            if ($endDate->day === 1) {
+                $endDate->subDay();
+            }
+            $endDate = $endDate->format('Y-m-d');
+
             $allData[] = [
                 'title' => $education['topic_and_school'],
                 'start_date' => $education['start_date'],
-                'end_date' => $education['end_date'],
+                'end_date' => $endDate,
                 'percentage' => $education['study_percentage'],
                 'type' => 'education',
             ];
         }
         foreach ($workExperienceData ?? [] as $workExperience) {
+            $endDate = Carbon::parse($workExperience['end_date']);
+
+            if ($endDate->day === 1) {
+                $endDate->subDay();
+            }
+            $endDate = $endDate->format('Y-m-d');
+
             $allData[] = [
                 'title' => $workExperience['title_workplace'],
                 'start_date' => $workExperience['start_date'],
-                'end_date' => $workExperience['end_date'],
+                'end_date' => $endDate,
                 'percentage' => $workExperience['work_percentage'],
                 'type' => 'work',
             ];

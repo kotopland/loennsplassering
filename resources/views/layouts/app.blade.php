@@ -51,7 +51,7 @@
                     <!-- Button Section -->
                     <div class="col-md-auto col-12 text-md-end text-center">
                         @if (session('applicationId'))
-                            <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-secondary" _="on click confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')">
+                            <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-secondary" _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
                                 Logg ut
                             </a>
                         @endif
