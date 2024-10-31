@@ -175,7 +175,7 @@
 
                 <thead>
                     <tr>
-                        <th>Utdannelse<br />(Som gir kompetansepoeng):</th>
+                        <th>Utdannelse<br />(Beregnet til {{ $application->competence_points }} kompetansepoeng):</th>
                         @php
                             $monthDifference = \Carbon\Carbon::parse($timeline[0])->diffInMonths(\Carbon\Carbon::parse($timeline_adjusted[0]));
                         @endphp
@@ -194,7 +194,7 @@
                             @if ($tableData_adjusted[$key - 1]['type'] === 'education' && $item['type'] === 'work')
                                 <tr>
                                     <td>
-                                        <strong>Arbeidserfaring<br />(Som gir ansiennitet):</strong>
+                                        <strong>Arbeidserfaring<br />(Som kan gi {{ $calculatedTotalWorkExperienceMonths }} mnd ansiennitet):</strong>
                                     </td>
                                 </tr>
                             @endif
