@@ -70,7 +70,6 @@ class SalaryEstimationService
         }
 
         // Process work_experience
-
         foreach ($application->work_experience ?? [] as $id => $work) {
             $workStartDate = Carbon::parse($work['start_date']);
             $workEndDate = Carbon::parse($work['end_date']);
@@ -87,7 +86,7 @@ class SalaryEstimationService
                 $this->removeDuplicates($adjustedWorkExperience);
 
                 // $work['start_date'] = $dateAge18->addMonth()->toDateString();
-                $adjustedWorkExperience[$id]['start_date'] = $dateAge18->addMonth()->toDateString();
+                $adjustedWorkExperience[$id]['start_date'] = $dateAge18->addDay()->toDateString();
                 $adjustedWorkExperience[$id][] = ['comments' => 'Endrer start til etter 18 års alder.'];
 
                 continue;
@@ -146,6 +145,9 @@ class SalaryEstimationService
             $application->competence_points = min($competencePoints, 4);
         }
 
+        // Adjust education for overlaps
+        $adjustedEducation = $this->adjustEducation($adjustedEducation);
+
         // Adjust work experience for overlaps
         $adjustedWorkExperience = $this->adjustWorkExperience($adjustedWorkExperience, $adjustedEducation);
 
@@ -157,6 +159,20 @@ class SalaryEstimationService
         $application->work_experience_adjusted = $adjustedWorkExperience;
 
         return $application;
+    }
+
+    public function adjustEducation($adjustedEducation)
+    {
+        $educationArray = [];
+        foreach ($adjustedEducation as $education) {
+            $eduEndDate = Carbon::parse($education['end_date']);
+            if ($eduEndDate->day === 1) {
+                $education['end_date'] = $eduEndDate->subDay()->toDateString();
+                $educationArray[] = $education;
+            }
+        }
+
+        return $educationArray;
     }
 
     public function containsAnyString($text, array $searchStrings): bool
@@ -197,7 +213,9 @@ class SalaryEstimationService
                     return $education['relevance'] ? 3 : 1;
                 }
             case 'master':
-                if ($education['study_points'] >= 120) {
+                if ($education['study_points'] >= 300) {
+                    return 6;
+                } elseif ($education['study_points'] >= 120) {
                     return 3;
                 }
             default:
@@ -321,13 +339,24 @@ class SalaryEstimationService
                 // Calculate the percentage for this month.
                 $allocatedPercentage = min($work['work_percentage'], $availablePercentage);
 
+                if ($workStart->lessThanOrEqualTo(Carbon::parse($work['start_date']))) {
+                    $workStart = Carbon::parse($work['start_date']);
+                } else {
+                    $workStart = $workStart->copy()->startOfMonth();
+                }
+
+                if ($workEnd->lessThanOrEqualTo($workStart->copy()->endOfMonth())) {
+                    $arrayWorkEnd = $workEnd->toDateString();
+                } else {
+                    $arrayWorkEnd = $workStart->copy()->endOfMonth()->toDateString();
+                }
                 // Add the split segment to the collection.
                 $splitWork[] = [
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
                     'work_percentage' => $allocatedPercentage,
-                    'start_date' => $workStart->copy()->startOfMonth()->toDateString(),
-                    'end_date' => $workStart->copy()->endOfMonth()->toDateString(),
+                    'start_date' => $workStart->toDateString(),
+                    'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
                 ];
 

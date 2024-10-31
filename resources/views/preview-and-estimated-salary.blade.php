@@ -116,7 +116,7 @@
                                             'education' => $item['type'] === 'education',
                                             'work' => $item['type'] === 'work',
                                         ])>
-                                            {{ $item['percentage'] }}%
+                                            {{ $item['percentage'] }}% {{ $item['start_date'] }} - {{ $item['end_date'] }}
                                         </span>
                                     @endif
                                 </td>
@@ -197,7 +197,7 @@
                                             'education' => $item['type'] === 'education',
                                             'work' => $item['type'] === 'work',
                                         ])>
-                                            {{ $item['percentage'] }}%
+                                            {{ $item['percentage'] }}% {{ $item['start_date'] }} - {{ $item['end_date'] }}
                                         </span>
                                     @endif
                                 </td>
