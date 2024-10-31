@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Lønnsberegning</h1>
+    <h1>
+        Lønnsberegning</h1>
     @if (session()->has('message'))
         <p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
     @endif
@@ -87,21 +88,30 @@
                 <thead>
                     <tr>
                         <th>
-                            <h5>Hva du har registrert</h5>
+                            <h4>Hva du har registrert</h4>
                         </th>
                     </tr>
                 </thead>
 
                 <thead>
                     <tr>
-                        <th>Utdannelse/Ansiennitets opplysninger:</th>
+                        <th>Utdannelse:</th>
                         @foreach ($timeline as $month)
                             <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($tableData as $item)
+                    @foreach ($tableData as $key => $item)
+                        @if ($key > 0)
+                            @if ($tableData[$key - 1]['type'] === 'education' && $item['type'] === 'work')
+                                <tr>
+                                    <td>
+                                        <strong>Arbeidserfaring:</strong>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endif
                         <tr>
                             <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
                             @foreach ($timeline as $month)
@@ -116,7 +126,7 @@
                                             'education' => $item['type'] === 'education',
                                             'work' => $item['type'] === 'work',
                                         ])>
-                                            {{ $item['percentage'] }}% {{ $item['start_date'] }} - {{ $item['end_date'] }}
+                                            {{ $item['percentage'] }}%
                                         </span>
                                     @endif
                                 </td>
@@ -158,14 +168,14 @@
                     </tr>
                     <tr class="">
                         <th>
-                            <h5>Maskinbehandlet</h5>
+                            <h4>Maskinbehandlet</h4>
                         </th>
                     </tr>
                 </thead>
 
                 <thead>
                     <tr>
-                        <th>Utdannelse/Ansiennitets opplysninger:</th>
+                        <th>Utdannelse<br />(Som gir kompetansepoeng):</th>
                         @php
                             $monthDifference = \Carbon\Carbon::parse($timeline[0])->diffInMonths(\Carbon\Carbon::parse($timeline_adjusted[0]));
                         @endphp
@@ -179,9 +189,19 @@
                 </thead>
                 <tbody>
 
-                    @foreach ($tableData_adjusted as $item)
+                    @foreach ($tableData_adjusted as $key => $item)
+                        @if ($key > 0)
+                            @if ($tableData_adjusted[$key - 1]['type'] === 'education' && $item['type'] === 'work')
+                                <tr>
+                                    <td>
+                                        <strong>Arbeidserfaring<br />(Som gir ansiennitet):</strong>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endif
                         <tr>
-                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
+                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}
+                            </td>
                             @for ($i = 1; $i <= $monthDifference; $i++)
                                 <td class="table-primary"></td>
                             @endfor
@@ -197,7 +217,7 @@
                                             'education' => $item['type'] === 'education',
                                             'work' => $item['type'] === 'work',
                                         ])>
-                                            {{ $item['percentage'] }}% {{ $item['start_date'] }} - {{ $item['end_date'] }}
+                                            {{ $item['percentage'] }}%
                                         </span>
                                     @endif
                                 </td>
