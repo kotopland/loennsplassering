@@ -169,17 +169,18 @@ class ExportExcelJob implements ShouldQueue
 
             $row++;
         }
-        if (count($application->education) <= 11 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 15) {
+
+        if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines
             $row = 28;
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
-        } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
+        } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) <= 29) {
             // long education / experience lines
             $row = 39;
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-expanded-'.$application->id.'.xlsx'; // New modified file path
-        } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
+        } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) > 29) {
             // long education / experience lines
             $row = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
@@ -212,7 +213,7 @@ class ExportExcelJob implements ShouldQueue
 
         $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
-        if (count($application->education) <= 11 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 15) {
+        if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines
             $row = 62;
         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {

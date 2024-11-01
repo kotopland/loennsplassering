@@ -82,179 +82,182 @@
     </div>
 
     <div class="callout callout-primary d-none" id="tidslinje">
-        <h2>Tidslinje over din utdannelse og ansiennitet</h2>
-        <div class="table-container">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            <h4>Hva du har registrert</h4>
-                        </th>
-                    </tr>
-                </thead>
-
-                <thead>
-                    <tr>
-                        <th>Utdannelse:</th>
-                        @foreach ($timeline as $month)
-                            <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($tableData as $key => $item)
-                        @if ($key > 0)
-                            @if ($tableData[$key - 1]['type'] === 'education' && $item['type'] === 'work')
-                                <tr>
-                                    <td>
-                                        <strong>Arbeidserfaring:</strong>
-                                    </td>
-                                </tr>
-                            @endif
-                        @endif
+        @if (count($timeline) === 0)
+            <div class="text-center">Tidslinje kan ikke lages da det ikke er noe kompetanse og arbeidserfaring</div>
+        @else
+            <h2>Tidslinje over din utdannelse og ansiennitet</h2>
+            <div class="table-container">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
+                            <th>
+                                <h4>Hva du har registrert</h4>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <thead>
+                        <tr>
+                            <th>Utdannelse:</th>
+                            @foreach ($timeline as $month)
+                                <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($tableData as $key => $item)
+                            @if ($key > 0)
+                                @if ($tableData[$key - 1]['type'] === 'education' && $item['type'] === 'work')
+                                    <tr>
+                                        <td>
+                                            <strong>Arbeidserfaring:</strong>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endif
+                            <tr>
+                                <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}</td>
+                                @foreach ($timeline as $month)
+                                    @php
+                                        $itemStart = strtotime($item['start_date']);
+                                        $itemEnd = strtotime($item['end_date']);
+                                        $currentMonth = strtotime($month);
+                                    @endphp
+                                    <td class="table-primary">
+                                        @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
+                                            <span class="badge bg-primary" @class([
+                                                'education' => $item['type'] === 'education',
+                                                'work' => $item['type'] === 'work',
+                                            ])>
+                                                {{ $item['percentage'] }}%
+                                            </span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <td><strong>Sum over total studie/ansiennitet</strong></td>
                             @foreach ($timeline as $month)
                                 @php
-                                    $itemStart = strtotime($item['start_date']);
-                                    $itemEnd = strtotime($item['end_date']);
-                                    $currentMonth = strtotime($month);
+                                    $monthlySum = 0;
                                 @endphp
-                                <td class="table-primary">
-                                    @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
-                                        <span class="badge bg-primary" @class([
-                                            'education' => $item['type'] === 'education',
-                                            'work' => $item['type'] === 'work',
-                                        ])>
-                                            {{ $item['percentage'] }}%
-                                        </span>
-                                    @endif
+                                @foreach ($tableData as $item)
+                                    @php
+                                        $itemStart = strtotime($item['start_date']);
+                                        $itemEnd = strtotime($item['end_date']);
+                                        $currentMonth = strtotime($month);
+
+                                        if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd) {
+                                            $monthlySum += $item['percentage'];
+                                        }
+                                    @endphp
+                                @endforeach
+                                <td @class([
+                                    'bg-danger' => $monthlySum > 100,
+                                    'bg-warning' => $monthlySum === 0,
+                                    'table-secondary',
+                                ])>
+                                    <strong>{{ $monthlySum }}%</strong>
                                 </td>
                             @endforeach
                         </tr>
-                    @endforeach
-                </tbody>
-                <thead>
-                    <tr>
-                        <td><strong>Sum over total studie/ansiennitet</strong></td>
-                        @foreach ($timeline as $month)
-                            @php
-                                $monthlySum = 0;
-                            @endphp
-                            @foreach ($tableData as $item)
-                                @php
-                                    $itemStart = strtotime($item['start_date']);
-                                    $itemEnd = strtotime($item['end_date']);
-                                    $currentMonth = strtotime($month);
-
-                                    if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd) {
-                                        $monthlySum += $item['percentage'];
-                                    }
-                                @endphp
-                            @endforeach
-                            <td @class([
-                                'bg-danger' => $monthlySum > 100,
-                                'bg-warning' => $monthlySum === 0,
-                                'table-secondary',
-                            ])>
-                                <strong>{{ $monthlySum }}%</strong>
-                            </td>
-                        @endforeach
-                    </tr>
-                </thead>
-                <thead>
-                    <tr>
-                        <th></th>
-                    </tr>
-                    <tr class="">
-                        <th>
-                            <h4>Maskinbehandlet</h4>
-                        </th>
-                    </tr>
-                </thead>
-
-                <thead>
-                    <tr>
-                        <th>Utdannelse<br />(Beregnet til {{ $application->competence_points }} kompetansepoeng):</th>
-                        @php
-                            $monthDifference = \Carbon\Carbon::parse($timeline[0])->diffInMonths(\Carbon\Carbon::parse($timeline_adjusted[0]));
-                        @endphp
-                        @for ($i = 0; $i < $monthDifference; $i++)
-                            <th class="table-primary border-dark border-bottom border-start-0">{{ $timeline[$i] }}</th>
-                        @endfor
-                        @foreach ($timeline_adjusted as $month)
-                            <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach ($tableData_adjusted as $key => $item)
-                        @if ($key > 0)
-                            @if ($tableData_adjusted[$key - 1]['type'] === 'education' && $item['type'] === 'work')
-                                <tr>
-                                    <td>
-                                        <strong>Arbeidserfaring<br />(Som kan gi {{ $calculatedTotalWorkExperienceMonths }} mnd ansiennitet):</strong>
-                                    </td>
-                                </tr>
-                            @endif
-                        @endif
+                    </thead>
+                    <thead>
                         <tr>
-                            <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}
-                            </td>
-                            @for ($i = 1; $i <= $monthDifference; $i++)
-                                <td class="table-primary"></td>
+                            <th></th>
+                        </tr>
+                        <tr class="">
+                            <th>
+                                <h4>Maskinbehandlet</h4>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <thead>
+                        <tr>
+                            <th>Utdannelse<br />(Beregnet til {{ $application->competence_points }} kompetansepoeng):</th>
+                            @php
+                                $monthDifference = \Carbon\Carbon::parse($timeline[0])->diffInMonths(\Carbon\Carbon::parse($timeline_adjusted[0]));
+                            @endphp
+                            @for ($i = 0; $i < $monthDifference; $i++)
+                                <th class="table-primary border-dark border-bottom border-start-0">{{ $timeline[$i] }}</th>
                             @endfor
                             @foreach ($timeline_adjusted as $month)
+                                <th class="table-primary border-dark border-bottom border-start-0">{{ $month }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach ($tableData_adjusted as $key => $item)
+                            @if ($key > 0)
+                                @if ($tableData_adjusted[$key - 1]['type'] === 'education' && $item['type'] === 'work')
+                                    <tr>
+                                        <td>
+                                            <strong>Arbeidserfaring<br />(Som kan gi {{ $calculatedTotalWorkExperienceMonths }} mnd ansiennitet):</strong>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endif
+                            <tr>
+                                <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}
+                                </td>
+                                @for ($i = 1; $i <= $monthDifference; $i++)
+                                    <td class="table-primary"></td>
+                                @endfor
+                                @foreach ($timeline_adjusted as $month)
+                                    @php
+                                        $itemStart = strtotime($item['start_date']);
+                                        $itemEnd = strtotime($item['end_date']);
+                                        $currentMonth = strtotime($month);
+                                    @endphp
+                                    <td class="table-primary">
+                                        @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
+                                            <span class="badge bg-primary" @class([
+                                                'education' => $item['type'] === 'education',
+                                                'work' => $item['type'] === 'work',
+                                            ])>
+                                                {{ $item['percentage'] }}%
+                                            </span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <td><strong>Sum over total studie/ansiennitet</strong></td>
+                            @foreach ($timeline as $month)
                                 @php
-                                    $itemStart = strtotime($item['start_date']);
-                                    $itemEnd = strtotime($item['end_date']);
-                                    $currentMonth = strtotime($month);
+                                    $monthlySum = 0;
                                 @endphp
-                                <td class="table-primary">
-                                    @if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd)
-                                        <span class="badge bg-primary" @class([
-                                            'education' => $item['type'] === 'education',
-                                            'work' => $item['type'] === 'work',
-                                        ])>
-                                            {{ $item['percentage'] }}%
-                                        </span>
-                                    @endif
+                                @foreach ($tableData_adjusted as $item)
+                                    @php
+                                        $itemStart = strtotime($item['start_date']);
+                                        $itemEnd = strtotime($item['end_date']);
+                                        $currentMonth = strtotime($month);
+
+                                        if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd) {
+                                            $monthlySum += $item['percentage'];
+                                        }
+                                    @endphp
+                                @endforeach
+                                <td @class([
+                                    'bg-danger' => $monthlySum > 100,
+                                    'bg-warning' => $monthlySum === 0,
+                                    'table-secondary',
+                                ])>
+                                    <strong>{{ $monthlySum }}%</strong>
                                 </td>
                             @endforeach
                         </tr>
-                    @endforeach
-                </tbody>
-                <thead>
-                    <tr>
-                        <td><strong>Sum over total studie/ansiennitet</strong></td>
-                        @foreach ($timeline as $month)
-                            @php
-                                $monthlySum = 0;
-                            @endphp
-                            @foreach ($tableData_adjusted as $item)
-                                @php
-                                    $itemStart = strtotime($item['start_date']);
-                                    $itemEnd = strtotime($item['end_date']);
-                                    $currentMonth = strtotime($month);
-
-                                    if ($currentMonth >= $itemStart && $currentMonth <= $itemEnd) {
-                                        $monthlySum += $item['percentage'];
-                                    }
-                                @endphp
-                            @endforeach
-                            <td @class([
-                                'bg-danger' => $monthlySum > 100,
-                                'bg-warning' => $monthlySum === 0,
-                                'table-secondary',
-                            ])>
-                                <strong>{{ $monthlySum }}%</strong>
-                            </td>
-                        @endforeach
-                    </tr>
-                </thead>
-            </table>
-        </div>
-
+                    </thead>
+                </table>
+            </div>
+        @endif
         {{-- @dd($adjustedDataset); --}}
     @endsection
