@@ -107,7 +107,7 @@
                                                 <div class="col-12 d-flex flex-wrap>
                                                     <input type="hidden" name="relevance" value="false">
                                                     <div class="col-auto p-2 pe-4">
-                                                        <input type="checkbox" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 'true') checked @endif class="form-check-input">
+                                                        <input type="checkbox" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif class="form-check-input">
                                                         <label for="update_relevant" class="form-check-label">Særdeles høy relevanse for stillingen?</label>
                                                     </div>
                                                 </div>

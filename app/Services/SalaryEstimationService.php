@@ -61,11 +61,10 @@ class SalaryEstimationService
                 unset($adjustedEducation[$id]);
             }
 
-            $competencePoint = $this->calculateCompetencePoints($education);
+            $competencePoint = $this->calculateCompetencePoints($application, $education);
             $competencePoints += $competencePoint;
             $education['competence_points'] = $competencePoint;
 
-            // $competencePoints += $this->calculateCompetencePoints($education);
             $adjustedEducation[] = $education;
         }
 
@@ -199,24 +198,37 @@ class SalaryEstimationService
         ];
     }
 
-    private function calculateCompetencePoints($education)
+    private function calculateCompetencePoints($application, $education)
     {
         if (strtolower($education['study_points']) === 'bestått') {
             $months = Carbon::parse($education['start_date'])->diffInMonths($education['end_date']);
 
             return ($months >= 9) && $education['relevance'] ? 1 : 0;
         }
-
+        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
         switch (@$education['highereducation']) {
             case 'bachelor':
+
                 if ($education['study_points'] >= 180) {
-                    return $education['relevance'] ? 3 : 1;
+                    if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
+                        return $education['relevance'] ? 3 : 1;
+                    } elseif ($employeeGroup['ladder'] === 'D') {
+                        return $education['relevance'] ? 2 : 1;
+                    }
                 }
             case 'master':
                 if ($education['study_points'] >= 300) {
-                    return 6;
+                    if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
+                        return $education['relevance'] ? 7 : 6;
+                    } elseif ($employeeGroup['ladder'] === 'D') {
+                        return $education['relevance'] ? 4 : 3;
+                    }
                 } elseif ($education['study_points'] >= 120) {
-                    return 3;
+                    if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
+                        return 3;
+                    } elseif ($employeeGroup['ladder'] === 'D') {
+                        return 2;
+                    }
                 }
             default:
                 if ($education['study_points'] >= 60) {
@@ -282,7 +294,7 @@ class SalaryEstimationService
 
                 // Check if the work overlaps with education and meets the special conditions.
                 $overlapAllowed = in_array($work['workplace_type'], ['freechurch', 'other_christian']) &&
-                                  $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01'));
+                                  $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && $edu['relevance'];
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
                     // Create a segment before the education starts.
@@ -323,9 +335,16 @@ class SalaryEstimationService
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
 
+            // Adjust work_percentage for "freechurch" type after May 1, 2014.
+            $workSpcialConditionDate = Carbon::parse('2014-05-01');
+
             while ($workStart->lessThanOrEqualTo($workEnd)) {
                 $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
 
+                if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && $work['workplace_type'] === 'freechurch') {
+                    $work['work_percentage'] = 100;
+                    $work['relevance'] = 1;
+                }
                 // Calculate the available percentage for this month.
                 $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
 
