@@ -98,7 +98,6 @@ class SalaryEstimationService
             }
 
         }
-        // dd($adjustedWorkExperience);
         $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         // Cap competence points at 7
@@ -194,6 +193,7 @@ class SalaryEstimationService
             'start_date' => $education['start_date'],
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
+            'comments' => 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
             'relevance' => @$education['relevance'],
         ];
     }
@@ -285,6 +285,7 @@ class SalaryEstimationService
 
             // Adjust work_percentage for "freechurch" type after May 1, 2014.
             if ($work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
+                $work['old_work_percentage'] = $work['work_percentage'];
                 $work['work_percentage'] = 100;
             }
 
@@ -298,6 +299,8 @@ class SalaryEstimationService
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
                     // Create a segment before the education starts.
+                    $work['comments'] = 'Ansiennitet fra Frikirken/kristne organisasjoner under utdanning med kompetansetillegg gir uttelling etter 2015. ';
+
                     if ($currentStart->lessThan($eduStart)) {
                         $adjustedWork[] = array_merge($work, [
                             'start_date' => $currentStart->toDateString(),
@@ -342,8 +345,10 @@ class SalaryEstimationService
                 $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
 
                 if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && $work['workplace_type'] === 'freechurch') {
+                    $work['old_work_percentage'] = $work['work_percentage'];
                     $work['work_percentage'] = 100;
                     $work['relevance'] = 1;
+                    $work['comments'] = ($work['comments'] ?? '').'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
                 }
                 // Calculate the available percentage for this month.
                 $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
@@ -374,6 +379,8 @@ class SalaryEstimationService
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
                     'work_percentage' => $allocatedPercentage,
+                    'old_work_percentage' => $work['old_work_percentage'] ?? null,
+                    'comments' => $work['comments'] ?? null,
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
