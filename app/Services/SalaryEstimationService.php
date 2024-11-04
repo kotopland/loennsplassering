@@ -166,6 +166,7 @@ class SalaryEstimationService
             $eduEndDate = Carbon::parse($education['end_date']);
             if ($eduEndDate->day === 1) {
                 $education['end_date'] = $eduEndDate->subDay()->toDateString();
+                $education['comments'] = 'Endret sluttdato til siste dag i forrige måned for korrekt utregning. ';
                 $educationArray[] = $education;
             }
         }
@@ -554,6 +555,7 @@ class SalaryEstimationService
                 'end_date' => $endDate,
                 'percentage' => $education['study_percentage'],
                 'type' => 'education',
+                'comments' => $education['comments'] ?? null,
             ];
         }
         foreach ($workExperienceData ?? [] as $workExperience) {
@@ -570,6 +572,7 @@ class SalaryEstimationService
                 'end_date' => $endDate,
                 'percentage' => $workExperience['work_percentage'],
                 'type' => 'work',
+                'comments' => $education['comments'] ?? null,
             ];
         }
 

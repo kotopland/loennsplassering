@@ -203,7 +203,12 @@
                                 @endif
                             @endif
                             <tr>
-                                <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }}
+                                <td>{{ strlen($item['title']) > 30 ? substr($item['title'], 0, 30) . '...' : $item['title'] }} 
+                                    @if(@$item['comments'])
+                                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $item['comments'] }}">
+  info
+</button>
+@endif
                                 </td>
                                 @for ($i = 1; $i <= $monthDifference; $i++)
                                     <td class="table-primary"></td>
