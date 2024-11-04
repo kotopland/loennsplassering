@@ -141,31 +141,34 @@ class ExportExcelJob implements ShouldQueue
             $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
-            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $text, 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
             $row++;
         }
-        $adjusted = collect($application->education_adjusted);
-        $original = collect($application->education);
-        $existingTopics = $adjusted->pluck('topic_and_school')->toArray();
+        $adjustedEducation = collect($application->education_adjusted);
+        $originalEducation = collect($application->education);
+        $existingTopics = $adjustedEducation->pluck('topic_and_school')->toArray();
 
         // Filter the original education to only include those not present in the adjusted.
-        $nonDuplicateOriginal = $original->filter(function ($item) use ($existingTopics) {
+        $nonDuplicateOriginal = $originalEducation->filter(function ($item) use ($existingTopics) {
             return ! in_array($item['topic_and_school'], $existingTopics);
         });
 
+        $wECollection = collect(array_merge($application->education, $application->work_experience));
         foreach ($nonDuplicateOriginal ?? [] as $item) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
             $text .= '. Maskinelt registrert som ansiennitet under og gir derfor ikke kompetansepoeng.';
-            $data[] = ['row' => $row, 'column' => 'AA', 'value' => $text, 'datatype' => 'text'];
+            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
 
             $row++;
         }
@@ -192,9 +195,10 @@ class ExportExcelJob implements ShouldQueue
 
         foreach ($application->work_experience ?? [] as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['work_percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $enteredItem['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => $enteredItem['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['percentage'] / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker ';
             $text .= @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
@@ -203,10 +207,14 @@ class ExportExcelJob implements ShouldQueue
 
         foreach ($application->work_experience_adjusted ?? [] as $adjustedItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => $adjustedItem['work_percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'P', 'value' => @floatval($wECollection->firstWhere('id', $adjustedItem['id'])['percentage'] ?? 0) / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'W', 'value' => $adjustedItem['percentage'] / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'X', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'Y', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt behandlet felt', 'datatype' => 'text'];
             $row++;
         }

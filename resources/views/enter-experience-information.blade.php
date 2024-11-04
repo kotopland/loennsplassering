@@ -51,8 +51,8 @@
 
                                                         <!-- Work Percentage -->
                                                         <div class="col-6 col-md-3">
-                                                            <label for="update_work_percentage" class="form-check-label">Stillingsprosent:</label>
-                                                            <input type="number" id="update_work_percentage" name="work_percentage" min="0" max="100" value="{{ old('work_percentage', $item['work_percentage']) }}" required class="form-control @error('work_percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
+                                                            <label for="update_percentage" class="form-check-label">Stillingsprosent:</label>
+                                                            <input type="number" id="update_percentage" name="percentage" min="0" max="100" value="{{ old('percentage', $item['percentage']) }}" required class="form-control @error('percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
                                                         </div>
 
                                                         <div class="col-12 col-md-6">
@@ -129,20 +129,20 @@
 
                                 <tr>
                                     <th id="title_workplace-{{ $id }}" scope="row">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
-                                    <td id="work_percentage-{{ $id }}">{{ $item['work_percentage'] }}{{ is_numeric($item['work_percentage']) ? '%' : '' }}</td>
+                                    <td id="percentage-{{ $id }}">{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
                                     <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                     <td>
-                                        <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['work_percentage'], @$item['work_percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}"">
-                                            @if (in_array(null, [@$item['title_workplace'], @$item['work_percentage'], @$item['work_percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true))
+                                        <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['percentage'], @$item['percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}"">
+                                            @if (in_array(null, [@$item['title_workplace'], @$item['percentage'], @$item['percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true))
                                                 Vennligst oppdater
                                             @else
                                                 Endre
                                             @endif
                                         </a>
                                     </td>
-                                    {{-- <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #work_percentage to the innerText of #work_percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td> --}}
+                                    {{-- <td><a class="btn btn-sm btn-outline-primary" href="#" _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #percentage to the innerText of #percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag ny basert på denne</a></td> --}}
                                     <td><a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
                                 </tr>
                             @endforeach
@@ -166,8 +166,8 @@
                                 @enderror
                             </div>
                             <div class="col-auto pe-4">
-                                <label class="form-check-label" for="work_percentage">Stillingsprosent:</label>
-                                <input type="number" min="0" max="100" required id="work_percentage" name="work_percentage" value="{{ old('work_percentage') }}" placeholder="%" class="form-control @error('work_percentage') is-invalid @enderror">
+                                <label class="form-check-label" for="percentage">Stillingsprosent:</label>
+                                <input type="number" min="0" max="100" required id="percentage" name="percentage" value="{{ old('percentage') }}" placeholder="%" class="form-control @error('percentage') is-invalid @enderror">
                             </div>
                             <div class="col-auto">
                                 <div class="row justify-content-center">

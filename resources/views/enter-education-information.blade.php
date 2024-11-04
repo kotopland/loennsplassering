@@ -129,12 +129,12 @@
                                     <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
                                     <td id="study_points-{{ $id }}">{{ $item['study_points'] }}</td>
-                                    <td id="study_percentage-{{ $id }}">{{ @$item['study_percentage'] }} {{ is_numeric($item['study_percentage']) ? '%' : '' }}</td>
+                                    <td id="percentage-{{ $id }}">{{ @$item['percentage'] }} {{ is_numeric($item['percentage']) ? '%' : '' }}</td>
                                     <td id="highereducation-{{ $id }}">{{ @$item['highereducation'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                     <td>
-                                        <a class="btn btn-sm @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['study_percentage'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}"">
-                                            @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['study_percentage'], @$item['relevance']], true))
+                                        <a class="btn btn-sm @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}"">
+                                            @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true))
                                                 Vennligst oppdater
                                             @else
                                                 Endre

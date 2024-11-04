@@ -9,6 +9,7 @@ use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -36,6 +37,40 @@ class EmployeeCVController extends Controller
         session(['applicationId' => $application->id]);
         session()->flash('message', 'Dine lagrede opplysninger er lastet inn.');
         session()->flash('alert-class', 'alert-success');
+
+        // fix missing attributes
+        $education = collect($application->education);
+
+        // Iterate over each item and add an ID if it does not exist
+        $updatedEducation = $education->map(function ($item) {
+            if (! isset($item['id'])) {
+                $item['id'] = Str::uuid()->toString(); // Generate a unique ID
+            }
+            if (! isset($item['percentage'])) {
+                $item['percentage'] = $item['study_percentage'];
+            }
+
+            return $item;
+        });
+
+        $workExperience = collect($application->work_experience);
+
+        // Iterate over each item and add an ID if it does not exist
+        $updatedWorkExperience = $workExperience->map(function ($item) {
+            if (! isset($item['id'])) {
+                $item['id'] = Str::uuid()->toString(); // Generate a unique ID
+            }
+            if (! isset($item['percentage'])) {
+                $item['percentage'] = $item['work_percentage'];
+            }
+
+            return $item;
+        });
+
+        // Update the education field in the application model
+        $application->education = $updatedEducation->toArray();
+        $application->work_experience = $updatedWorkExperience->toArray();
+        $application->save();
 
         return redirect()->route('enter-employment-information');
     }
@@ -121,7 +156,7 @@ class EmployeeCVController extends Controller
                 @$item['start_date'],
                 @$item['end_date'],
                 @$item['study_points'],
-                @$item['study_percentage'],
+                @$item['percentage'],
                 @$item['relevance'],
             ], true)) {
 
@@ -175,9 +210,10 @@ class EmployeeCVController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'study_points' => $request->study_points,
-            'study_percentage' => $studyPercentage,
+            'percentage' => $studyPercentage,
             'highereducation' => $request->highereducation,
             'relevance' => $relevance,
+            'id' => Str::uuid()->toString(),
         ];
         $application->education = $education;
         $application->save();
@@ -231,9 +267,10 @@ class EmployeeCVController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'study_points' => $request->study_points,
-            'study_percentage' => $studyPercentage,
+            'percentage' => $studyPercentage,
             'highereducation' => $request->highereducation,
             'relevance' => $relevance,
+            'id' => Str::uuid()->toString(),
         ];
 
         // Update the model and save
@@ -259,7 +296,7 @@ class EmployeeCVController extends Controller
         foreach ($application->work_experience ?? [] as $item) {
             if (in_array(null, [
                 @$item['title_workplace'],
-                @$item['work_percentage'],
+                @$item['percentage'],
                 @$item['start_date'],
                 @$item['end_date'],
                 @$item['relevance'],
@@ -277,7 +314,7 @@ class EmployeeCVController extends Controller
 
         $validatedData = $request->validate([
             'title_workplace' => 'string|required',
-            'work_percentage' => 'required|numeric|between:0,100',
+            'percentage' => 'required|numeric|between:0,100',
             'start_date' => 'date|required',
             'end_date' => 'date|required',
             'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
@@ -285,9 +322,9 @@ class EmployeeCVController extends Controller
         ], [
             'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
             'title_workplace.string' => 'Tittel og arbeidssted må være tekst.',
-            'work_percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
-            'work_percentage.numeric' => 'Arbeidsprosent må være et tall.',
-            'work_percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
+            'percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
+            'percentage.numeric' => 'Arbeidsprosent må være et tall.',
+            'percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
             'start_date.required' => 'Vennligst velg en startdato.',
             'start_date.date' => 'Startdato må være en gyldig dato.',
             'end_date.required' => 'Vennligst velg en sluttdato.',
@@ -300,11 +337,12 @@ class EmployeeCVController extends Controller
         $work_experience = $application->work_experience ?? [];
         $work_experience[] = [
             'title_workplace' => $validatedData['title_workplace'],
-            'work_percentage' => $validatedData['work_percentage'],
+            'percentage' => $validatedData['percentage'],
             'start_date' => $validatedData['start_date'],
             'end_date' => $validatedData['end_date'],
             'workplace_type' => $validatedData['workplace_type'],
             'relevance' => $relevance,
+            'id' => Str::uuid()->toString(),
         ];
         $application->work_experience = $work_experience;
         $application->save();
@@ -317,7 +355,7 @@ class EmployeeCVController extends Controller
         $validatedData = $request->validate([
             'edit' => 'numeric|required',
             'title_workplace' => 'string|required',
-            'work_percentage' => 'required|numeric|between:0,100',
+            'percentage' => 'required|numeric|between:0,100',
             'start_date' => 'date|required',
             'end_date' => 'date|required',
             'workplace_type' => 'string|sometimes|nullable|in:normal,freechurch,other_christian',
@@ -327,9 +365,9 @@ class EmployeeCVController extends Controller
             'edit.numeric' => 'ID må være et tall.',
             'title_workplace.required' => 'Vennligst fyll inn tittel og arbeidssted.',
             'title_workplace.string' => 'Tittel og arbeidssted må være tekst.',
-            'work_percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
-            'work_percentage.numeric' => 'Arbeidsprosent må være et tall.',
-            'work_percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
+            'percentage.required' => 'Vennligst fyll inn arbeidsprosent.',
+            'percentage.numeric' => 'Arbeidsprosent må være et tall.',
+            'percentage.between' => 'Arbeidsprosent må være mellom 0 og 100.',
             'start_date.required' => 'Vennligst velg en startdato.',
             'start_date.date' => 'Startdato må være en gyldig dato.',
             'end_date.required' => 'Vennligst velg en sluttdato.',
@@ -345,11 +383,12 @@ class EmployeeCVController extends Controller
 
         $workExperienceItem = [
             'title_workplace' => $validatedData['title_workplace'],
-            'work_percentage' => $validatedData['work_percentage'],
+            'percentage' => $validatedData['percentage'],
             'start_date' => $validatedData['start_date'],
             'end_date' => $validatedData['end_date'],
             'workplace_type' => $validatedData['workplace_type'],
             'relevance' => $relevance,
+            'id' => Str::uuid()->toString(),
         ];
 
         $workExperienceData[$request->edit] = $workExperienceItem;
@@ -371,6 +410,9 @@ class EmployeeCVController extends Controller
         $application = $salaryEstimationService->checkForSavedApplication($application);
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
+
+        // $wECollection = collect(array_merge($application->education, $application->work_experience));
+        // $wECollection->firstWhere('id', $application->work_experience_adjusted[0]['id'])['start_date'];
         // dd($adjustedDataset);
         $timelineData = $salaryEstimationService->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
         $timelineData_adjusted = $salaryEstimationService->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
@@ -430,15 +472,16 @@ class EmployeeCVController extends Controller
             $doneWithWorkExperience = false;
 
             foreach ($data ?? [] as $row => $column) {
-                if ($row >= 14 && !$doneWithEducation) {
+                if ($row >= 14 && ! $doneWithEducation) {
                     // Check if education section is completed
                     if (str_contains($column[1], 'Ansiennitetsopplysninger:')) {
                         $doneWithEducation = true;
+
                         continue;
                     }
 
                     // Process education if not empty
-                    if (!empty(trim($column[1]))) {
+                    if (! empty(trim($column[1]))) {
                         try {
                             $studyPercentage = strtolower($column[20]) == 'bestått' ? '100' : '';
 
@@ -456,32 +499,35 @@ class EmployeeCVController extends Controller
                                 'start_date' => $this->isValidExcelDate($column[18]) ? Date::excelToDateTimeObject($column[18])->format('Y-m-d') : '',
                                 'end_date' => $this->isValidExcelDate($column[19]) ? Date::excelToDateTimeObject($column[19])->format('Y-m-d') : '',
                                 'study_points' => $column[20],
-                                'study_percentage' => $studyPercentage
+                                'percentage' => $studyPercentage,
                             ];
                         } catch (\InvalidArgumentException $e) {
                             session()->flash('message', 'Feil i datoformatet i excel-arket. Sjekk at alle datoer er på formatet ÅÅÅÅ-MM-DD.');
                             session()->flash('alert-class', 'alert-danger');
+
                             return redirect()->back();
                         } catch (\Exception $e) {
                             session()->flash('message', 'En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.');
                             session()->flash('alert-class', 'alert-danger');
+
                             return redirect()->back();
                         }
                     }
-                } elseif ($doneWithEducation && !$doneWithWorkExperience) {
+                } elseif ($doneWithEducation && ! $doneWithWorkExperience) {
                     // Check if work experience section starts
                     if (str_contains($column[1], 'PS: husk også ')) {
                         $doneWithWorkExperience = true;
+
                         continue;
                     }
 
                     // Process work experience if not empty
-                    if (!empty(trim($column[1]))) {
+                    if (! empty(trim($column[1]))) {
                         $work_experience[] = [
                             'title_workplace' => $column[1],
-                            'work_percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '',
+                            'percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '',
                             'start_date' => $this->isValidExcelDate($column[16]) ? Date::excelToDateTimeObject($column[16])->format('Y-m-d') : '',
-                            'end_date' => $this->isValidExcelDate($column[17]) ? Date::excelToDateTimeObject($column[17])->format('Y-m-d') : ''
+                            'end_date' => $this->isValidExcelDate($column[17]) ? Date::excelToDateTimeObject($column[17])->format('Y-m-d') : '',
                         ];
                     }
                 }
@@ -494,9 +540,10 @@ class EmployeeCVController extends Controller
         } catch (PhpSpreadsheetException $e) {
             session()->flash('message', 'En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.');
             session()->flash('alert-class', 'alert-danger');
+
             return redirect()->back();
         }
-        
+
         $application->education = $education;
         $application->work_experience = $work_experience;
         $application->save();
@@ -508,7 +555,6 @@ class EmployeeCVController extends Controller
 
         return redirect()->route('enter-employment-information');
 
-        
     }
 
     public function destroyEducationInformation(Request $request)

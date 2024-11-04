@@ -29,7 +29,6 @@ class SalaryEstimationService
     // Main method remains unchanged.
     public function adjustEducationAndWork($application)
     {
-
         $dateAge18 = Carbon::parse($application->birth_date)->addYears(18);
 
         $adjustedEducation = [];
@@ -38,6 +37,7 @@ class SalaryEstimationService
 
         // Process education
         foreach ($application->education ?? [] as $id => $education) {
+
             $eduStartDate = Carbon::parse($education['start_date']);
             $eduEndDate = Carbon::parse($education['end_date']);
 
@@ -190,12 +190,13 @@ class SalaryEstimationService
     {
         return [
             'title_workplace' => $education['topic_and_school'],
-            'work_percentage' => $education['study_percentage'],
+            'percentage' => $education['percentage'],
             'start_date' => $education['start_date'],
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
             'comments' => 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
             'relevance' => @$education['relevance'],
+            'id' => $education['id'],
         ];
     }
 
@@ -284,10 +285,9 @@ class SalaryEstimationService
             $workEnd = Carbon::parse($work['end_date']);
             $currentStart = $workStart;
 
-            // Adjust work_percentage for "freechurch" type after May 1, 2014.
+            // Adjust percentage for "freechurch" type after May 1, 2014.
             if ($work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
-                $work['old_work_percentage'] = $work['work_percentage'];
-                $work['work_percentage'] = 100;
+                $work['percentage'] = 100;
             }
 
             foreach ($education ?? [] as $edu) {
@@ -339,15 +339,14 @@ class SalaryEstimationService
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
 
-            // Adjust work_percentage for "freechurch" type after May 1, 2014.
+            // Adjust percentage for "freechurch" type after May 1, 2014.
             $workSpcialConditionDate = Carbon::parse('2014-05-01');
 
             while ($workStart->lessThanOrEqualTo($workEnd)) {
                 $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
 
                 if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && $work['workplace_type'] === 'freechurch') {
-                    $work['old_work_percentage'] = $work['work_percentage'];
-                    $work['work_percentage'] = 100;
+                    $work['percentage'] = 100;
                     $work['relevance'] = 1;
                     $work['comments'] = ($work['comments'] ?? '').'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
                 }
@@ -362,7 +361,7 @@ class SalaryEstimationService
                 }
 
                 // Calculate the percentage for this month.
-                $allocatedPercentage = min($work['work_percentage'], $availablePercentage);
+                $allocatedPercentage = min($work['percentage'], $availablePercentage);
 
                 if ($workStart->lessThanOrEqualTo(Carbon::parse($work['start_date']))) {
                     $workStart = Carbon::parse($work['start_date']);
@@ -379,12 +378,12 @@ class SalaryEstimationService
                 $splitWork[] = [
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
-                    'work_percentage' => $allocatedPercentage,
-                    'old_work_percentage' => $work['old_work_percentage'] ?? null,
+                    'percentage' => $allocatedPercentage,
                     'comments' => $work['comments'] ?? null,
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
+                    'id' => $work['id'],
                 ];
 
                 // Update the monthly percentage tracker.
@@ -413,7 +412,7 @@ class SalaryEstimationService
             if (
                 $previous &&
                 $previous['title_workplace'] === $current['title_workplace'] &&
-                $previous['work_percentage'] === $current['work_percentage'] &&
+                $previous['percentage'] === $current['percentage'] &&
                 Carbon::parse($previous['end_date'])->addDay()->equalTo(Carbon::parse($current['start_date']))
             ) {
                 // If consecutive, extend the previous segment's end date.
@@ -505,7 +504,7 @@ class SalaryEstimationService
             $diffInMonths = ($endDate->format('Y') - $startDate->format('Y')) * 12 + $endDate->format('n') - $startDate->format('n') + 1;
 
             // Multiply by work percentage and add to the total
-            $totalMonths += ($diffInMonths * $workExperience['work_percentage']) / 100;
+            $totalMonths += ($diffInMonths * $workExperience['percentage']) / 100;
         }
 
         return $totalMonths;
@@ -553,7 +552,7 @@ class SalaryEstimationService
                 'title' => $education['topic_and_school'],
                 'start_date' => $education['start_date'],
                 'end_date' => $endDate,
-                'percentage' => $education['study_percentage'],
+                'percentage' => $education['percentage'],
                 'type' => 'education',
                 'comments' => $education['comments'] ?? null,
             ];
@@ -570,9 +569,9 @@ class SalaryEstimationService
                 'title' => $workExperience['title_workplace'],
                 'start_date' => $workExperience['start_date'],
                 'end_date' => $endDate,
-                'percentage' => $workExperience['work_percentage'],
+                'percentage' => $workExperience['percentage'],
                 'type' => 'work',
-                'comments' => $education['comments'] ?? null,
+                'comments' => $workExperience['comments'] ?? null,
             ];
         }
 
