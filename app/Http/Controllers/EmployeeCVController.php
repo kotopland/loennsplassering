@@ -26,46 +26,19 @@ class EmployeeCVController extends Controller
     {
         request()->session()->invalidate();
 
-        session()->flash('message', 'Du er nå logget ut.');
-        session()->flash('alert-class', 'alert-success');
+        $this->flashMessage('Du er nå logget ut.');
 
         return redirect()->route('welcome');
     }
 
-    public function openApplication(EmployeeCV $application)
+    public function openApplication(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         session(['applicationId' => $application->id]);
-        session()->flash('message', 'Dine lagrede opplysninger er lastet inn.');
-        session()->flash('alert-class', 'alert-success');
+        $this->flashMessage('Dine lagrede opplysninger er lastet inn.');
 
-        // fix missing attributes
-        $education = collect($application->education);
-
-        // Iterate over each item and add an ID if it does not exist
-        $updatedEducation = $education->map(function ($item) {
-            if (! isset($item['id'])) {
-                $item['id'] = Str::uuid()->toString(); // Generate a unique ID
-            }
-            if (! isset($item['percentage'])) {
-                $item['percentage'] = $item['study_percentage'];
-            }
-
-            return $item;
-        });
-
-        $workExperience = collect($application->work_experience);
-
-        // Iterate over each item and add an ID if it does not exist
-        $updatedWorkExperience = $workExperience->map(function ($item) {
-            if (! isset($item['id'])) {
-                $item['id'] = Str::uuid()->toString(); // Generate a unique ID
-            }
-            if (! isset($item['percentage'])) {
-                $item['percentage'] = $item['work_percentage'];
-            }
-
-            return $item;
-        });
+        // update missing attributes
+        $updatedEducation = $salaryEstimationService->updateMissingDatasetItems($application->education);
+        $updatedWorkExperience = $salaryEstimationService->updateMissingDatasetItems($application->work_experience);
 
         // Update the education field in the application model
         $application->education = $updatedEducation->toArray();
@@ -93,8 +66,7 @@ class EmployeeCVController extends Controller
         $application->email_sent = true;
         $application->save();
 
-        session()->flash('message', 'Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.');
-        session()->flash('alert-class', 'alert-success');
+        $this->flashMessage('Lenke til dette skjemaet er påkrevet. Vennligst sjekk at du har ått e-posten.');
 
         return response('Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.')->header('Content-Type', 'text/html');
 
@@ -106,7 +78,7 @@ class EmployeeCVController extends Controller
             session()->forget('applicationId');
         }
 
-        $application = $salaryEstimationService->checkForSavedApplication($application);
+        $application = $salaryEstimationService->getOrCreateApplication($application);
         $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
         $application->work_start_date = $application->work_start_date ?? '2024-11-02';
         $application->birth_date = $application->birth_date ?? '1990-10-02';
@@ -141,12 +113,11 @@ class EmployeeCVController extends Controller
     public function enterEducationInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
-            session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
-            session()->flash('alert-class', 'alert-danger');
+            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
 
             return redirect()->route('welcome');
         }
-        $application = $salaryEstimationService->checkForSavedApplication($application);
+        $application = $salaryEstimationService->getOrCreateApplication($application);
 
         $hasErrors = false; // Initialize the flag to false
 
@@ -284,12 +255,11 @@ class EmployeeCVController extends Controller
     public function enterExperienceInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
-            session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
-            session()->flash('alert-class', 'alert-danger');
+            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
 
             return redirect()->route('welcome');
         }
-        $application = $salaryEstimationService->checkForSavedApplication($application);
+        $application = $salaryEstimationService->getOrCreateApplication($application);
 
         $hasErrors = false; // Initialize the flag to false
 
@@ -401,13 +371,12 @@ class EmployeeCVController extends Controller
     public function previewAndEstimatedSalary(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
-            session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
-            session()->flash('alert-class', 'alert-danger');
+            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
 
             return redirect()->route('welcome');
         }
 
-        $application = $salaryEstimationService->checkForSavedApplication($application);
+        $application = $salaryEstimationService->getOrCreateApplication($application);
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
 
@@ -502,13 +471,11 @@ class EmployeeCVController extends Controller
                                 'percentage' => $studyPercentage,
                             ];
                         } catch (\InvalidArgumentException $e) {
-                            session()->flash('message', 'Feil i datoformatet i excel-arket. Sjekk at alle datoer er på formatet ÅÅÅÅ-MM-DD.');
-                            session()->flash('alert-class', 'alert-danger');
+                            $this->flashMessage('Feil i datoformatet i excel-arket. Sjekk at alle datoer er på formatet ÅÅÅÅ-MM-DD.', 'danger');
 
                             return redirect()->back();
                         } catch (\Exception $e) {
-                            session()->flash('message', 'En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.');
-                            session()->flash('alert-class', 'alert-danger');
+                            $this->flashMessage('En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.', 'danger');
 
                             return redirect()->back();
                         }
@@ -538,8 +505,7 @@ class EmployeeCVController extends Controller
                 }
             }
         } catch (PhpSpreadsheetException $e) {
-            session()->flash('message', 'En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.');
-            session()->flash('alert-class', 'alert-danger');
+            $this->flashMessage('En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.', 'danger');
 
             return redirect()->back();
         }
@@ -550,8 +516,7 @@ class EmployeeCVController extends Controller
 
         // Example: Perform calculations based on the extracted data
         // $results = $this->performCalculations($data);
-        session()->flash('message', 'Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
-        session()->flash('alert-class', 'alert-success');
+        $this->flashMessage('Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
 
         return redirect()->route('enter-employment-information');
 
@@ -602,8 +567,7 @@ class EmployeeCVController extends Controller
     public function exportAsXls()
     {
         if (! session('applicationId')) {
-            session()->flash('message', 'Din sesjon er utløpt og du må starte på nytt.');
-            session()->flash('alert-class', 'alert-danger');
+            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
 
             return redirect()->route('welcome');
         }
@@ -625,8 +589,7 @@ class EmployeeCVController extends Controller
 
         // Dispatch the job
         ExportExcelJob::dispatch(session('applicationId'), $email);
-        session()->flash('message', 'En epost med et excel dokument blir sendt i løpet av et par minutter.');
-        session()->flash('alert-class', 'alert-success');
+        $this->flashMessage('En epost med et excel dokument blir sendt i løpet av et par minutter.');
 
         return redirect()->back();
 
@@ -635,5 +598,11 @@ class EmployeeCVController extends Controller
     private function isValidExcelDate($dateString)
     {
         return is_numeric($dateString);
+    }
+
+    private function flashMessage($message, $type = 'success')
+    {
+        session()->flash('message', $message);
+        session()->flash('alert-class', 'alert-'.$type); // Adjust your alert classes accordingly
     }
 }

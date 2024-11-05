@@ -147,7 +147,7 @@ class ExportExcelJob implements ShouldQueue
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant.' : '';
-            $text .= isset($item['competence_points']) && intval($item['competence_points']) > 0 ? ' Gitt '.$item['competence_points'].' kompetanasepoeng.' : '';
+            $text .= isset($item['competence_points']) && intval($item['competence_points']) >= 0 ? ' Gitt '.$item['competence_points'].' kompetanasepoeng.' : '';
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
             $row++;
         }
@@ -168,7 +168,7 @@ class ExportExcelJob implements ShouldQueue
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
-            $text .= ! isset($item['competence_points']) ? '. Gir ansiennitet istedet for kompetansepoeng i perider som ikke overskrider 100% ansiennitet.' : '';
+            $text .= ! isset($item['competence_points']) ? '. Flytet til ansiennitet og gir uttelling i perider som ikke overskrider 100% ansiennitet.' : '';
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
 
             $row++;

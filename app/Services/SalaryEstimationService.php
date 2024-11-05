@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Models\EmployeeCV;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class SalaryEstimationService
 {
-    public function checkForSavedApplication($application)
+    private Carbon $dateAge18;
+
+    public function getOrCreateApplication($application)
     {
         if ($application->id) {
             return $application;
@@ -25,11 +28,11 @@ class SalaryEstimationService
         return $newApplication;
     }
 
-    // ## CHATGPT START
     // Main method remains unchanged.
     public function adjustEducationAndWork($application)
     {
-        $dateAge18 = Carbon::parse($application->birth_date)->addYears(18);
+        $this->dateAge18 = Carbon::parse($application->birth_date)->addYears(18);
+        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         $adjustedEducation = [];
         $adjustedWorkExperience = $application->work_experience ?? [];
@@ -42,21 +45,21 @@ class SalaryEstimationService
             $eduEndDate = Carbon::parse($education['end_date']);
 
             // If both start and end dates are before birthDate, skip it.
-            if ($eduEndDate->lessThan($dateAge18)) {
+            if ($eduEndDate->lessThan($this->dateAge18)) {
                 unset($adjustedEducation[$id]);
 
                 continue;
             }
 
             // If start date is before birthDate and end date is after, adjust start date.
-            if ($eduStartDate->lessThan($dateAge18) && $eduEndDate->greaterThanOrEqualTo($dateAge18) && ! $this->containsAnyString($education['topic_and_school'], ['videregående', 'vgs', 'fagskole'])) {
-                $education['start_date'] = $dateAge18->toDateString();
-                $adjustedEducation[$id][] = ['comments' => 'Endrer start til 18 års alder.'];
+            if ($eduStartDate->lessThan($this->dateAge18) && $eduEndDate->greaterThanOrEqualTo($this->dateAge18) && ! $this->containsAnyString($education['topic_and_school'], ['videregående', 'vgs', 'fagskole'])) {
+                $education['start_date'] = $this->dateAge18->toDateString();
+                $education['comments'] = @$education['comments'].'Endret start til 18 års alder. ';
 
             }
 
             // Skip if employee was under 18 at adjusted start date.
-            if ($dateAge18->diffInYears(Carbon::parse($education['start_date'])) < 0) {
+            if ($this->dateAge18->diffInYears(Carbon::parse($education['start_date'])) < 0) {
                 continue;
                 unset($adjustedEducation[$id]);
             }
@@ -67,38 +70,6 @@ class SalaryEstimationService
 
             $adjustedEducation[] = $education;
         }
-
-        // Process work_experience
-        foreach ($application->work_experience ?? [] as $id => $work) {
-            $workStartDate = Carbon::parse($work['start_date']);
-            $workEndDate = Carbon::parse($work['end_date']);
-
-            // If both start and end dates are before birthDate, skip it.
-            if ($workEndDate->lessThan($dateAge18)) {
-                unset($adjustedWorkExperience[$id]);
-
-                continue;
-            }
-
-            // If start date is before birthDate and end date is after, adjust start date.
-            if ($workStartDate->lessThan($dateAge18) && $workEndDate->greaterThanOrEqualTo($dateAge18)) {
-                $this->removeDuplicates($adjustedWorkExperience);
-
-                // $work['start_date'] = $dateAge18->addMonth()->toDateString();
-                $adjustedWorkExperience[$id]['start_date'] = $dateAge18->addDay()->toDateString();
-                $adjustedWorkExperience[$id][] = ['comments' => 'Endrer start til etter 18 års alder.'];
-
-                continue;
-            }
-            // Skip if employee was under 18 at adjusted start date.
-            if ($dateAge18->diffInYears(Carbon::parse($work['start_date'])) < 0) {
-                unset($adjustedWorkExperience[$id]);
-
-                continue;
-            }
-
-        }
-        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         // Cap competence points at 7
         if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true) && $competencePoints > 7) {
@@ -143,6 +114,37 @@ class SalaryEstimationService
             $application->competence_points = min($competencePoints, 4);
         }
 
+        // Process work_experience
+        foreach ($application->work_experience ?? [] as $id => $work) {
+            $workStartDate = Carbon::parse($work['start_date']);
+            $workEndDate = Carbon::parse($work['end_date']);
+
+            // If both start and end dates are before birthDate, skip it.
+            if ($workEndDate->lessThan($this->dateAge18)) {
+                unset($adjustedWorkExperience[$id]);
+
+                continue;
+            }
+
+            // If start date is before birthDate and end date is after, adjust start date.
+            if ($workStartDate->lessThan($this->dateAge18) && $workEndDate->greaterThanOrEqualTo($this->dateAge18)) {
+                $this->removeDuplicates($adjustedWorkExperience);
+
+                // $work['start_date'] = $this->dateAge18->addMonth()->toDateString();
+                $adjustedWorkExperience[$id]['start_date'] = $this->dateAge18->addDay()->toDateString();
+                $adjustedWorkExperience[$id]['comments'] = @$adjustedWorkExperience[$id]['comments'].'Endret start til etter 18 års alder. ';
+
+                continue;
+            }
+            // Skip if employee was under 18 at adjusted start date.
+            if ($this->dateAge18->diffInYears(Carbon::parse($work['start_date'])) < 0) {
+                unset($adjustedWorkExperience[$id]);
+
+                continue;
+            }
+
+        }
+
         // Adjust education for overlaps
         $adjustedEducation = $this->adjustEducation($adjustedEducation);
 
@@ -166,7 +168,7 @@ class SalaryEstimationService
             $eduEndDate = Carbon::parse($education['end_date']);
             if ($eduEndDate->day === 1) {
                 $education['end_date'] = $eduEndDate->subDay()->toDateString();
-                $education['comments'] = 'Endret sluttdato til siste dag i forrige måned for korrekt utregning. ';
+                $education['comments'] = @$education['comments'].'Endret sluttdato til siste dag i forrige måned for korrekt utregning. ';
                 $educationArray[] = $education;
             }
         }
@@ -195,7 +197,7 @@ class SalaryEstimationService
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
             'relevance' => @$education['relevance'],
-            'comments' => 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
+            'comments' => @$education['comments'].'Utdanning gjort om til å gi uttelling i ansiennitet. ',
             'original' => false,
             'id' => $education['id'],
         ];
@@ -296,12 +298,15 @@ class SalaryEstimationService
                 $eduEnd = Carbon::parse($edu['end_date']);
 
                 // Check if the work overlaps with education and meets the special conditions.
-                $overlapAllowed = in_array($work['workplace_type'], ['freechurch', 'other_christian']) &&
-                                  $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && $edu['relevance'];
+                $overlapAllowed = (
+                    ($eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master'], true))
+                    || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')))
+                                && $edu['relevance'] && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
+
                     // Create a segment before the education starts.
-                    $work['comments'] = 'Ansiennitet fra Frikirken/kristne organisasjoner under utdanning med kompetansetillegg gir uttelling etter 2015. ';
+                    $work['comments'] = Str::finish(@$work['comments'], 'Splittet ansiennitet pga ikke relevant men tellende kompetansepoenggivende utdanning i perioden. ');
 
                     if ($currentStart->lessThan($eduStart)) {
                         $adjustedWork[] = array_merge($work, [
@@ -309,10 +314,10 @@ class SalaryEstimationService
                             'end_date' => $eduStart->subDay()->toDateString(),
                         ]);
                     }
-
                     // Update the current start date to the day after education ends.
                     $currentStart = $eduEnd->addDay();
                 }
+
             }
 
             // Add the remaining part of the work period.
@@ -349,7 +354,7 @@ class SalaryEstimationService
                 if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && $work['workplace_type'] === 'freechurch') {
                     $work['percentage'] = 100;
                     $work['relevance'] = 1;
-                    $work['comments'] = ($work['comments'] ?? '').'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
+                    $work['comments'] = @$work['comments'].'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
                 }
                 // Calculate the available percentage for this month.
                 $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
@@ -383,7 +388,7 @@ class SalaryEstimationService
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
-                    'comments' => $work['comments'] ?? null,
+                    'comments' => @$work['comments'],
                     'original' => false,
                     'id' => $work['id'],
                 ];
@@ -435,19 +440,6 @@ class SalaryEstimationService
 
         return $mergedWork;
     }
-
-    private function datesOverlap($start1, $end1, $start2, $end2)
-    {
-        return $start1->lte($end2) && $end1->gte($start2);
-    }
-
-    private function removeDuplicates($workExperience)
-    {
-        return collect($workExperience)->unique(function ($work) {
-            return $work['title_workplace'].$work['start_date'].$work['end_date'];
-        })->values()->all();
-    }
-    // ## CHATGPT END ##
 
     public static function calculateStudyPercentage(string $startDate, string $endDate, int $studyPoints): float
     {
@@ -556,7 +548,7 @@ class SalaryEstimationService
                 'end_date' => $endDate,
                 'percentage' => $education['percentage'],
                 'type' => 'education',
-                'comments' => $education['comments'] ?? null,
+                'comments' => @$education['comments'],
             ];
         }
         foreach ($workExperienceData ?? [] as $workExperience) {
@@ -573,7 +565,7 @@ class SalaryEstimationService
                 'end_date' => $endDate,
                 'percentage' => $workExperience['percentage'],
                 'type' => 'work',
-                'comments' => $workExperience['comments'] ?? null,
+                'comments' => @$workExperience['comments'],
             ];
         }
 
@@ -598,5 +590,34 @@ class SalaryEstimationService
             'timeline' => $timeline,
             'tableData' => $allData,
         ];
+    }
+
+    public function updateMissingDatasetItems($items)
+    {
+        return collect($items)->map(function ($item) {
+            if (! isset($item['id'])) {
+                $item['id'] = Str::uuid()->toString(); // Generate a unique ID
+            }
+            if (! isset($item['percentage'])) {
+                $item['percentage'] = $item['study_percentage'] ?? $item['work_percentage'] ?? 0;
+            }
+            if (@$item['workplace_type'] == 'freechurch') {
+                $item['relevance'] = true;
+            }
+
+            return $item;
+        });
+    }
+
+    private function datesOverlap($start1, $end1, $start2, $end2)
+    {
+        return $start1->lte($end2) && $end1->gte($start2);
+    }
+
+    private function removeDuplicates($workExperience)
+    {
+        return collect($workExperience)->unique(function ($work) {
+            return $work['title_workplace'].$work['start_date'].$work['end_date'];
+        })->values()->all();
     }
 }
