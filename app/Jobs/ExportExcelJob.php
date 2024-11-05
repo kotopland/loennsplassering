@@ -136,15 +136,18 @@ class ExportExcelJob implements ShouldQueue
         ];
 
         $row = 15;
+
+        $wECollection = collect(array_merge($application->education, $application->work_experience));
         foreach ($application->education_adjusted ?? [] as $item) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'S', 'value' => $item['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => $item['end_date'], 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
-            $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
+            $text .= @$item['relevance'] ? ' og registrert som relevant.' : '';
+            $text .= isset($item['competence_points']) && intval($item['competence_points']) > 0 ? ' Gitt '.$item['competence_points'].' kompetanasepoeng.' : '';
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
             $row++;
         }
@@ -156,8 +159,6 @@ class ExportExcelJob implements ShouldQueue
         $nonDuplicateOriginal = $originalEducation->filter(function ($item) use ($existingTopics) {
             return ! in_array($item['topic_and_school'], $existingTopics);
         });
-
-        $wECollection = collect(array_merge($application->education, $application->work_experience));
         foreach ($nonDuplicateOriginal ?? [] as $item) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $data[] = ['row' => $row, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
@@ -167,7 +168,7 @@ class ExportExcelJob implements ShouldQueue
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
-            $text .= '. Maskinelt registrert som ansiennitet under og gir derfor ikke kompetansepoeng.';
+            $text .= ! isset($item['competence_points']) ? '. Gir ansiennitet istedet for kompetansepoeng i perider som ikke overskrider 100% ansiennitet.' : '';
             $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
 
             $row++;

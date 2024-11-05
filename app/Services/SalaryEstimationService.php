@@ -194,8 +194,9 @@ class SalaryEstimationService
             'start_date' => $education['start_date'],
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
-            'comments' => 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
             'relevance' => @$education['relevance'],
+            'comments' => 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
+            'original' => false,
             'id' => $education['id'],
         ];
     }
@@ -379,10 +380,11 @@ class SalaryEstimationService
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
                     'percentage' => $allocatedPercentage,
-                    'comments' => $work['comments'] ?? null,
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
+                    'comments' => $work['comments'] ?? null,
+                    'original' => false,
                     'id' => $work['id'],
                 ];
 
