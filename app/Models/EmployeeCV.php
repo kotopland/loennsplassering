@@ -231,4 +231,18 @@ class EmployeeCV extends Model
 
         return $reversedArray;
     }
+
+    public static function getSalary($level1, $level2, $position)
+    {
+        // Check if the specified levels exist
+        if (! isset(self::salaryLadders[$level1][$level2])) {
+            return null; // or handle the error as needed
+        }
+
+        $ladder = self::salaryLadders[$level1][$level2];
+        // Clamp the position to the range of the ladder array
+        $position = max(0, min($position, count($ladder) - 1));
+
+        return $ladder[$position];
+    }
 }

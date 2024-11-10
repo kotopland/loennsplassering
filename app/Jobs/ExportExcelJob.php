@@ -104,7 +104,7 @@ class ExportExcelJob implements ShouldQueue
         $subject = 'Foreløpig beregning av din lønnsplassering';
         $body = $this->generateEmailBody($data['data']);
         Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
-        Mail::to('knut.ola.topland@frikirken.no')->send(new SimpleEmail('Sendt epost: '.$subject, $body, $modifiedFilePath));
+        Mail::to(env('APP_REPORT_EMAIL'))->send(new SimpleEmail('Sendt epost: '.$subject, $body, $modifiedFilePath));
     }
 
     /**
@@ -241,7 +241,7 @@ class ExportExcelJob implements ShouldQueue
 
         $ladder = $salaryCategory['ladder'];
         $group = $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '';
-        $salaryPlacement = EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][$ladderPosition];
+        $salaryPlacement = EmployeeCV::getSalary($salaryCategory['ladder'], $salaryCategory['group'], $ladderPosition);
         $data[] = ['row' => $row, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
         $data[] = ['row' => $row + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
         $data[] = ['row' => $row + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];

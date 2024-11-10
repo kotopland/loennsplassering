@@ -303,7 +303,7 @@ class EmployeeCVController extends Controller
             'relevance.in' => 'Ugyldig verdi for relevans.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
-        $relevance = $validatedData['relevance'] ?? 0;
+        $relevance = $validatedData['workplace_type'] === 'freechurch' ? 1 : $validatedData['relevance'] ?? 0;
         $work_experience = $application->work_experience ?? [];
         $work_experience[] = [
             'title_workplace' => $validatedData['title_workplace'],
@@ -347,7 +347,7 @@ class EmployeeCVController extends Controller
         ]);
 
         $application = EmployeeCV::find(session('applicationId'));
-        $relevance = $validatedData['relevance'] ?? 0;
+        $relevance = $validatedData['workplace_type'] === 'freechurch' ? 1 : $validatedData['relevance'] ?? 0;
         $workExperienceData = $application->work_experience ?? [];
         $workExperienceItem = $workExperienceData[$request->edit];
 
@@ -406,7 +406,7 @@ class EmployeeCVController extends Controller
             'ansiennitetFromDate' => $workStartDate->subMonths($calculatedTotalWorkExperienceMonths)->format('Y-m-d'),
             'ladder' => $salaryCategory['ladder'],
             'group' => $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '',
-            'salaryPlacement' => EmployeeCV::salaryLadders[$salaryCategory['ladder']][$salaryCategory['group']][$ladderPosition],
+            'salaryPlacement' => EmployeeCV::getSalary($salaryCategory['ladder'], $salaryCategory['group'], $ladderPosition),
         ]);
     }
 
