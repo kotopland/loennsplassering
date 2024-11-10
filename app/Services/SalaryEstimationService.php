@@ -130,25 +130,27 @@ class SalaryEstimationService
 
     /*************  ✨ Codeium Command ⭐  *************/
     /**
-     * Adjust education start date to be after 18 years of age.
-     *
-     * Goes through each education entry and does the following:
-     * - If the end date is before the applicant turned 18, remove the entry.
-     * - If the start date is before the applicant turned 18 and the end date is after,
+     * Adjusts education start dates to be after the applicant turned 18.
+     * Does the following:
+     * - If the education ended before the applicant turned 18, remove the entry.
+     * - If the education started before the applicant turned 18 and the end date is after,
      *   update the start date to be the day after the applicant turned 18, and add a comment.
-     *   unless the education is 'videregående', 'vgs', or 'fagskole'.
-     * - If the start date is before the applicant turned 18, remove the entry.
+     * - If the education started before the applicant turned 18, remove the entry.
+     *
+     * @param  array  $education  The array of education entries to be adjusted.
+     * @return array The adjusted education array.
      */
-    /******  0d6bf073-9e1f-4fa9-a650-3f3bcf6bff14  *******/
+    /******  4d22b404-9c9d-4b83-b4ab-511071b7c1f9  *******/
     private function adjustEducationStartDate(array $education): array
     {
+
         $educationAdjusted = [];
         foreach ($education as $id => $edu) {
             $eduStartDate = Carbon::parse($edu['start_date']);
             $eduEndDate = Carbon::parse($edu['end_date']);
 
             if ($eduEndDate->lessThan($this->dateAge18)) {
-                return []; // Remove if education ended before 18
+                continue;  // Remove if education ended before 18
             }
 
             if ($eduStartDate->lessThan($this->dateAge18) && $eduEndDate->greaterThanOrEqualTo($this->dateAge18) && ! $this->containsAnyString($edu['topic_and_school'], ['videregående', 'vgs', 'fagskole'])) {
@@ -157,12 +159,12 @@ class SalaryEstimationService
             }
 
             if ($this->dateAge18->diffInYears(Carbon::parse($edu['start_date'])) < 0) {
-                return []; // Remove if still under 18 after adjustment
+                continue; // Remove if still under 18 after adjustment
             }
             $educationAdjusted[] = $edu;
         }
 
-        return $education;
+        return $educationAdjusted;
     }
 
     /*************  ✨ Codeium Command ⭐  *************/
@@ -340,11 +342,12 @@ class SalaryEstimationService
         $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
         switch (@$education['highereducation']) {
             case 'bachelor':
-
                 if ($education['study_points'] >= 180) {
                     if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
+
                         return $education['relevance'] ? 3 : 1;
                     } elseif ($employeeGroup['ladder'] === 'D') {
+
                         return $education['relevance'] ? 2 : 1;
                     }
                 }
@@ -364,9 +367,11 @@ class SalaryEstimationService
                 }
             default:
                 if ($education['study_points'] >= 60) {
+
                     return 1;
                 }
         }
+
     }
 
     /*************  ✨ Codeium Command ⭐  *************/
