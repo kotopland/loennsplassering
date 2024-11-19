@@ -135,9 +135,13 @@ td:first-child {
 }
 
 .form-switch .form-check-input {
-    width: 3em !important;
+    width: 2.5em !important;
+    height: 1.3em !important;
 }
 
+.form-check-input[type="radio"]:not(.form-switch .form-check-input):not(:checked) {
+    margin-top: 0.25rem !important;
+}
 
 .form-check-input[type="radio"]:not(.form-switch .form-check-input):checked {
     background: var(--bs-light) !important;

@@ -148,7 +148,10 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,5,10,20,30,60,120,180,200,240,300,0|required',
+                'study_points' => [
+                    'required', // Field is required
+                    'regex:/^(bestått|[1-9][0-9]{0,2}|1000)$/',
+                ],
                 'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
                 'relevance' => 'in:true,false|nullable',
             ],
@@ -159,8 +162,8 @@ class EmployeeCVController extends Controller
                 'start_date.date' => 'Startdato må være en gyldig dato.',
                 'end_date.required' => 'Vennligst velg en sluttdato.',
                 'end_date.date' => 'Sluttdato må være en gyldig dato.',
-                'study_points.required' => 'Vennligst velg antall studiepoeng.',
-                'study_points.in' => 'Ugyldig antall studiepoeng. Velg et av de tilgjengelige alternativene.',
+                'study_points.required' => 'Studiepoeng eller bestått mangler.',
+                'study_points.regex' => 'Ugyldig antall studiepoeng. 0-1000 eller "bestått".',
                 'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
                 'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
@@ -202,7 +205,10 @@ class EmployeeCVController extends Controller
                 'topic_and_school' => 'string|required',
                 'start_date' => 'date|required',
                 'end_date' => 'date|required',
-                'study_points' => 'string|in:bestått,5,10,20,30,60,120,180,200,240,300,0|required',
+                'study_points' => [
+                    'required', // Field is required
+                    'regex:/^(bestått|[1-9][0-9]{0,2}|1000)$/',
+                ],
                 'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
                 'relevance' => 'in:true,false|nullable',
             ],
@@ -215,8 +221,8 @@ class EmployeeCVController extends Controller
                 'start_date.date' => 'Startdato må være en gyldig dato.',
                 'end_date.required' => 'Vennligst velg en sluttdato.',
                 'end_date.date' => 'Sluttdato må være en gyldig dato.',
-                'study_points.required' => 'Vennligst velg antall studiepoeng.',
-                'study_points.in' => 'Ugyldig antall studiepoeng. Velg et av de tilgjengelige alternativene.',
+                'study_points.required' => 'Studiepoeng eller bestått mangler.',
+                'study_points.regex' => 'Ugyldig antall studiepoeng. 1-1000 eller "bestått".',
                 'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
                 'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
