@@ -105,6 +105,7 @@ class EmployeeCVController extends Controller
         $application = EmployeeCV::find(session('applicationId'));
         $application->job_title = $request->job_title;
         $application->birth_date = $request->birth_date;
+        $application->work_start_date = $request->work_start_date;
         $application->save();
 
         return redirect()->route('enter-education-information', compact('application'));
