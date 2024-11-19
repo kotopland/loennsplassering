@@ -222,23 +222,19 @@
             </div>
         </div>
     </div>
-    <div class="my-2 py-3">
-
-        <h4>Kurs, verv og frivillig arbeid, relevant for stillingen. </h4>
-        <p>Denne kalkulatoren kan ikke beregne frivillig arbeid automatsik. Normalt sett gies det bare ansiennitet eller kompetansetillegg i særtilfeller der det er brukt mye tid utover normal menighets- og organisasjonsliv. Er du eldste eller har vært kan du skrives det som en 25% stilling.</p>
-    </div>
+    
     <div class="text-md-end text-center pb-1">
         <a href={{ route('enter-education-information', $application) }} class="btn btn-sm btn-secondary my-2" tabindex="99">
             Forrige side
         </a>
         @if ($hasErrors)
-            <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2 disabled" id="btn-next">
-                Neste: Estimering
-            </a><br />
+            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-success my-2 disabled" id="btn-next">
+                Neste: Kurs og Verv
+            </a>
             <span class="badge text-bg-danger">Du må oppdatere felt med mangler før du kan gå videre</span>
         @else
-            <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-success my-2" id="btn-next">
-                Neste: Estimering
+            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-success my-2" id="btn-next">
+                Neste: Kurs og Verv
             </a>
         @endif
     </div>

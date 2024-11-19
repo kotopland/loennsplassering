@@ -19,6 +19,7 @@ Route::post('/lonnsberegner/update-single-education-information', [EmployeeCVCon
 Route::get('/lonnsberegner/enter-experience-information/{application?}', [EmployeeCVController::class, 'enterExperienceInformation'])->name('enter-experience-information');
 Route::post('/lonnsberegner/post-experience-information', [EmployeeCVController::class, 'postExperienceInformation'])->name('post-experience-information');
 Route::post('/lonnsberegner/update-single-experience-information', [EmployeeCVController::class, 'updateSingleExperienceInformation'])->name('update-single-experience-information');
+Route::get('/lonnsberegner/enter-enter-courses-and-activities/{application?}', [EmployeeCVController::class, 'enterCoursesAndActivityInformation'])->name('enter-courses-and-activity-information');
 Route::get('/lonnsberegner/preview-and-estimated-lonnsberegner/{application?}', [EmployeeCVController::class, 'previewAndEstimatedSalary'])->name('preview-and-estimated-salary');
 Route::get('/lonnsberegner/export-as-xls', [EmployeeCVController::class, 'exportAsXls'])->name('export-as-xls');
 

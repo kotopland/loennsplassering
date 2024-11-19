@@ -369,6 +369,11 @@ class EmployeeCVController extends Controller
         return redirect()->route('enter-experience-information', compact('application'));
     }
 
+    public function enterCoursesAndActivityInformation(EmployeeCV $application)
+    {
+        return view('enter-courses-and-activities', compact('application'));
+    }
+
     public function previewAndEstimatedSalary(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
