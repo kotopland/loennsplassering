@@ -394,7 +394,9 @@ class EmployeeCVController extends Controller
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
             SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
             Carbon::now())
-        );
+        ) - 1;
+
+        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
 
         return view('preview-and-estimated-salary', [
             'application' => $application,

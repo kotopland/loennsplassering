@@ -237,10 +237,10 @@ class ExportExcelJob implements ShouldQueue
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
             SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $totalMonths),
             Carbon::now())
-        );
+        ) - 1;
 
         $ladder = $salaryCategory['ladder'];
-        $group = $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '';
+        $group = in_array($salaryCategory['ladder'], ['B', 'D']) ? '' : $salaryCategory['group'];
         $salaryPlacement = EmployeeCV::getSalary($salaryCategory['ladder'], $salaryCategory['group'], $ladderPosition);
         $data[] = ['row' => $row, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
         $data[] = ['row' => $row + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
