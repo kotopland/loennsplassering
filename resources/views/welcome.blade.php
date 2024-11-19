@@ -10,7 +10,7 @@
         Alle ansettelser i Frikirken følger lønnsavtalen vedtatt av synodestyret (<a href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>).
         Sekretæren for lønnsutvalget foretar lønnsplasseringer i henhold til lønnsavtalen, arbeidsgivers forventninger til stillingen og den ansattes kvalifikasjoner.
         Dette er en tidkrevende prosess, og det er derfor vanlig praksis å foreta lønnsplasseringen etter ansettelsen.
-        Dette kan oppleves som ugunstig for ansatte, og vi har derfor utviklet et verktøy som kan beregne en sannsynlig lønnsplassering.
+        Vi har derfor utviklet et verktøy som kan beregne en sannsynlig lønnsplassering.
         Ved å bruke dette verktøyet får du
         <li>beregnet kompetansepoeng, ansiennitet og plassering i statens lønnstabell</li>
         <li>se en tidslinje over din kompetanse og ansiennitet</li>
