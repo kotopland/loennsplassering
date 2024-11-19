@@ -228,7 +228,7 @@
         <p>Denne kalkulatoren kan ikke beregne frivillig arbeid automatsik. Normalt sett gies det bare ansiennitet eller kompetansetillegg i særtilfeller der det er brukt mye tid utover normal menighets- og organisasjonsliv. Er du eldste eller har vært kan du skrives det som en 25% stilling.</p>
     </div>
     <div class="text-md-end text-center pb-1">
-        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary my-2">
+        <a href={{ route('enter-education-information', $application) }} class="btn btn-sm btn-secondary my-2" tabindex="99">
             Forrige side
         </a>
         @if ($hasErrors)

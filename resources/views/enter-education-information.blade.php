@@ -226,7 +226,7 @@
     </div>
 
     <div class="text-md-end text-center pb-1">
-        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary">
+        <a href={{ route('enter-employment-information', $application) }} class="btn btn-sm btn-secondary" tabindex="99">
             Forrige: Informasjon om stillingen
         </a>
         @if ($hasErrors)
