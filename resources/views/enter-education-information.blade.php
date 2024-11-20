@@ -327,16 +327,18 @@
 </div>
 
 <div class="text-md-end text-center pb-1">
-    <a href="{{ route('enter-employment-information', $application) }}" class="btn btn-outline-primary" tabindex="99">
+    <a href="{{ route('enter-employment-information', $application) }}" class="btn btn-outline-primary my-2"
+        tabindex="99">
         Forrige: Informasjon om stillingen
     </a>
     @if($hasErrors)
-    <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-primary disabled" id="btn-next">
+    <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-primary disabled my-2"
+        id="btn-next">
         Neste: Din ansiennitet
     </a><br />
     <span class="badge text-bg-danger">Du må oppdatere felt med mangler før du kan gå videre</span>
     @else
-    <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-primary" id="btn-next">
+    <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-primary my-2" id="btn-next">
         Neste: Din ansiennitet
     </a>
     @endif

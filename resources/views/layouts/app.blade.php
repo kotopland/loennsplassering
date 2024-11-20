@@ -32,32 +32,34 @@
 </head>
 
 <body>
-    <div class="px-2 py-3 bg-secondary">
-        <div class="row align-items-center">
-            <!-- Title Section -->
-            <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-8 col-xl-9 ms-md-5">
-                <a href="{{ url('https://www.frikirken.no') }}"><img src="{{ url('images/logo-frikirken-w.png') }}"
-                        alt="Gå til Frikirkens nettside" class="img-fluid py-2" style="max-height: 65px"></a>
-                {{-- <h4 style="line-height:0em;" class="pt-2"><strong>{{ config('app.name', 'Laravel')
-                        }}</strong>
-                </h4> --}}
-            </div>
+    <div class="row text-center px-2 py-3 mt-0 bg-secondary">
+        <div>
+            <div class="row align-items-center">
 
-            <!-- Button Section -->
-            <div class="col-auto text-end me-md-5 pe-md-5">
-                @if (session('applicationId'))
-                <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal"
-                    data-bs-target="#yourModal">
-                    Lagre skjemaet.
-                </a>
-                @endif
+                <!-- Title Section -->
+                <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-8 col-xl-9 ms-md-5">
+                    <a href="{{ url('https://www.frikirken.no') }}">
+                        <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside"
+                            class="img-fluid py-2" style="max-height: 65px">
+                    </a>
+                </div>
 
-                @if (session('applicationId'))
-                <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1"
-                    _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
-                    Logg ut
-                </a>
-                @endif
+                <!-- Button Section -->
+                <div class="col-auto text-end me-md-5 pe-md-5">
+                    @if (session('applicationId'))
+                    <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal"
+                        data-bs-target="#yourModal">
+                        Lagre skjemaet.
+                    </a>
+                    @endif
+
+                    @if (session('applicationId'))
+                    <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1"
+                        _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
+                        Logg ut
+                    </a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
