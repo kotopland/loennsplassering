@@ -2,8 +2,13 @@
 $body-bg: #f8fafc;
 
 // Typography
-$font-family-sans-serif: 'noto sans', sans-serif;
-$font-size-base: 1rem;
+@font-face {
+    font-family: 'rift-soft';
+    src: url('/fonts/RiftSoft-Bold.woff2');
+}
+
+$font-family-sans-serif: sans-serif;
+$font-size-base: 1.15rem;
 $focus-ring-blur: 1px;
 // $line-height-base: 1.6;
 // $input-btn-padding-y: .375rem;
@@ -11,3 +16,10 @@ $focus-ring-blur: 1px;
 
 // $form-label-font-weight: 500 !important;
 // $form-label-font-size: $font-size-base + 0.3;
+
+$primary: #243061;
+$secondary: #C63A0A;
+$success: #91215d;
+$info: #ebe9e4;
+$warning: #fccb4d;
+$danger: #f56553;

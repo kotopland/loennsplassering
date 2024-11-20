@@ -1,5 +1,6 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans:wght@100;400;500;600;700;900&display=swap');
+// @import url('https://fonts.cdnfonts.com/css/helvetica-neue-55');
 
 @import "../css/app.css";
 
@@ -9,13 +10,49 @@
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
-@import 'vanillajs-datepicker/css/datepicker-bs5.css';
+// @import 'vanillajs-datepicker/css/datepicker-bs5.css';
+
+@font-face {
+    font-family: "Helvetica W01";
+    src: url("/fonts/89294146-207c-4803-91fe-338f0d0094bd.woff2") format("woff2"), url("/fonts/57055fe4-c2d3-4287-bac2-eece43fdcbd3.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Helvetica W01";
+    src: url("/fonts/ac4134ce-b28e-4df9-b88c-a67db965774e.woff2") format("woff2"), url("/fonts/6389110a-e983-4d95-8d1f-5a87de018aac.woff") format("woff");
+    font-weight: 400;
+    font-style: oblique;
+}
+
+@font-face {
+    font-family: "Helvetica W01";
+    src: url("/fonts/7ce0a2f5-eb00-46aa-919c-5b3f3667646c.woff2") format("woff2"), url("/fonts/cad22c74-45b4-4c49-9e6a-0cd3768a7bc7.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Helvetica W01";
+    src: url("/fonts/3e13f208-91f2-41ec-b1bf-e5b29d486821.woff2") format("woff2"), url("/fonts/17d3cf02-3e99-48c3-953a-b26082b28949.woff") format("woff");
+    font-weight: 700;
+    font-style: oblique;
+}
+
+body {
+    font-family: "Helvetica W01";
+    font-weight: normal;
+    line-height: 1.45;
+    // font-size: 17px;
+}
 
 h1 {
     margin-top: 0.5em;
     // margin-bottom: 0px;
     line-height: 2em;
     font-weight: 500;
+    font-family: rift-soft, sans-serif !important;
 }
 
 h2 {
@@ -23,6 +60,7 @@ h2 {
     // margin-bottom: 0px;
     line-height: 2em;
     font-weight: 500;
+    font-family: "Helvetica W01", sans-serif !important;
 }
 
 h3 {
@@ -30,6 +68,15 @@ h3 {
     // margin-bottom: 0px;
     line-height: 1.5em;
     font-weight: 500;
+    font-family: "Helvetica W01", sans-serif !important;
+}
+
+h4 {
+    margin-top: 0.5em;
+    // margin-bottom: 0px;
+    line-height: 1.0em;
+    font-weight: 500;
+    font-family: "Helvetica W01", sans-serif !important;
 }
 
 .table-container {
@@ -69,6 +116,12 @@ td:first-child {
     background-color: var(--bs-primary-subtle);
     /* Bootstrap's subtle primary background */
     border-left-color: var(--bs-primary);
+}
+
+.callout-secondary {
+    background-color: var(--bs-secondary-subtle);
+    /* Bootstrap's subtle primary background */
+    border-left-color: var(--bs-secondary);
 }
 
 .callout-success {
@@ -117,11 +170,14 @@ td:first-child {
     }
 }
 
+label {
+    font-weight: 700;
+}
 
 /* INPUT CUSTOMIZATIONS */
 .form-check-input {
     transition: all 0.15s ease-out 0s !important;
-    border: 3px solid var(--bs-secondary) !important;
+    border: 3px solid var(--bs-primary) !important;
     cursor: pointer !important;
     display: inline-block !important;
     margin-top: 0.0rem !important;

@@ -12,7 +12,8 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    {{--
+    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet"> --}}
 
     <!-- Scripts -->
     @vite(['resources/js/app.js'])
@@ -26,55 +27,61 @@
         });
     </script>
 
-    <script src='{{ url('js/_hyperscript.min.js') }}'></script>
+    <script src='{{ url(' js/_hyperscript.min.js') }}'></script>
     @yield('head')
 </head>
 
 <body>
-    <div id="app" class="container">
-        <div class="container">
-            <div class="px-2 py-3 bg-primary-subtle border border-secondary border-4 border-top-0 border-start-0 border-end-0">
-                <div class="row align-items-center">
-                    <!-- Title Section -->
-                    <div class="col-md-6 col-12 my-2">
-                        <h4 style="line-height:0em;" class="pt-2"><strong>{{ config('app.name', 'Laravel') }}</strong></h4>
-                    </div>
-
-                    <!-- Button Section -->
-                    <div class="col-md-auto col-12 text-md-end text-center">
-                        @if (session('applicationId'))
-                            <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#yourModal">
-                                Lagre skjemaet.
-                            </a>
-                        @endif
-                    </div>
-                    <!-- Button Section -->
-                    <div class="col-md-auto col-12 text-md-end text-center">
-                        @if (session('applicationId'))
-                            <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-secondary" _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
-                                Logg ut
-                            </a>
-                        @endif
-                    </div>
-                </div>
+    <div class="px-2 py-3 bg-secondary">
+        <div class="row align-items-center">
+            <!-- Title Section -->
+            <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-8 col-xl-9 ms-md-5">
+                <a href="{{ url('https://www.frikirken.no') }}"><img src="{{ url('images/logo-frikirken-w.png') }}"
+                        alt="Gå til Frikirkens nettside" class="img-fluid py-2" style="max-height: 65px"></a>
+                {{-- <h4 style="line-height:0em;" class="pt-2"><strong>{{ config('app.name', 'Laravel')
+                        }}</strong>
+                </h4> --}}
             </div>
 
+            <!-- Button Section -->
+            <div class="col-auto text-end me-md-5 pe-md-5">
+                @if (session('applicationId'))
+                <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal"
+                    data-bs-target="#yourModal">
+                    Lagre skjemaet.
+                </a>
+                @endif
+
+                @if (session('applicationId'))
+                <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1"
+                    _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
+                    Logg ut
+                </a>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div id="app" class="container">
+        <div class="container">
             <main class="my-4">
                 @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
-                {{-- @dd(request()->cookie('cookie_consent')) --}}
+                <h1>Estimering av Lønnsplassering</h1>
                 @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
-                    @yield('content')
+                @yield('content')
                 @else
-                    Du kan ikke bruke denne webappen uten å akseptere informasjonskapsler (cookies).
-                    Dersom du ønsker å bruke webappen, kan du ombestemme deg og <div class="cookie-buttons"><button id="accept-cookies" class="btn btn-outline-primary my-3 me-4" _="on click wait 500ms then reload() the location of the window">akseptere nødvendige informasjonskapsler.</button></div>
+                Du kan ikke bruke denne webappen uten å akseptere informasjonskapsler (cookies).
+                Dersom du ønsker å bruke webappen, kan du ombestemme deg og <div class="cookie-buttons"><button
+                        id="accept-cookies" class="btn btn-outline-primary my-3 me-4"
+                        _="on click wait 500ms then reload() the location of the window">akseptere nødvendige
+                        informasjonskapsler.</button></div>
                 @endif
             </main>
 
@@ -88,18 +95,23 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Du kan enten, <a href="{{ route('open-application', session('applicationId')) }}">lagre denne lenken</a> eller få lenken sendt til din e-postadresse.
+                        Du kan enten, <a href="{{ route('open-application', session('applicationId')) }}">lagre denne
+                            lenken</a> eller få lenken sendt til din e-postadresse.
                         <div class="pt-2 ps-2 text-primary" id="email-result">
                             <div class=" my-4">
                                 <label for="email" class="form-label">Send til e-postaddressen:</label>
-                                <input type="email" class="form-control" id="email-input" name="email_address" required placeholder="e-postadresse...">
+                                <input type="email" class="form-control" id="email-input" name="email_address" required
+                                    placeholder="e-postadresse...">
                                 <div id="emailHelp" class="form-text">Vi lagrer ikke e-postadressen din.</div>
                             </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result" hx-validate="true">Send</button>
+                        <button type="button" class="btn btn-success"
+                            hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}"
+                            hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result"
+                            hx-validate="true">Send</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -107,19 +119,35 @@
         </div>
         <div id="cookie-banner" class="cookie-banner">
             <p>
-                Dette nettstedet bruker informasjonskapsler for å sikre at du får den beste opplevelsen på nettstedet vårt.
+                Dette nettstedet bruker informasjonskapsler for å sikre at du får den beste opplevelsen på nettstedet
+                vårt.
                 <a href="{{ route('privacy-policy') }}">Finn ut mer.</a>
             </p>
             <div class="cookie-buttons">
-                <button id="accept-cookies" class="btn btn-success my-3 me-4" _="on click wait 500ms then reload() the location of the window">Aksept</button>
-                <button id="reject-cookies" class="btn btn-danger my-3" _="on click wait 500ms then reload() the location of the window">Avvis</button>
+                <button id="accept-cookies" class="btn btn-success my-3 me-4"
+                    _="on click wait 500ms then reload() the location of the window">Aksept</button>
+                <button id="reject-cookies" class="btn btn-danger my-3"
+                    _="on click wait 500ms then reload() the location of the window">Avvis</button>
             </div>
         </div>
-        <div class="px-2 py-2 bg-primary-subtle border border-secondary border-4 border-bottom-0 border-start-0 border-end-0 text-center mb-5">
-            <a href="{{ route('privacy-policy') }}">Personvernerklæring</a>
-            -
-            <a href="{{ url('www.frikirken.no') }}">www.frikirken.no</a>
+    </div>
+    <div class="row bg-primary text-center py-3 px-5 mt-5 text-light">
+        <div class="col-6 text-start">
+            <div class="row">
+                <div class="col-auto">© Copyright 2024 {{ Date('Y')==2024 ? '' : '- '.Date('Y') }}</div>
+                <div class="col"> Evangelisk
+                    Lutherske Frikirke
+                </div>
+            </div>
         </div>
+        <div class="col-6 text-end">
+            <small>
+                <a class="text-light" href="{{ route('privacy-policy') }}">Personvernerklæring</a>
+                -
+                <a class="text-light" href="{{ url('www.frikirken.no') }}">www.frikirken.no</a>
+            </small>
+        </div>
+    </div>
 </body>
 
 </html>
