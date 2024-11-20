@@ -41,7 +41,7 @@
                                 method="POST" id="salary_form">
                                 @csrf
 
-                                <div class="row g-3 my-2 border border-primary border-2 bg-info p-md-4">
+                                <div class="row g-3 my-2 border border-primary border-2 bg-info p-2 p-md-4">
                                     <h4 class="mb-4">Endre erfaring:</h4>
                                     <div class="row">
                                         <!-- Title and Workplace -->
@@ -209,7 +209,7 @@
             <form action="{{ route('post-experience-information') }}" method="POST" id="salary_form">
                 @csrf
 
-                <div class="row g-3 mb-2 border border-primary border-2 bg-info  p-2">
+                <div class="row g-3 mb-2 border border-primary border-2 bg-info p-2 p-md-4">
                     <h4 class="mb-4">Legg til erfaring:</h4>
                     <div class="row">
                         <div class="col-auto">
