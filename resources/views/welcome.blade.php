@@ -4,7 +4,6 @@
 @if (session()->has('message'))
 <p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
-<h1>Beregn din lønnsplassering</h1>
 <div class="callout callout-secondary bg-info">
     <h3 style="margin-top:0!important;">Hva gjør dette verktøyet?</h3>
     Alle ansettelser i Frikirken følger lønnsavtalen vedtatt av synodestyret (<a
