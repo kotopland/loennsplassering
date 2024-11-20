@@ -27,7 +27,7 @@
         });
     </script>
 
-    <script src='{{ url(' js/_hyperscript.min.js') }}'></script>
+    <script src='{{ url("js/_hyperscript.min.js") }}'></script>
     @yield('head')
 </head>
 

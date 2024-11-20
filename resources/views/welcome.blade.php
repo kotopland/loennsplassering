@@ -41,7 +41,7 @@
 </div>
 @else
 <a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}"
-    class="btn btn-lg btn-success @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start her for å
+    class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start her for å
     beregne lønnsplassering</a>
 @endif
 
