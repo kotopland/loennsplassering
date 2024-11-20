@@ -124,9 +124,9 @@
                 <a href="{{ route('privacy-policy') }}">Finn ut mer.</a>
             </p>
             <div class="cookie-buttons">
-                <button id="accept-cookies" class="btn btn-success my-3 me-4"
+                <button id="accept-cookies" class="btn btn-primary border border-light rounded my-3 me-4"
                     _="on click wait 500ms then reload() the location of the window">Aksept</button>
-                <button id="reject-cookies" class="btn btn-danger my-3"
+                <button id="reject-cookies" class="btn btn-outline-danger my-3"
                     _="on click wait 500ms then reload() the location of the window">Avvis</button>
             </div>
         </div>
