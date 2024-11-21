@@ -220,7 +220,7 @@ class ExportExcelJob implements ShouldQueue
             $row++;
         }
 
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
+        $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines

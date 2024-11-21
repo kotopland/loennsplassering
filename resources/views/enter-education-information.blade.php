@@ -9,12 +9,13 @@
     Utdanning
 </h2>
 <p>Dersom du har tatt en grad (bachelor- eller master-/sivilingeniørgrad) skal du samle alle utdanningene som hører til
-    graden og registrere det samlet som en. Hver grad registreres. Bachelor har normalt 180 studiepoeng, og Master har
+    graden og registrere det samlet som en. Hver grad skal registreres hver for seg. Bachelor har normalt 180
+    studiepoeng, og Master har
     180 studiepoeng. Annen utdanning skal registreres hver for seg. Bare utdanning etter fylte 18 år skal registreres.
     Dette gjelder også folkehøgskole og bibelskole.</p>
 @if($hasErrors)
 <div class="callout callout-danger bg-danger-subtle">
-    Det er noen mangler i registrerte opplysninger. Vennligst oppdater dem.
+    Det er noen mangler i de registrerte opplysninger. Vennligst oppdater dem.
 </div>
 @endif
 
@@ -38,7 +39,7 @@
             <tbody class="table-group-divider">
                 @foreach ($application->education as $id => $item)
                 @if(request()->has('edit') && request()->edit == $id)
-                <tr>
+                <tr id="update">
                     <td colspan="10">
                         <form action="{{ route('update-single-education-information', ['edit' => $id]) }}" method="POST"
                             id="salary_form">
@@ -190,7 +191,7 @@
                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                     <td>
                         <a class="btn btn-sm @if(in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif"
-                            href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}">
+                            href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}#update">
                             @if(in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'],
                             @$item['study_points'], @$item['percentage'], @$item['relevance']], true))
                             Vennligst oppdater

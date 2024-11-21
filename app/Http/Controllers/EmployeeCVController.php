@@ -84,7 +84,7 @@ class EmployeeCVController extends Controller
         $application->birth_date = $application->birth_date ?? null;
         $application->save();
 
-        $positionsLaddersGroups = EmployeeCV::positionsLaddersGroups;
+        $positionsLaddersGroups = (new EmployeeCV)->getPositionsLaddersGroups();
         ksort($positionsLaddersGroups);
 
         $hasNull = false; // Initialize the flag to false
@@ -99,10 +99,10 @@ class EmployeeCVController extends Controller
             'birth_date' => 'required|date',
             'work_start_date' => 'required|date',
         ], [
-            'job_title.required' => 'Type stilling er obligatorisk.',
-            'birth_date.required' => 'Fødselsdato er obligatorisk.',
+            'job_title.required' => 'Type stilling er et obligatorisk felt.',
+            'birth_date.required' => 'Fødselsdato er et obligatorisk felt.',
             'birth_date.date' => 'Fødselsdato må være en gyldig dato.',
-            'work_start_date.required' => 'Start på stilling er obligatorisk.',
+            'work_start_date.required' => 'Start på stilling er et obligatorisk felt.',
             'work_start_date.date' => 'Start på stilling må være en gyldig dato.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
@@ -395,22 +395,20 @@ class EmployeeCVController extends Controller
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
 
-        // $wECollection = collect(array_merge($application->education, $application->work_experience));
-        // $wECollection->firstWhere('id', $application->work_experience_adjusted[0]['id'])['start_date'];
-        // dd($adjustedDataset);
         $timelineData = $salaryEstimationService->createTimelineData($adjustedDataset->education, $adjustedDataset->work_experience);
         $timelineData_adjusted = $salaryEstimationService->createTimelineData($adjustedDataset->education_adjusted, $adjustedDataset->work_experience_adjusted);
         $workStartDate = Carbon::parse($application->work_start_date);
         $calculatedTotalWorkExperienceMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted);
 
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
+        $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
+
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
             SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
-            Carbon::now())
+            Carbon::parse($application->work_start_date))
         ) - 1;
 
-        $salaryCategory = EmployeeCV::positionsLaddersGroups[$application->job_title];
+        $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         return view('preview-and-estimated-salary', [
             'application' => $application,

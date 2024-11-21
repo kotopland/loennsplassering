@@ -48,7 +48,7 @@ class SalaryEstimationService
     public function adjustEducationAndWork($application)
     {
         $this->dateAge18 = Carbon::parse($application->birth_date)->addYears(18);
-        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
+        $employeeGroup = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         $adjustedEducation = $application->education ?? [];
         $adjustedWorkExperience = $application->work_experience ?? [];
@@ -339,7 +339,7 @@ class SalaryEstimationService
 
             return ($months >= 9) && $education['relevance'] ? 1 : 0;
         }
-        $employeeGroup = EmployeeCV::positionsLaddersGroups[$application->job_title];
+        $employeeGroup = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
         switch (@$education['highereducation']) {
             case 'bachelor':
                 if ($education['study_points'] >= 180) {
@@ -719,17 +719,27 @@ class SalaryEstimationService
         $totalMonths = 0;
 
         foreach ($workExperienceData ?? [] as $workExperience) {
-            $startDate = Carbon::parse($workExperience['start_date']);
-            $endDate = Carbon::parse($workExperience['end_date']);
+            try {
+                $startDate = Carbon::parse($workExperience['start_date']);
+                $endDate = Carbon::parse($workExperience['end_date']);
 
-            // Calculate the difference in months
-            $diffInMonths = ($endDate->format('Y') - $startDate->format('Y')) * 12 + $endDate->format('n') - $startDate->format('n') + 1;
+                // Ensure the end date is not before the start date
+                if ($endDate->lessThan($startDate)) {
+                    continue;
+                }
 
-            // Multiply by work percentage and add to the total
-            $totalMonths += ($diffInMonths * $workExperience['percentage']) / 100;
+                // Calculate the difference in months
+                $diffInMonths = $startDate->diffInMonths($endDate);
+
+                // Adjust for partial percentages
+                $totalMonths += ($diffInMonths * $workExperience['percentage']) / 100;
+            } catch (\Exception $e) {
+                // Handle invalid date formats gracefully
+                continue;
+            }
         }
 
-        return $totalMonths;
+        return intval(round($totalMonths));
     }
 
     /*************  ✨ Codeium Command ⭐  *************/

@@ -49,10 +49,10 @@
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between pe-md-5 ps-md-5">
                 <!-- Logo Section -->
                 <div class="d-flex align-items-center">
-                    <a href="{{ url('https://www.frikirken.no') }}" class="text-decoration-none">
+                    {{-- <a href="{{ url('https://www.frikirken.no') }}" class="text-decoration-none"> --}}
                         <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside"
                             class="img-fluid py-2" style="max-height: 65px">
-                    </a>
+                        {{-- </a> --}}
                 </div>
 
                 <!-- Button Section -->

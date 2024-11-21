@@ -48,6 +48,54 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $name
+ * @property string $ladder
+ * @property int $group
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereLadder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereUpdatedAt($value)
+ */
+	class Position extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $ladder
+ * @property int $group
+ * @property array $salaries
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereLadder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereSalaries($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder whereUpdatedAt($value)
+ */
+	class SalaryLadder extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $name
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password

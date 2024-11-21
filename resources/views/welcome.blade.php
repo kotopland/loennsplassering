@@ -2,7 +2,7 @@
 
 @section('content')
 @if (session()->has('message'))
-<p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
+<p class="alert my-2{{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
 <div class="callout callout-secondary bg-info">
     <p class="teaser">

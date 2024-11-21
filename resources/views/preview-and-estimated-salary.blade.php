@@ -9,7 +9,7 @@
     <div class="progress-bar bg-success" style="width: 100%">100%</div>
 </div>
 @if (session()->has('message'))
-<p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
+<p class="alert my-2{{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
 <div class="my-2 py-3">
     <p>

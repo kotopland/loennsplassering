@@ -35,7 +35,7 @@
                 <tbody>
                     @foreach ($application->work_experience as $id => $item)
                     @if(request()->has('edit') && request()->edit == $id)
-                    <tr>
+                    <tr id="update">
                         <td colspan="10">
                             <form action="{{ route('update-single-experience-information', ['edit' => $id]) }}"
                                 method="POST" id="salary_form">
@@ -185,15 +185,17 @@
                         <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                         <td>
                             <a class="btn btn-sm @if(in_array(null, [@$item['title_workplace'], @$item['percentage'], @$item['percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif"
-                                href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}"">
-                                            @if(in_array(null, [@$item['title_workplace'], @$item['percentage'], @$item['percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']], true))
-                                                Vennligst oppdater
-                                            @else
-                                                Endre
-                                            @endif
-                                        </a>
-                                    </td>
-                                    {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
+                                href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update">
+                                @if(in_array(null, [@$item['title_workplace'], @$item['percentage'],
+                                @$item['percentage'], @$item['start_date'], @$item['end_date'], @$item['relevance']],
+                                true))
+                                Vennligst oppdater
+                                @else
+                                Endre
+                                @endif
+                            </a>
+                        </td>
+                        {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
                                 _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #percentage to the innerText of #percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag
                                 ny basert på denne</a>
                         </td> --}}
