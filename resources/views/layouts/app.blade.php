@@ -3,13 +3,24 @@
 
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="content-language" content="no">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <meta name="description"
+        content="Beregn din sannsynlige lønnsplassering i Frikirken basert på stillingstittel, utdanning og erfaring. Få en indikasjon på lønnstrinn og last ned en oversikt.">
+    <meta name="keywords"
+        content="lønnskalkulator, lønn, frikirken, lønnstrinn, stilling, utdanning, erfaring, ansiennitet, kompetansepoeng">
+    <meta property="og:title" content="Lønnskalkulator - Frikirken">
+    <meta property="og:description"
+        content="Beregn din sannsynlige lønnsplassering i Frikirken basert på stillingstittel, utdanning og erfaring. Få en indikasjon på lønnstrinn og last ned en oversikt.">
+    <meta property="og:url" content="{{ config('app.url') }}">
+    <meta property="og:locale" content="nb_NO">
+    <meta property="og:type" content="website">
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     {{--
@@ -32,30 +43,30 @@
 </head>
 
 <body>
-    <div class="row text-center px-2 py-3 mt-0 bg-secondary">
-        <div>
-            <div class="row align-items-center">
-
-                <!-- Title Section -->
-                <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-8 col-xl-9 ms-md-5">
-                    <a href="{{ url('https://www.frikirken.no') }}">
+    <div class="container-fluid bg-secondary text-white py-3">
+        <div class="row align-items-center">
+            <!-- Header Content -->
+            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between pe-md-5 ps-md-5">
+                <!-- Logo Section -->
+                <div class="d-flex align-items-center">
+                    <a href="{{ url('https://www.frikirken.no') }}" class="text-decoration-none">
                         <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside"
                             class="img-fluid py-2" style="max-height: 65px">
                     </a>
                 </div>
 
                 <!-- Button Section -->
-                <div class="col-auto text-end me-md-5 pe-md-5">
+                <div class="d-flex align-items-center gap-2">
                     @if (session('applicationId'))
                     <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal"
                         data-bs-target="#yourModal">
-                        Lagre skjemaet.
+                        Lagre skjemaet
                     </a>
                     @endif
 
                     @if (session('applicationId'))
                     <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1"
-                        _="on click if not confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')  halt">
+                        onclick="if (!confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')) return false;">
                         Logg ut
                     </a>
                     @endif
@@ -75,7 +86,7 @@
                     </ul>
                 </div>
                 @endif
-                <h1>Estimering av Lønnsplassering</h1>
+                <h1>{{ config('app.name', 'Laravel') }}</h1>
                 @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
                 @yield('content')
                 @else

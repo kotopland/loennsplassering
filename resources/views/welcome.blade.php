@@ -6,27 +6,37 @@
 @endif
 <div class="callout callout-secondary bg-info">
     <h3 style="margin-top:0!important;">Hva gjør dette verktøyet?</h3>
-    Alle ansettelser i Frikirken følger lønnsavtalen vedtatt av synodestyret (<a
+    Lurer du på hva lønnen din bør være? Denne kalkulatoren gir deg en indikasjon på lønnsplasseringen din basert på
+    stillingstittel, utdanningsnivå og relevant arbeidserfaring.
+    <br />I Frikirken følger alle ansettelser lønnsavtalen vedtatt av synodestyret (<a
         href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>).
-    Sekretæren for lønnsutvalget foretar lønnsplasseringer i henhold til lønnsavtalen, arbeidsgivers forventninger til
-    stillingen og den ansattes kvalifikasjoner.
-    Dette er en tidkrevende prosess, og det er derfor vanlig praksis å foreta lønnsplasseringen etter ansettelsen.
-    Vi har derfor utviklet et verktøy som kan beregne en sannsynlig lønnsplassering.
-    Ved å bruke dette verktøyet får du
-    <li>beregnet kompetansepoeng, ansiennitet og plassering i statens lønnstabell</li>
-    <li>se en tidslinje over din kompetanse og ansiennitet</li>
-    <li>se en tidslinje over maskinberegnet kompetanse og ansiennitet etter regler fra lønnsavtalen</li>
-    <li>få en ferdig utfylt og med beregnet lønnsplassering i form av et Excel vedlegg på e-post</li>
+    Lønnsplasseringen foretas av sekretæren for lønnsutvalget, basert på lønnsavtalen, arbeidsgivers forventninger og
+    den ansattes kvalifikasjoner.
+    Dette er en tidkrevende prosess, og lønnsplasseringen skjer derfor vanligvis etter ansettelsen. For å gi en
+    indikasjon på mulig lønn har vi utviklet et verktøy som beregner en sannsynlig lønnsplassering.
+    <br />
+    <br />
+    Med dette verktøyet kan du:
+    <ul>
+        <li>Beregne kompetansepoeng og ansiennitet, og se plassering i statens lønnstabell.</li>
+        <li>Se en tidslinje over din kompetanse og ansiennitet.</li>
+        <li>Se en tidslinje over maskinberegnet kompetanse og ansiennitet basert på lønnsavtalen.</li>
+        <li>Motta en ferdig utfylt oversikt med beregnet lønnsplassering som et Excel-vedlegg på e-post.</li>
+    </ul>
     <h3>Begrensninger i verktøyet</h3>
-    Verktøyet tar ikke hensyn til arbeidsgivers forventninger og vurderinger av relevant kompetanse og ansiennitet for
-    stillingen. Dette skaper usikkerhet i plasseringen. Plasseringen verktøyet gir er derfor ikke endelig og kan ikke
-    brukes som argumentasjon dersom lønnsplasseringen ikke samsvarer med den ansattes forventninger. Det kan forekomme
-    avvik på 1-2 lønnstrinn, både opp og ned.
+    Vær oppmerksom på at dette verktøyet ikke tar hensyn til
+    <ul>
+        <li> kurs, verv og frivillig arbeid som kan i noen tilfeller gi tillegg. </li>
+        <li>arbeidsgivers individuelle vurderinger av kompetanse, ansiennitet og ansvar.</li>
+    </ul>
+    <strong>Den estimerte lønnsplasseringen er derfor ikke endelig og kan ikke brukes som argumentasjon i
+        plasseringen. Avvik på 1-2 lønnstrinn må forventes, både opp og ned.</strong>
     <h3>Håndtering av dine data</h3>
-    Denne beregningen er anonym. Når du blir spurt om å legge inn e-postadressen din, blir den ikke lagret, men brukes
-    til å sende deg skjemaet ditt eller beregnet lønnsplassering som excel fil slik at du kan hente det frem senere.
-    Informasjonen du ellers registrerer lagres i databasen slik at du kan hente den frem igjen. Databasen vil bli brukt
-    til å finjustere verktøyet.
+    Denne beregningen er anonym. Din e-postadresse lagres ikke, men brukes kun til å sende deg resultatet som en
+    Excel-fil.
+    Slik kan du enkelt hente frem beregningen senere.
+    <br />Informasjonen du registrerer i skjemaet lagres i en database, slik at du også kan hente den frem igjen ved
+    behov. Det brukes også for lønnsutvalget til å forbedre og finjustere verktøyet.
 </div>
 
 @if (session('applicationId'))
@@ -39,17 +49,22 @@
                 skjema</small></small></a>
 </div>
 @else
-<a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}"
-    class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start her for å
-    beregne lønnsplassering</a>
+<div class="text-center">
+    <a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}"
+        class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start
+        her for å
+        beregne lønnsplassering</a>
+</div>
 @endif
 
 <div class="mb-5"></div>
 
 <div class="callout callout-secondary bg-info">
     <h3 style="margin-top:0!important;">Har allerede et tidligere utfylt lønnsplasseringsskjema?</h3>
-    Hvis du har et lønnsskjema i samme format som du finner på Frikirkens websider kan du laste det opp slik at du kan
-    arbeide videre med det og gjøre en beregning av lønnsplasseringen din. Vi lagrer ikke dokumentet og bare stilling,
+    Hvis du har et lønnsskjema i samme format som du finner på Frikirkens websider kan du laste det opp slik at du
+    kan
+    arbeide videre med det og gjøre en beregning av lønnsplasseringen din. Vi lagrer ikke dokumentet og bare
+    stilling,
     fødselsdato, tiltredelsesdato, kompetanse og ansiennitet blir benyttet.
     <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST"
         enctype="multipart/form-data">
@@ -63,7 +78,8 @@
             @if (session('applicationId'))
             <button type="submit"
                 class="btn btn-lg btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
-                Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
+                Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på
+                    med)</small>
             </button>
             @else
             <button type="submit"
