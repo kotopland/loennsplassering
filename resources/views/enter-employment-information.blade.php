@@ -46,4 +46,7 @@
         <button type="submit" class="btn btn-primary" tabindex="4">Neste: Din utdanning</button>
     </div>
 </form>
+<div class="py-5"></div>
+<div class="py-5"></div>
+<div class="py-5"></div>
 @endsection
