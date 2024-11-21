@@ -79,9 +79,9 @@ class EmployeeCVController extends Controller
         }
 
         $application = $salaryEstimationService->getOrCreateApplication($application);
-        $application->job_title = $application->job_title ?? 'Menighet: Menighetsarbeider';
-        $application->work_start_date = $application->work_start_date ?? '2024-11-02';
-        $application->birth_date = $application->birth_date ?? '1990-10-02';
+        $application->job_title = $application->job_title ?? null;
+        $application->work_start_date = $application->work_start_date ?? null;
+        $application->birth_date = $application->birth_date ?? null;
         $application->save();
 
         $positionsLaddersGroups = EmployeeCV::positionsLaddersGroups;

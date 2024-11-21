@@ -15,7 +15,7 @@ class DeleteOldEmployeeCVs extends Command
      *
      * @var string
      */
-    protected $signature = 'employee-cvs:delete-old-viewed';
+    protected $signature = 'employee-cvs:delete-old-records';
 
     /**
      * The console command description.
