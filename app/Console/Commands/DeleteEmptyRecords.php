@@ -8,7 +8,7 @@ use App\Models\EmployeeCV;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class DeleteEmptyEmployeeCVs extends Command
+class DeleteEmptyRecords extends Command
 {
     /**
      * The name and signature of the console command.
