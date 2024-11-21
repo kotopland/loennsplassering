@@ -97,10 +97,13 @@ class EmployeeCVController extends Controller
         $request->validate([
             'job_title' => 'required|string',
             'birth_date' => 'required|date',
+            'work_start_date' => 'required|date',
         ], [
             'job_title.required' => 'Type stilling er obligatorisk.',
             'birth_date.required' => 'Fødselsdato er obligatorisk.',
             'birth_date.date' => 'Fødselsdato må være en gyldig dato.',
+            'work_start_date.required' => 'Start på stilling er obligatorisk.',
+            'work_start_date.date' => 'Start på stilling må være en gyldig dato.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
         $application->job_title = $request->job_title;
