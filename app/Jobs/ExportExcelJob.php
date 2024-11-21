@@ -236,7 +236,7 @@ class ExportExcelJob implements ShouldQueue
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
             SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $totalMonths),
-            Carbon::now())
+            Carbon::parse($application->work_start_date))
         ) - 1;
 
         $ladder = $salaryCategory['ladder'];
