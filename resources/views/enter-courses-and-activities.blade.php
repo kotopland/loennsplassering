@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-
-<h2>
-    Kurs, verv og frivillig arbeid, relevant for stillingen.
-</h2>
 <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0"
     aria-valuemax="100">
     <div class="progress-bar bg-success" style="width: 80%">80%</div>
 </div>
+
+<h2>
+    Kurs, verv og frivillig arbeid, relevant for stillingen.
+</h2>
 
 
 <div class="my-2 py-3">

@@ -1,13 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<h2>
-    Estimert Lønnsberegning
-</h2>
 <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0"
     aria-valuemax="100">
     <div class="progress-bar bg-success" style="width: 100%">100%</div>
 </div>
+
+<h2>
+    Estimert Lønnsberegning
+</h2>
+
 @if (session()->has('message'))
 <p class="alert my-2{{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
