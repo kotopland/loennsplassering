@@ -5,20 +5,26 @@
 <p class="alert {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
 <div class="callout callout-secondary bg-info">
-    <h3 style="margin-top:0!important;">Hva gjør dette verktøyet?</h3>
-    Lurer du på hva lønnen din bør være? Denne kalkulatoren gir deg en indikasjon på lønnsplasseringen din basert på
-    stillingstittel, utdanningsnivå og relevant arbeidserfaring.
-    <br />I Frikirken følger alle ansettelser lønnsavtalen vedtatt av synodestyret (<a
-        href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>).
-    Lønnsplasseringen foretas av sekretæren for lønnsutvalget, basert på lønnsavtalen, arbeidsgivers forventninger og
-    den ansattes kvalifikasjoner.
-    Dette er en tidkrevende prosess, og lønnsplasseringen skjer derfor vanligvis etter ansettelsen. For å gi en
-    indikasjon på mulig lønn har vi utviklet et verktøy som beregner en sannsynlig lønnsplassering.
-    <br />
-    <br />
-    Med dette verktøyet kan du:
+    <p class="teaser">
+        Lurer du på hva lønnen din bør være?
+        Denne kalkulatoren gir deg en indikasjon på lønnsplasseringen din basert på
+        stillingstittel, utdanningsnivå og relevant arbeidserfaring.
+    </p>
+    <p>
+        I Frikirken følger alle ansettelser lønnsavtalen vedtatt av synodestyret (<a
+            href="{{ url('https://frikirken.no/arbeid') }}">https://frikirken.no/arbeid</a>).
+        Lønnsplasseringen foretas av sekretæren for lønnsutvalget, basert på lønnsavtalen utifra arbeidsgivers
+        forventninger
+        og
+        den ansattes kvalifikasjoner.
+        Dette er en tidkrevende prosess, og lønnsplasseringen skjer derfor vanligvis etter ansettelsen.
+    </p>
+    <h3>Hva verktøyet gjør</h3>
+    For å få en
+    indikasjon på hva lønnen blir, kan du bruke dette verktøyet for å beregne en omtrentlig lønnsplassering.
+    Den vil:
     <ul>
-        <li>Beregne kompetansepoeng og ansiennitet, og se plassering i statens lønnstabell.</li>
+        <li>Beregne kompetansepoeng og ansiennitet, og få din plassering i statens lønnstabell.</li>
         <li>Se en tidslinje over din kompetanse og ansiennitet.</li>
         <li>Se en tidslinje over maskinberegnet kompetanse og ansiennitet basert på lønnsavtalen.</li>
         <li>Motta en ferdig utfylt oversikt med beregnet lønnsplassering som et Excel-vedlegg på e-post.</li>
