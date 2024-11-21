@@ -76,6 +76,15 @@
     </div>
     <div id="app" class="container">
         <div class="container">
+            @auth
+            Administrere:
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
+                <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a>
+                <button type="submit" class="btn btn-link">Logg ut av admin verktøyet</button>
+            </form>
+            @endauth
+
             <main class="my-4">
                 @if ($errors->any())
                 <div class="alert alert-danger">

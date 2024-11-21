@@ -1,6 +1,27 @@
 <?php
 
+use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\SalaryLadderController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EmployeeCVController;
+use Illuminate\Support\Facades\Route;
+
+Route::post('/login', [LoginController::class, 'sendLoginLink'])->name('login');
+Route::get('/login/{token}', [LoginController::class, 'processLoginLink'])->name('login.process');
+
+Route::get('/login', function () {
+    return view('auth-login.index');
+});
+Route::post('/logout', function () {
+    Auth::logout();
+
+    return redirect('/')->with('success', 'Logged out successfully!');
+})->name('logout');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('positions', PositionController::class);
+    Route::resource('salary-ladders', SalaryLadderController::class);
+});
 
 Route::get('/', function () {
     return redirect()->route('welcome');
