@@ -104,7 +104,7 @@ class ExportExcelJob implements ShouldQueue
         $subject = 'Foreløpig beregning av din lønnsplassering';
         $body = $this->generateEmailBody($data['data']);
         Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
-        Mail::to(env('APP_REPORT_EMAIL'))->send(new SimpleEmail('Sendt epost: '.$subject, $body, $modifiedFilePath));
+        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost: '.$subject, $body, $modifiedFilePath));
     }
 
     /**
