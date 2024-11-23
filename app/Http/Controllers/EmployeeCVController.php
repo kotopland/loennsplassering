@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Jobs\ExportExcelJob;
 use App\Mail\SimpleEmail; // We'll create this import class later
 use App\Models\EmployeeCV;
+use App\Services\ExcelImportService;
 use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class EmployeeCVController extends Controller
 {
@@ -425,116 +424,33 @@ class EmployeeCVController extends Controller
         ]);
     }
 
-    public function loadExcel(Request $request)
+    public function loadExcel(Request $request, ExcelImportService $excelImportService)
     {
-        // Validate that an Excel file is provided
         $request->validate([
             'excel_file' => 'required|file|mimes:xlsx,xls,csv',
         ], [
             'excel_file.required' => 'Du må velge en fil.',
-            'excel_file.file' => 'Den opplastede filen må være en fil.', // Dette er litt redundant, men kan være nyttig
+            'excel_file.file' => 'Den opplastede filen må være en fil.',
             'excel_file.mimes' => 'Filen må være en Excel-fil (xlsx, xls) eller en CSV-fil (csv).',
         ]);
 
         try {
-            // Load the uploaded file
-            $file = $request->file('excel_file');
-
-            // Use Maatwebsite Excel to read the data from the first sheet
-            $data = Excel::toArray([], $file)[0]; // Get the first sheet
-            // Optional: Log or view the extracted data (useful for debugging)
-            // Log::info($data);
-            $application = EmployeeCV::create();
+            $application = $excelImportService->processExcelFile($request->file('excel_file'));
             session(['applicationId' => $application->id]);
-            $application->birth_date = $this->isValidExcelDate($data[6][4]) ? Date::excelToDateTimeObject($data[6][4])->format('Y-m-d') : '';
-            $application->job_title = $data[7][4];
-            $application->work_start_date = $this->isValidExcelDate($data[8][4]) ? Date::excelToDateTimeObject($data[8][4])->format('Y-m-d') : '';
 
-            $education = [];
-            $work_experience = [];
-            $doneWithEducation = false;
-            $doneWithWorkExperience = false;
+            $this->flashMessage('Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
 
-            foreach ($data ?? [] as $row => $column) {
-                if ($row >= 14 && ! $doneWithEducation) {
-                    // Check if education section is completed
-                    if (str_contains($column[1], 'Ansiennitetsopplysninger:')) {
-                        $doneWithEducation = true;
+            return redirect()->route('enter-employment-information');
 
-                        continue;
-                    }
-
-                    // Process education if not empty
-                    if (! empty(trim($column[1]))) {
-                        try {
-                            $studyPercentage = strtolower($column[20]) == 'bestått' ? '100' : '';
-
-                            if (empty($studyPercentage) && $this->isValidExcelDate($column[18]) &&
-                                $this->isValidExcelDate($column[19]) && is_numeric($column[20])) {
-                                $studyPercentage = SalaryEstimationService::calculateStudyPercentage(
-                                    Date::excelToDateTimeObject($column[18])->format('Y-m-d'),
-                                    Date::excelToDateTimeObject($column[19])->format('Y-m-d'),
-                                    intval($column[20])
-                                );
-                            }
-
-                            $education[] = [
-                                'topic_and_school' => $column[1],
-                                'start_date' => $this->isValidExcelDate($column[18]) ? Date::excelToDateTimeObject($column[18])->format('Y-m-d') : '',
-                                'end_date' => $this->isValidExcelDate($column[19]) ? Date::excelToDateTimeObject($column[19])->format('Y-m-d') : '',
-                                'study_points' => $column[20],
-                                'percentage' => $studyPercentage,
-                            ];
-                        } catch (\InvalidArgumentException $e) {
-                            $this->flashMessage('Feil i datoformatet i excel-arket. Sjekk at alle datoer er på formatet ÅÅÅÅ-MM-DD.', 'danger');
-
-                            return redirect()->back();
-                        } catch (\Exception $e) {
-                            $this->flashMessage('En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.', 'danger');
-
-                            return redirect()->back();
-                        }
-                    }
-                } elseif ($doneWithEducation && ! $doneWithWorkExperience) {
-                    // Check if work experience section starts
-                    if (str_contains($column[1], 'PS: husk også ')) {
-                        $doneWithWorkExperience = true;
-
-                        continue;
-                    }
-
-                    // Process work experience if not empty
-                    if (! empty(trim($column[1]))) {
-                        $work_experience[] = [
-                            'title_workplace' => $column[1],
-                            'percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '',
-                            'start_date' => $this->isValidExcelDate($column[16]) ? Date::excelToDateTimeObject($column[16])->format('Y-m-d') : '',
-                            'end_date' => $this->isValidExcelDate($column[17]) ? Date::excelToDateTimeObject($column[17])->format('Y-m-d') : '',
-                        ];
-                    }
-                }
-
-                // Exit loop if both sections are complete
-                if ($doneWithWorkExperience) {
-                    break;
-                }
-            }
         } catch (PhpSpreadsheetException $e) {
             $this->flashMessage('En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.', 'danger');
 
             return redirect()->back();
+        } catch (\InvalidArgumentException $e) {
+            $this->flashMessage($e->getMessage(), 'danger');
+
+            return redirect()->back();
         }
-
-        $application->education = $education;
-        $application->work_experience = $work_experience;
-        $application->save();
-
-        // Example: Perform calculations based on the extracted data
-        // $results = $this->performCalculations($data);
-        $this->flashMessage('Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
-
-        return redirect()->route('enter-employment-information');
-
     }
 
     public function destroyEducationInformation(Request $request)

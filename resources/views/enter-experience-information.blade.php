@@ -207,11 +207,11 @@
             </table>
         </div>
         @endisset
-        <div>
+        <div class="mt-5">
             <form action="{{ route('post-experience-information') }}" method="POST" id="salary_form">
                 @csrf
 
-                <div class="row g-3 mb-2 border border-primary border-2 bg-info p-2 p-md-4">
+                <div class="row g-3 mb-2 border border-primary border-2 bg-success-subtle p-2 p-md-4">
                     <h4 class="mb-4">Legg til erfaring:</h4>
                     <div class="row">
                         <div class="col-auto">
