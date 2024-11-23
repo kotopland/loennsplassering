@@ -151,7 +151,7 @@ class ExcelImportService
             }
         }
 
-        return $workExperience;
+        return $this->removeDuplicateExperiences($workExperience);
     }
 
     private function formatWorkExperienceRow(array $column): array
@@ -164,5 +164,31 @@ class ExcelImportService
             'end_date' => $this->formatExcelDate($column[17]),
             'relevance' => $column[19] == 1 ? true : false,
         ];
+    }
+
+    private function removeDuplicateExperiences(array $experiences): array
+    {
+        // First, create a lookup key for each experience
+        $uniqueExperiences = [];
+        foreach ($experiences as $experience) {
+            $key = $experience['title_workplace'].'|'.
+                   $experience['start_date'].'|'.
+                   $experience['end_date'];
+
+            // If key doesn't exist, add it
+            if (! isset($uniqueExperiences[$key])) {
+                $uniqueExperiences[$key] = $experience;
+
+                continue;
+            }
+
+            // If current experience is relevant and existing one isn't, replace it
+            if (($experience['relevance'] ?? false) && ! ($uniqueExperiences[$key]['relevance'] ?? false)) {
+                $uniqueExperiences[$key] = $experience;
+            }
+        }
+
+        // Convert back to indexed array
+        return array_values($uniqueExperiences);
     }
 }

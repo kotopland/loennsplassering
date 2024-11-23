@@ -149,12 +149,15 @@
                                         <!-- Relevance  -->
                                         <div class="row p-2">
                                             <div class="col-auto p-2 pe-4">
-                                                <input type="checkbox" id="update_relevance" name="relevance"
-                                                    value="true" class="form-check-input" @if(old('relevance',
-                                                    $item['relevance'] ?? '' )=='true' ) checked @endif>
-                                                <label for="update_relevance" class="form-check-label">
-                                                    Særdeles høy relevanse for stillingen du skal inn i?
-                                                </label>
+                                                <div class="form-check form-switch px-1 my-2">
+                                                    <input type="checkbox" id="update_relevance" name="relevance"
+                                                        role="switch" value="true" class="form-check-input"
+                                                        @if(old('relevance', $item['relevance'] ?? '' )=='true' )
+                                                        checked @endif>
+                                                    <label for="update_relevance" class="form-check-label">
+                                                        Særdeles høy relevanse for stillingen du skal inn i?
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -288,19 +291,22 @@
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-auto p-2  pe-4">
-                            <input type="checkbox" class="form-check-input" id="relevance" name="relevance"
-                                value="true">
-                            <label class="form-check-label" for="relevance">Særdeles høy relevanse for stillingen du
-                                skal inn i?</label>
-                        </div>
                         <div class="col-auto p-2 pe-4">
-                            <input type="submit"
-                                class="form-control-input btn btn-sm btn-primary @if(null === old('topic_and_school')) disabled @endif"
-                                id="btn-submit" name="submit" value="Registrer erfaring">
+                            <div class="form-check form-switch px-1 my-2">
+                                <input type="checkbox" class="form-check-input" role="switch" id="relevance"
+                                    name="relevance" value="true">
+                                <label class="form-check-label" for="relevance">
+                                    Særdeles høy relevanse for stillingen du skal inn i?
+                                </label>
+                            </div>
+
+                            <div class="col-auto p-2 pe-4">
+                                <input type="submit"
+                                    class="form-control-input btn btn-sm btn-primary @if(null === old('topic_and_school')) disabled @endif"
+                                    id="btn-submit" name="submit" value="Registrer erfaring">
+                            </div>
                         </div>
                     </div>
-                </div>
             </form>
         </div>
     </div>
