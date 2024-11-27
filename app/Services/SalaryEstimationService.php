@@ -529,7 +529,7 @@ class SalaryEstimationService
             while ($workStart->lessThanOrEqualTo($workEnd)) {
                 $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
 
-                if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && $work['workplace_type'] === 'freechurch') {
+                if (Carbon::parse($monthKey.'-01')->greaterThanOrEqualTo($workSpcialConditionDate) && array_key_exists('workplace_type', $work) && $work['workplace_type'] === 'freechurch') {
                     $work['percentage'] = 100;
                     $work['relevance'] = 1;
                     $work['comments'] = @$work['comments'].'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
