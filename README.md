@@ -57,8 +57,15 @@ Verktøyet tar ikke hensyn til arbeidsgivers vurderinger, noe som kan føre til 
    ```
 4. **Kjør migrasjoner:**
    ```
-   php artisan migrate
+   php artisan migrate:fresh --seed
    ```
+
+5. **Sett opp admin bruker:**
+```
+php artisan tinker
+$user = User::insert(['name'=>'Your Name','email'=>'your.email@example.com', 'password'=>Hash::make(Str::random(10))]);
+```
+You can then access the admin pages on [https://app.domain/admin] (https://app.domain/admin)
 
 ## Planlegging og Oppgaver
 Oppgaver er definert i

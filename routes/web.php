@@ -18,9 +18,12 @@ Route::post('/logout', function () {
     return redirect('/')->with('success', 'Logged out successfully!');
 })->name('logout');
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('positions', PositionController::class);
-    Route::resource('salary-ladders', SalaryLadderController::class);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::view('/', 'admin.index')->name('admin.index');
+        Route::resource('positions', PositionController::class);
+        Route::resource('salary-ladders', SalaryLadderController::class);
+    });
 });
 
 Route::get('/', function () {
