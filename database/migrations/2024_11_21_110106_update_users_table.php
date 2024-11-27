@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dropColumn('password');
         });
 
-        Schema::drop('password_reset_tokens');
+        // Schema::drop('password_reset_tokens');
 
     }
 
