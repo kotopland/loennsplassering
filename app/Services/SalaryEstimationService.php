@@ -467,7 +467,7 @@ class SalaryEstimationService
                 $overlapAllowed = (
                     ($eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master'], true))
                     || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')))
-                                && $edu['relevance'] && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
+                                && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
 
