@@ -5,6 +5,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
+$channels_stack_channels = (env('LOG_SLACK_WEBHOOK_URL') == null) ? ['daily'] : ['daily', 'slack'];
+
 return [
 
     /*
@@ -54,7 +56,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            'channels' => $channels_stack_channels, //explode(',', env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 
