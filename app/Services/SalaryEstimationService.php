@@ -456,7 +456,7 @@ class SalaryEstimationService
             $currentStart = $workStart;
 
             // Adjust percentage for "freechurch" type after May 1, 2014.
-            if ($work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
+            if (array_key_exists('workplace_type', $work) && $work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
                 $work['percentage'] = 100;
             }
 
