@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('login_token')->nullable();
-            $table->dropColumn('password');
+            // $table->dropColumn('password');
         });
 
         // Schema::drop('password_reset_tokens');
