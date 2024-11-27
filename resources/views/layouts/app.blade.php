@@ -58,13 +58,16 @@
                 <!-- Button Section -->
                 <div class="d-flex align-items-center gap-2">
                     @if (session('applicationId'))
+                    <a href="{{ route('welcome') }}" class="btn btn-sm btn-outline-light my-1">
+                        Forsiden
+                    </a>
+
                     <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal"
                         data-bs-target="#yourModal">
                         Lagre skjemaet
                     </a>
-                    @endif
 
-                    @if (session('applicationId'))
+
                     <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1"
                         onclick="if (!confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')) return false;">
                         Logg ut
