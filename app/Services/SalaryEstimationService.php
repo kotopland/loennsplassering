@@ -568,7 +568,7 @@ class SalaryEstimationService
                     'relevance' => @$work['relevance'],
                     'comments' => @$work['comments'],
                     'original' => false,
-                    'id' => $work['id'],
+                    'id' => @$work['id'],
                 ];
 
                 // Update the monthly percentage tracker.
