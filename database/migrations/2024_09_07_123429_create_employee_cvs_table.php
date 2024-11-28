@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('employee_cvs', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->string('job_title')->nullable();
             $table->date('work_start_date')->nullable();
             $table->date('birth_date')->nullable();
