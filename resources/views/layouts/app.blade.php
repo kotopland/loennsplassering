@@ -74,7 +74,9 @@
             @auth
                 Administrere:
                 <form action="{{ route('logout') }}" method="POST">
-                    @csrf <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
+                    @csrf
+                    <a href="{{ route('admin.employee-cv.index') }}">lønnskjemaer</a> -
+                    <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
                     <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a>
                     <button type="submit" class="btn btn-link">Logg ut av admin verktøyet</button>
                 </form>
