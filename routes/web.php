@@ -54,3 +54,7 @@ Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'upload'])->n
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'store'])->name('lonnsberegner.calculate');
 
 Route::get('/logg-ut', [EmployeeCVController::class, 'signout'])->name('signout');
+
+Route::get('test-email', function () {
+    return new \App\Mail\SimpleEmail('test', 'test');
+});
