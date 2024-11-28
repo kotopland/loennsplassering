@@ -90,7 +90,7 @@
                         </ul>
                     </div>
                 @endif
-                <h1>{{ config('app.name', 'Laravel') }}</h1>
+                <h1>{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-line.png') }}" width="50px" style="margin-top: -40px"></h1>
                 @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
                     @yield('content')
                 @else
