@@ -10,7 +10,7 @@
     </h2>
 
     @if (session()->has('message'))
-        <p class="alert my-2{{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
+        <p class="alert my-2 {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
     @endif
     <div class="my-2 py-3">
         <p>
