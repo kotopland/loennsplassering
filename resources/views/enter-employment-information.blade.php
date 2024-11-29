@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-@if (session()->has('message'))
-<p class="alert my-2{{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
+@if(session()->has('message'))
+<p class="alert my-2 {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
 @endif
 <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0"
     aria-valuemax="100">
@@ -17,12 +17,13 @@
     <!-- Workplace -->
     <label class="form-label" for="job_title">Type stilling:</label>
     <select class="form-control" name="job_title" id="job_title" required tabindex="1">
-        @if (!key_exists($application->job_title, $positionsLaddersGroups))
+        @if(!key_exists($application->job_title, $positionsLaddersGroups))
         <option value="">Velg fra listen</option>
         @endif
         @foreach ($positionsLaddersGroups as $position => $positionArray)
-        <option value="{{ $position }}" @if (old('job_title', $application->job_title) === $position) selected @endif>
-            {{ $position }} ({{ $positionArray['ladder'].$positionArray['group'] }}) {{ $positionArray['description'] }}
+        <option value="{{ $position }}" @if(old('job_title', $application->job_title) === $position) selected @endif>
+            {{ $position }} ({{ $positionArray['ladder'] . $positionArray['group'] }}) {{ $positionArray['description']
+            }}
         </option>
         @endforeach
     </select>
