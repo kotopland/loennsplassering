@@ -112,10 +112,10 @@ class ExportExcelJob implements ShouldQueue
      */
     private function generateEmailBody(?array $data): string
     {
-        $body = 'Denne eposten ble generert på nettstedet '.config('app.name');
+        $body = 'Denne eposten ble generert på nettstedet '.config('app.name').'<br/><br/>';
         $body .= $data
-            ? ' Vedlagt ligger en maskinberegnet lønnsplassering (Med sannsynligheter for feil).'
-            : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke genereres. Se nettsiden for beregning.';
+            ? ' Vedlagt ligger en maskinberegnet lønnsplassering (med forbehold om feil).'
+            : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke bli behandlet maskinelt. Derimot kan du med linken nedenfor se plasseringen.';
         $body .= ' Du kan se og endre ditt skjema ved å trykke på denne linken: <a href="'.
                  route('open-application', $this->applicationId).'">'.
                  route('open-application', $this->applicationId).'</a>.';
