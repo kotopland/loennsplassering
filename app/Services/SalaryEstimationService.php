@@ -264,8 +264,9 @@ class SalaryEstimationService
             if ($eduEndDate->day === 1) {
                 $education['end_date'] = $eduEndDate->subDay()->toDateString();
                 $education['comments'] = @$education['comments'].'Endret sluttdato til siste dag i forrige måned for korrekt utregning. ';
-                $educationArray[] = $education;
+
             }
+            $educationArray[] = $education;
         }
 
         return $educationArray;
@@ -475,6 +476,7 @@ class SalaryEstimationService
                             'end_date' => $eduStart->subDay()->toDateString(),
                         ]);
                     }
+
                     // Update the current start date to the day after education ends.
                     $currentStart = $eduEnd->addDay();
                 }
