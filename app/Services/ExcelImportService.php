@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EmployeeCV;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
@@ -101,17 +102,18 @@ class ExcelImportService
         $studyPercentage = $this->calculateStudyPercentage($column);
 
         return [
+            'id' => Str::uuid()->toString(),
             'topic_and_school' => $column[1],
             'start_date' => $this->formatExcelDate($column[18]),
             'end_date' => $this->formatExcelDate($column[19]),
-            'study_points' => $column[20],
+            'study_points' => strtolower($column[20]),
             'percentage' => $studyPercentage,
         ];
     }
 
     private function calculateStudyPercentage(array $column): string
     {
-        if (strtolower($column[20]) == 'bestått') {
+        if ($column[20] == 'bestått') {
             return '100';
         }
 
@@ -158,6 +160,7 @@ class ExcelImportService
     {
 
         return [
+            'id' => Str::uuid()->toString(),
             'title_workplace' => $column[1],
             'percentage' => is_numeric($column[15]) ? floatval($column[15]) * 100 : '',
             'start_date' => $this->formatExcelDate($column[16]),

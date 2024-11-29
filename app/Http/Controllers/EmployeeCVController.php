@@ -271,13 +271,12 @@ class EmployeeCVController extends Controller
         $application = $salaryEstimationService->getOrCreateApplication($application);
 
         $hasErrors = false; // Initialize the flag to false
-
         foreach ($application->work_experience ?? [] as $item) {
             if (in_array(null, [
                 @$item['title_workplace'],
-                @$item['percentage'],
-                @$item['start_date'],
-                @$item['end_date'],
+                $item['percentage'] == '' ? null : $item['percentage'],
+                $item['start_date'] == '' ? null : $item['start_date'],
+                $item['end_date'] == '' ? null : $item['end_date'],
                 @$item['relevance'],
             ], true)) {
                 $hasErrors = true; // Set the flag if any null is found

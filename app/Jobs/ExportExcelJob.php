@@ -196,7 +196,7 @@ class ExportExcelJob implements ShouldQueue
 
         foreach ($application->work_experience ?? [] as $enteredItem) {
             $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => $enteredItem['percentage'] / 100, 'datatype' => 'number'];
+            $data[] = ['row' => $row, 'column' => 'P', 'value' => @$enteredItem['percentage'] / 100, 'datatype' => 'number'];
             $data[] = ['row' => $row, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];

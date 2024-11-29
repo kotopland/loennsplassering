@@ -10,7 +10,6 @@ class SalaryEstimationService
 {
     private Carbon $dateAge18;
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * If $application has an id, return it. Otherwise, try to find an EmployeeCV model by applicationId in the session or request.
      * If such a model is found, return it. Otherwise, create a new EmployeeCV model, store its id in the session, and return it.
@@ -37,7 +36,6 @@ class SalaryEstimationService
         return $newApplication;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjust education and work experience start dates, calculate competence points, and adjust education and work experience for overlaps.
      *
@@ -85,7 +83,6 @@ class SalaryEstimationService
         return $application;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjust work experience start date to be after 18 years of age.
      *
@@ -123,12 +120,19 @@ class SalaryEstimationService
 
                 continue;
             }
+
+            if ($workStartDate->lessThan($application->work_start_date) && $workEndDate->greaterThanOrEqualTo($application->work_start_date)) {
+                $this->removeDuplicates($adjustedWorkExperience);
+                $adjustedWorkExperience[$id]['end_date'] = Carbon::parse($application->work_start_date)->subDay()->toDateString();
+                $adjustedWorkExperience[$id]['comments'] = @$adjustedWorkExperience[$id]['comments'].'Endret sluttdato til dagen før tiltredelsesdato. ';
+
+                continue;
+            }
         }
 
         return $adjustedWorkExperience;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjusts education start dates to be after the applicant turned 18.
      * Does the following:
@@ -167,7 +171,6 @@ class SalaryEstimationService
         return $educationAdjusted;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Calculates the total competence points for the given education entries.
      *
@@ -188,7 +191,6 @@ class SalaryEstimationService
         return [$adjustedEducation, $competencePoints];
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Caps the given competence points based on the employee group's ladder.
      *
@@ -215,7 +217,6 @@ class SalaryEstimationService
         return min($competencePoints, $maxPoints[$employeeGroup['ladder']]);
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjusts education and work experience by moving excess education to work experience if the calculated competence points
      * exceed the maximum allowed for the employee group and ladder.
@@ -244,7 +245,6 @@ class SalaryEstimationService
         return $adjustedEducation;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjusts the end date of each education entry in the provided array.
      *
@@ -271,7 +271,6 @@ class SalaryEstimationService
         return $educationArray;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Check if a given text contains any of the given search strings.
      *
@@ -294,7 +293,6 @@ class SalaryEstimationService
         return false;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Converts an education entry into a work experience format.
      *
@@ -323,7 +321,6 @@ class SalaryEstimationService
         ];
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Calculates the competence points based on the education entry and the employee group's ladder.
      *
@@ -374,7 +371,6 @@ class SalaryEstimationService
 
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Moves excess education to work experience to not exceed max competence points.
      *
@@ -431,7 +427,6 @@ class SalaryEstimationService
         return $newEducation;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adjusts work experiences based on overlapping education periods and special conditions.
      *
@@ -499,7 +494,6 @@ class SalaryEstimationService
         return $this->enforceWorkPercentageLimit($adjustedWork);
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Enforces the limit of 100% work percentage per month across all work experiences.
      * Splits work experiences into month-by-month segments and adjusts the percentage
@@ -570,9 +564,8 @@ class SalaryEstimationService
                     'original' => false,
                     'id' => @$work['id'],
                 ];
-
                 // Update the monthly percentage tracker.
-                $monthlyPercentage[$monthKey] = ($monthlyPercentage[$monthKey] ?? 0) + $allocatedPercentage;
+                $monthlyPercentage[$monthKey] = $monthlyPercentage[$monthKey] ?? 0 + $allocatedPercentage;
 
                 // Move to the next month.
                 $workStart->addMonth();
@@ -588,7 +581,6 @@ class SalaryEstimationService
         return $test;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Merge consecutive work segments that have the same title and percentage.
      *
@@ -638,7 +630,6 @@ class SalaryEstimationService
         return $mergedWork;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Calculates the percentage of the study points completed based on the given start and end dates.
      *
@@ -700,7 +691,6 @@ class SalaryEstimationService
         return (int) ceil($percentage / 10) * 10;
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Calculate the total work experience in months from an array of work experience data.
      * Each work experience segment is expected to have a start date, end date, and percentage.
@@ -733,6 +723,7 @@ class SalaryEstimationService
 
                 // Adjust for partial percentages
                 $totalMonths += ($diffInMonths * $workExperience['percentage']) / 100;
+
             } catch (\Exception $e) {
                 // Handle invalid date formats gracefully
                 continue;
@@ -742,7 +733,6 @@ class SalaryEstimationService
         return intval(round($totalMonths));
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Get the difference in years between two dates, with decimals.
      *
@@ -762,7 +752,6 @@ class SalaryEstimationService
         return $totalDays / 365.25; // Accounting for leap years
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Adds a given number of months (with decimals) to a date.
      *
@@ -792,7 +781,6 @@ class SalaryEstimationService
         return $newDate->subDays($fractionalDays);
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Create a timeline and table data for education and work experience.
      *
@@ -866,7 +854,6 @@ class SalaryEstimationService
         ];
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Updates an array of items with missing fields.
      *
@@ -891,7 +878,6 @@ class SalaryEstimationService
         });
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Check if two date ranges overlap.
      *
@@ -907,7 +893,6 @@ class SalaryEstimationService
         return $start1->lte($end2) && $end1->gte($start2);
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
     /**
      * Remove duplicates from an array of work experiences.
      *
