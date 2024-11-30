@@ -721,7 +721,6 @@ class SalaryEstimationService
                 $factor = ($workExperience['relevance'] !== true) ? 0.5 : 1;
                 // Calculate the difference in months
                 $diffInMonths = $startDate->diffInMonths($endDate);
-
                 // Adjust for partial percentages
                 $totalMonths += ($diffInMonths * $workExperience['percentage'] * $factor) / 100;
 
@@ -731,7 +730,7 @@ class SalaryEstimationService
             }
         }
 
-        return intval(round($totalMonths));
+        return $totalMonths;
     }
 
     /**

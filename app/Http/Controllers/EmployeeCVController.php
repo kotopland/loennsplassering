@@ -402,11 +402,9 @@ class EmployeeCVController extends Controller
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
-            SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $calculatedTotalWorkExperienceMonths),
-            Carbon::parse($application->work_start_date))
+            SalaryEstimationService::addMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths),
+            $workStartDate)
         ) - 1;
-
-        $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         return view('preview-and-estimated-salary', [
             'application' => $application,
@@ -416,7 +414,7 @@ class EmployeeCVController extends Controller
             'timeline_adjusted' => $timelineData_adjusted['timeline'],
             'tableData_adjusted' => $timelineData_adjusted['tableData'],
             'calculatedTotalWorkExperienceMonths' => SalaryEstimationService::calculateTotalWorkExperienceMonths($adjustedDataset->work_experience_adjusted),
-            'ansiennitetFromDate' => $workStartDate->subMonths($calculatedTotalWorkExperienceMonths)->format('Y-m-d'),
+            'ansiennitetFromDate' => $workStartDate->subDays(11.88 * 365.25 / 12)->format('Y-m-d'),
             'ladder' => $salaryCategory['ladder'],
             'group' => $salaryCategory['group'] !== ('B' || 'D') ? $salaryCategory['group'] : '',
             'salaryPlacement' => EmployeeCV::getSalary($salaryCategory['ladder'], $salaryCategory['group'], $ladderPosition),
