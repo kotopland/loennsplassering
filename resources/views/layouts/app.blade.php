@@ -34,7 +34,7 @@
         });
     </script>
 
-    <script src='{{ url('js/_hyperscript.min.js') }}'></script>
+    <script src="{{ url('js/_hyperscript.min.js') }}"></script>
     @yield('head')
 </head>
 
@@ -46,10 +46,13 @@
                 <!-- Logo Section -->
                 <div class="d-flex align-items-center">
                     {{-- <a href="{{ url('https://www.frikirken.no') }}" class="text-decoration-none"> --}}
-                    <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside" class="img-fluid py-2" style="max-height: 65px">
+                    <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside" class="img-fluid py-2 app-logo" style="max-height: 65px">
                     {{-- </a> --}}
                 </div>
-
+                <div class="d-flex align-items-center">
+                    <h1 class="m-0 p-0 app-header">{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-line.png') }}" width="50px" style="margin-top: -40px" class="app-beta">
+                    </h1>
+                </div>
                 <!-- Button Section -->
                 <div class="d-flex align-items-center gap-2">
                     @if (session('applicationId'))
@@ -92,7 +95,7 @@
                         </ul>
                     </div>
                 @endif
-                <h1>{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-line.png') }}" width="50px" style="margin-top: -40px"></h1>
+
                 @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
                     @yield('content')
                 @else

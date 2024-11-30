@@ -18,7 +18,7 @@ body {
 
 @font-face {
     font-family: "Helvetica W01";
-    src: url("/fonts/89294146-207c-4803-91fe-338f0d0094bd.woff2") format("woff2"), url("/fonts/57055fe4-c2d3-4287-bac2-eece43fdcbd3.woff") format("woff");
+    src: url("/fonts/57055fe4-c2d3-4287-bac2-eece43fdcbd3.woff") format("woff");
     font-weight: 400;
     font-style: normal;
 }
@@ -248,4 +248,35 @@ label {
     position: sticky !important;
     left: 0 !important;
     /* background-color: white !important; */
+}
+
+
+@media (max-width: 576px) {
+    .app-header {
+        font-size: 1.1em;
+    }
+
+    .app-logo {
+        width: 4em !important;
+    }
+
+    .app-beta {
+        width: 1em !important;
+    }
+}
+
+@media ((min-width: 767px) and (max-width: 767px)) {
+    .app-header {
+        font-size: 1.3em;
+    }
+
+    .app-beta {
+        width: 1em !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .app-header {
+        font-size: 2em;
+    }
 }

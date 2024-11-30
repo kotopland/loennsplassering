@@ -709,7 +709,6 @@ class SalaryEstimationService
     public static function calculateTotalWorkExperienceMonths($workExperienceData)
     {
         $totalMonths = 0;
-
         foreach ($workExperienceData ?? [] as $workExperience) {
             try {
                 $startDate = Carbon::parse($workExperience['start_date']);
@@ -719,12 +718,12 @@ class SalaryEstimationService
                 if ($endDate->lessThan($startDate)) {
                     continue;
                 }
-
+                $factor = ($workExperience['relevance'] !== true) ? 0.5 : 1;
                 // Calculate the difference in months
                 $diffInMonths = $startDate->diffInMonths($endDate);
 
                 // Adjust for partial percentages
-                $totalMonths += ($diffInMonths * $workExperience['percentage']) / 100;
+                $totalMonths += ($diffInMonths * $workExperience['percentage'] * $factor) / 100;
 
             } catch (\Exception $e) {
                 // Handle invalid date formats gracefully
