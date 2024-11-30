@@ -42,7 +42,7 @@ class ExportExcelJob implements ShouldQueue
     public function handle(SalaryEstimationService $salaryEstimationService): void
     {
         try {
-            Log::info("Starting Excel generation for Application ID: {$this->applicationId}");
+            Log::channel('info_log')->info("Starting Excel generation for Application ID: {$this->applicationId}");
 
             $application = $this->fetchApplication();
             $application = $salaryEstimationService->adjustEducationAndWork($application);
@@ -51,7 +51,7 @@ class ExportExcelJob implements ShouldQueue
 
             $this->generateAndSendExcel($data, $application);
 
-            Log::info("Email sent successfully for Application ID: {$this->applicationId}");
+            Log::channel('info_log')->info("Email sent successfully for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
             Log::error("Error processing Application ID: {$this->applicationId} - ".$e->getMessage(), [
                 'stack' => $e->getTraceAsString(),
@@ -72,7 +72,7 @@ class ExportExcelJob implements ShouldQueue
             throw new Exception("Application not found for ID: {$this->applicationId}");
         }
 
-        Log::info("Application fetched successfully for ID: {$this->applicationId}");
+        Log::channel('info_log')->info("Application fetched successfully for ID: {$this->applicationId}");
 
         return $application;
     }
@@ -83,7 +83,7 @@ class ExportExcelJob implements ShouldQueue
     private function calculateTotalWorkExperienceMonths(EmployeeCV $application): int
     {
         $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
-        Log::info("Total work experience calculated for ID: {$this->applicationId}: {$totalMonths}");
+        Log::channel('info_log')->info("Total work experience calculated for ID: {$this->applicationId}: {$totalMonths}");
 
         return $totalMonths;
     }
@@ -99,7 +99,7 @@ class ExportExcelJob implements ShouldQueue
         $export = new ExistingSheetExport($data['data'], $originalFilePath);
         $export->modifyAndSave($modifiedFilePath);
 
-        Log::info("Excel file saved successfully for Application ID: {$this->applicationId}");
+        Log::channel('info_log')->info("Excel file saved successfully for Application ID: {$this->applicationId}");
 
         $subject = 'Foreløpig beregning av din lønnsplassering';
         $body = $this->generateEmailBody($data['data']);

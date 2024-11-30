@@ -5,7 +5,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-$channels_stack_channels = (env('LOG_SLACK_WEBHOOK_URL') == null) ? ['daily'] : ['daily', 'slack'];
+$channels_stack_channels = (env('LOG_SLACK_WEBHOOK_URL_CRITICAL') == null) ? ['daily'] : ['daily', 'slack_critical'];
 
 return [
 
@@ -75,6 +75,12 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'info_log' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/info.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
@@ -82,6 +88,22 @@ return [
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
+        ],
+
+        'slack_critical' => [
+            'driver' => 'slack',
+            'url' => env('LOG_SLACK_WEBHOOK_URL_CRITICAL'),
+            'username' => 'Laravel Log',
+            'emoji' => ':boom:',
+            'level' => env('LOG_LEVEL', 'critical'),
+        ],
+
+        'slack_info' => [
+            'driver' => 'slack',
+            'url' => env('LOG_SLACK_WEBHOOK_URL_INFO'),
+            'username' => 'Laravel Log',
+            'emoji' => ':boom:',
+            'level' => env('LOG_LEVEL', 'info'),
         ],
 
         'papertrail' => [

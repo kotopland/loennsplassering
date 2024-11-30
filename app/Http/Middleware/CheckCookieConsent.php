@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckCookieConsent
@@ -15,7 +14,6 @@ class CheckCookieConsent
     public function handle(Request $request, Closure $next): Response
     {
         $consent = $request->cookies->get('cookie_consent');
-        // Log::info('Cookie consent value: '.($consent ?? 'null'));
 
         $response = $next($request);
 
