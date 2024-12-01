@@ -91,9 +91,12 @@ h4 {
     line-height: 1.45;
 }
 
-.table-container {
-    width: 100% !important;
-    overflow-x: auto !important;
+
+@media (min-width: 768px) {
+    .table-container {
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
 }
 
 table {
@@ -233,22 +236,11 @@ label {
     border: 15px double var(--bs-primary);
 }
 
-.table-container {
-    width: 100% !important;
-    overflow-x: auto !important;
-}
 
-.table-timeline {
-    width: max-content !important;
-    border-collapse: collapse !important;
-}
 
-.table-timeline th:first-child,
-.table-timeline td:first-child {
-    position: sticky !important;
-    left: 0 !important;
-    /* background-color: white !important; */
-}
+
+
+
 
 
 @media (max-width: 576px) {

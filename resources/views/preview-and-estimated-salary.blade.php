@@ -123,6 +123,7 @@
                         <tr>
                             <th class="bg-primary text-white" colspan=" {{ count($timeline_adjusted) + 1 }}">
                                 <h4>Hva du har registrert</h4>
+                                <div class="badge bg-warning text-dark">Scroll horisontalt for å se full tidslinje</div>
                             </th>
                         </tr>
                     </thead>
@@ -204,6 +205,7 @@
                         <tr class="border-top border-bottom-0 border-start-0 border-end-0 border-primary border-4">
                             <th class="bg-primary text-white" colspan=" {{ count($timeline_adjusted) + 1 }}">
                                 <h4>Maskinbehandlet</h4>
+                                <div class="badge bg-warning text-dark">Scroll horisontalt for å se full tidslinje</div>
                             </th>
                         </tr>
                     </thead>
