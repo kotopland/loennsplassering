@@ -85,7 +85,7 @@
         er hva av utdanning og arbeid som arbeidsgiver mener er relevant. Relevanse kan bety en eller to ekstra eller mindre
         på f.eks en bachelor eller master.
         <div class="m-2">
-            <strong>Sum måneder ansiennitet:</strong> {{ $calculatedTotalWorkExperienceMonths }}<br />
+            <strong>Sum måneder ansiennitet:</strong> {{ round($calculatedTotalWorkExperienceMonths, 1) }}<br />
         </div>
         <div class="m-2">
             <strong>Ansiennitet beregnet fra:</strong> {{ $ansiennitetFromDate }}<br />
