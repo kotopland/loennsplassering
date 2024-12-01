@@ -254,7 +254,7 @@
 
     <div class="text-md-end text-center pb-1">
         <a href="{{ route('enter-employment-information', $application) }}" class="btn btn-outline-primary my-2" tabindex="99">
-            Forrige: Informasjon om stillingen
+            Forrige side
         </a>
         @if ($hasErrors)
             <a href="{{ route('enter-experience-information', $application) }}" class="btn btn-primary disabled my-2" id="btn-next">
