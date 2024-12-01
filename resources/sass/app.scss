@@ -396,3 +396,59 @@ label {
 }
 
 /* END Cookie Concent */
+/* Default span styling - for small screens, hidden on desktop */
+
+table.responsivetable td span {
+    background: #eee;
+    color: black;
+    display: none;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px;
+    margin: 0px;
+    position: absolute;
+    text-transform: uppercase;
+    top: 0px;
+    left: 0;
+    background-color: #C6E0F5;
+}
+
+/* Simple CSS for flexbox table on mobile */
+
+@media(max-width: 767px) {
+
+    table.responsivetable tr:first-child {
+        border-top: 1px solid;
+    }
+
+    table.responsivetable thead {
+        left: -9999px;
+        position: absolute;
+        visibility: hidden;
+    }
+
+    table.responsivetable tr {
+
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+        border: 1px solid;
+        border-top: 3px solid;
+    }
+
+    table.responsivetable td {
+        // border: 1px solid;
+        margin: 0 0 0 0;
+        padding-top: 20px;
+        /* additional padding to avoid heading overlap */
+        position: relative;
+        // width: 50%;
+        border: 0px solid;
+    }
+
+    /* Show the heading span */
+    table.responsivetable td span {
+        display: block;
+    }
+}

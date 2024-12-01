@@ -21,7 +21,7 @@
     <div class="mb-2 py-3">
         <div class="vstack gap-3">
             @isset($application->education)
-                <table class="table table-sm w-100">
+                <table class="table table-sm w-100 responsivetable">
                     <thead>
                         <tr>
                             <th scope="col">Utdanning</th>
@@ -30,7 +30,6 @@
                             <th scope="col">Studiepoeng</th>
                             <th scope="col">% Studie</th>
                             <th scope="col">Grad</th>
-                            <th scope="col"></th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -139,12 +138,12 @@
                                 </tr>
                             @else
                                 <tr>
-                                    <th id="topic_and_school-{{ $id }}" scope="row">{{ strlen($item['topic_and_school']) > 30 ? substr($item['topic_and_school'], 0, 30) . '...' : $item['topic_and_school'] }}</th>
-                                    <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
-                                    <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
-                                    <td id="study_points-{{ $id }}">{{ $item['study_points'] }}</td>
-                                    <td id="percentage-{{ $id }}">{{ @$item['percentage'] }} {{ is_numeric($item['percentage']) ? '%' : '' }}</td>
-                                    <td id="highereducation-{{ $id }}">{{ @$item['highereducation'] }}</td>
+                                    <td id="topic_and_school-{{ $id }}"><span>@lang('Utdanning'): </span><strong>{{ strlen($item['topic_and_school']) > 30 ? substr($item['topic_and_school'], 0, 30) . '...' : $item['topic_and_school'] }}</strong></th>
+                                    <td id="start_date-{{ $id }}"><span>@lang('Fra'): </span>{{ $item['start_date'] }}</td>
+                                    <td id="end_date-{{ $id }}"><span>@lang('Til'): </span>{{ $item['end_date'] }}</td>
+                                    <td id="study_points-{{ $id }}"><span>@lang('Studiepoeng')</span>{{ $item['study_points'] }}</td>
+                                    <td id="percentage-{{ $id }}"><span>@lang('# Studie')</span>{{ @$item['percentage'] }} {{ is_numeric($item['percentage']) ? '%' : '' }}</td>
+                                    <td id="highereducation-{{ $id }}"><span>@lang('Grad')</span>{{ @$item['highereducation'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                     <td>
                                         <a class="btn btn-sm @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}#update">
@@ -154,9 +153,7 @@
                                                 Endre
                                             @endif
                                         </a>
-                                    </td>
 
-                                    <td>
                                         <a class=" btn btn-sm btn-outline-danger" href="{{ route('destroy-education-information', ['id' => $id]) }}">
                                             Slett linje
                                         </a>

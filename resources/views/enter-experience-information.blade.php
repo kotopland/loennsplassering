@@ -19,7 +19,7 @@
 
             @isset($application->work_experience)
                 <div>
-                    <table class="table table-sm w-100">
+                    <table class="table table-sm w-100 responsivetable">
                         <thead>
                             <tr>
                                 <th scope="col">Tittel og arbeidssted</th>
@@ -27,7 +27,6 @@
                                 <th scope="col">Fra</th>
                                 <th scope="col">Til</th>
                                 <th scope="col">Relevanse</th>
-                                <th scope="col"></th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -140,10 +139,10 @@
                                 @endif
 
                                 <tr>
-                                    <th id="title_workplace-{{ $id }}" scope="row">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
-                                    <td id="percentage-{{ $id }}">{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
-                                    <td id="start_date-{{ $id }}">{{ $item['start_date'] }}</td>
-                                    <td id="end_date-{{ $id }}">{{ $item['end_date'] }}</td>
+                                    <th id="title_workplace-{{ $id }}">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
+                                    <td id="percentage-{{ $id }}"><span>@lang('Stillingsprosent'): </span>{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
+                                    <td id="start_date-{{ $id }}"><span>@lang('Fra'): </span>{{ $item['start_date'] }}</td>
+                                    <td id="end_date-{{ $id }}"><span>@lang('Til'): </span>{{ $item['end_date'] }}</td>
                                     <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
                                     <td>
                                         <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update">
@@ -153,12 +152,13 @@
                                                 Endre
                                             @endif
                                         </a>
-                                    </td>
-                                    {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
+
+                                        {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
                                 _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #percentage to the innerText of #percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag
                                 ny basert på denne</a>
                         </td> --}}
-                                    <td><a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a></td>
+                                        <a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
