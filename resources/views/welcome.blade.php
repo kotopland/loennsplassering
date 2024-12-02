@@ -109,26 +109,25 @@
 
     <div class="">
         <h3>Har du et utfylt lønnsplasseringsskjema?</h3>
-        Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Vi kan bare behandle Excel dokumenter basert på skjemaet som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
+        Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Vi kan bare behandle Lønnsskjema Excel dokumenter som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
         Dokumentet blir ikke lagret, men vi tar ut informasjon om stillingen, din fødselsdato, tiltredelsesdatoen, kompetansen og ansienniteten.
         <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="my-3">
-                <label for="excelFile" class="form-label">Last opp et allerede fylt ut Frikirkens lønnsskjema (Excel
-                    fil)</label>
-                <input type="file" name="excel_file" id="excelFile" required class="form-control">
-            </div>
-            <div class="text-md-end text-center pb-1">
-                @if (session('applicationId'))
-                    <button type="submit" class="btn btn-lg btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
-                        Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på
-                            med)</small>
-                    </button>
-                @else
-                    <button type="submit" class="btn btn-lg btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
-                        Last inn og fortsett utfylling
-                    </button>
-                @endif
+            <div class="row my-3">
+                <div class="col-auto">
+                    <input type="file" name="excel_file" id="excelFile" required class="form-control">
+                </div>
+                <div class="col-3 text-start d-flex align-items-end">
+                    @if (session('applicationId'))
+                        <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
+                            Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
+                        </button>
+                    @else
+                        <button type="submit" class="btn btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
+                            Last opp og fortsett utfylling
+                        </button>
+                    @endif
+                </div>
             </div>
         </form>
     </div>
