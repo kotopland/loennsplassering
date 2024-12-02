@@ -92,7 +92,7 @@
 
     @if (session('applicationId'))
         <div class="text-md-end text-center pb-1">
-            <a href="{{ route('enter-employment-information') }}" class="btn btn-lg btn-primary my-2 me-3">Fortsett med ditt
+            <a href="{{ route('enter-employment-information') }}" class="btn btn-lg btn-primary my-4 me-3">Fortsett med ditt
                 registrete lønnsplasseringsskjema</a>
             <a href="{{ route('enter-employment-information', ['createNew' => true]) }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse ved å trykke på knappen øverst på denne siden') halt" class="btn btn-lg btn-outline-primary my-2">Start på nytt<br /><small><small>med et tomt
                         skjema</small></small></a>
