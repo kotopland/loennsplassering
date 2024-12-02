@@ -114,10 +114,10 @@
         <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row my-3">
-                <div class="col-auto">
+                <div class="col-auto py-2">
                     <input type="file" name="excel_file" id="excelFile" required class="form-control">
                 </div>
-                <div class="col-3 text-start d-flex align-items-end">
+                <div class="col-auto text-start d-flex align-items-end py-2">
                     @if (session('applicationId'))
                         <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
                             Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
