@@ -109,7 +109,7 @@
 
     <div class="">
         <h3>Har du et utfylt lønnsplasseringsskjema?</h3>
-        Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Det i samme format som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
+        Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Vi kan bare behandle Excel dokumenter basert på skjemaet som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
         Dokumentet blir ikke lagret, men vi tar ut informasjon om stillingen, din fødselsdato, tiltredelsesdatoen, kompetansen og ansienniteten.
         <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data">
             @csrf
