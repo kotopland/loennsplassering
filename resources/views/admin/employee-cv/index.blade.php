@@ -15,7 +15,7 @@
         <tbody>
             @foreach ($employeeCV as $employee)
                 <tr>
-                    <td>{{ $employee->job_title }}</td>
+                    <td><a href="{{ route('open-application', ['application' => $employee->id]) }}">{{ $employee->job_title }}</a></td>
                     <td>{{ $employee->birth_date }}</td>
                     <td>{{ $employee->work_start_date }}</td>
                     <td>{{ $employee->email_sent }}</td>
