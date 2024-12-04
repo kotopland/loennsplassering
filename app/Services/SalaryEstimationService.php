@@ -460,10 +460,9 @@ class SalaryEstimationService
                 $eduStart = Carbon::parse($edu['start_date']);
                 $eduEnd = Carbon::parse($edu['end_date']);
                 // Check if the work overlaps with education and meets the special conditions.
-                $overlapAllowed = (
-                    ($eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master'], true))
-                    || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')))
-                                && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
+                $overlapAllowed =
+                    $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master'], true)// || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')
+                    && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
 
@@ -530,6 +529,7 @@ class SalaryEstimationService
                     $work['relevance'] = 1;
                     $work['comments'] = @$work['comments'].'100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
                 }
+
                 // Calculate the available percentage for this month.
                 $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
 
@@ -543,6 +543,7 @@ class SalaryEstimationService
                 // Calculate the percentage for this month.
                 $allocatedPercentage = min($work['percentage'], $availablePercentage);
 
+                // Split work into the required time range.
                 if ($workStart->lessThanOrEqualTo(Carbon::parse($work['start_date']))) {
                     $workStart = Carbon::parse($work['start_date']);
                 } else {
@@ -566,8 +567,9 @@ class SalaryEstimationService
                     'original' => false,
                     'id' => @$work['id'],
                 ];
+
                 // Update the monthly percentage tracker.
-                $monthlyPercentage[$monthKey] = $monthlyPercentage[$monthKey] ?? 0 + $allocatedPercentage;
+                $monthlyPercentage[$monthKey] = ($monthlyPercentage[$monthKey] ?? 0) + $allocatedPercentage;
 
                 // Move to the next month.
                 $workStart->addMonth();

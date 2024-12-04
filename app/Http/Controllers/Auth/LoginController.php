@@ -30,7 +30,8 @@ class LoginController extends Controller
     {
         $user = User::where('login_token', $token)->firstOrFail();
 
-        Auth::login($user, $request->has('remember'));
+        $rememberLogin = true;
+        Auth::login($user, $rememberLogin);
 
         $user->login_token = null;
         $user->save();
