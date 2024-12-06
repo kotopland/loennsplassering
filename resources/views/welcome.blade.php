@@ -4,6 +4,7 @@
     @if (session()->has('message'))
         <p class="alert my-2 {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
     @endif
+
     <div class="">
         <h3>Beregn din lønnsplassering</h3>
 

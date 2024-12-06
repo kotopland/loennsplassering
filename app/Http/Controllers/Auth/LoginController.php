@@ -23,7 +23,7 @@ class LoginController extends Controller
 
         Mail::to($user->email)->send(new \App\Mail\LoginLink($user));
 
-        return back()->with('status', 'Login link sent to your email!');
+        return back()->with('message', 'Login link sent to your email!');
     }
 
     public function processLoginLink(Request $request, $token)
