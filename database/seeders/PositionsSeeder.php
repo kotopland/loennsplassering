@@ -72,7 +72,7 @@ class PositionsSeeder extends Seeder
                 'group' => 1,
                 'description' => '',
             ],
-            'Menighet: Stillinger uten krav om fagkompetanse' => [
+            'Menighet: Ettåring' => [
                 'ladder' => 'C',
                 'group' => 1,
                 'description' => '',

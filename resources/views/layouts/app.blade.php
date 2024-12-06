@@ -77,40 +77,42 @@
             </div>
         </div>
     </div>
-    <div id="app" class="container">
-        <div class="container">
-            @auth
-                Administrere:
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <a href="{{ route('admin.employee-cv.index') }}">Lønnskjemaer</a> -
-                    <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
-                    <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a>
-                    <button type="submit" class="btn btn-link">Logg ut av admin verktøyet</button>
-                </form>
-            @endauth
+    <div id="app" class="@hasSection('customwidthbsclass')
+@yield('customwidthbsclass')
+@else
+container
+@endif">
+        @auth
+            Administrere:
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <a href="{{ route('admin.employee-cv.index') }}">Lønnskjemaer</a> -
+                <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
+                <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a>
+                <button type="submit" class="btn btn-link">Logg ut av admin verktøyet</button>
+            </form>
+        @endauth
 
-            <main class="my-4">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+        <main class="my-4">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
-                    @yield('content')
-                @else
-                    Du kan ikke bruke denne webappen uten å akseptere informasjonskapsler (cookies).
-                    Dersom du ønsker å bruke webappen, kan du ombestemme deg og <div class="cookie-buttons"><button id="accept-cookies" class="btn btn-outline-primary my-3 me-4" _="on click wait 500ms then reload() the location of the window">akseptere nødvendige
-                            informasjonskapsler.</button></div>
-                @endif
-            </main>
+            @if (is_null(request()->cookie('cookie_consent')) || request()->cookie('cookie_consent') !== 'rejected')
+                @yield('content')
+            @else
+                Du kan ikke bruke denne webappen uten å akseptere informasjonskapsler (cookies).
+                Dersom du ønsker å bruke webappen, kan du ombestemme deg og <div class="cookie-buttons"><button id="accept-cookies" class="btn btn-outline-primary my-3 me-4" _="on click wait 500ms then reload() the location of the window">akseptere nødvendige
+                        informasjonskapsler.</button></div>
+            @endif
+        </main>
 
-        </div>
         <div class="modal fade" id="yourModal" tabindex="-1" aria-labelledby="yourModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
