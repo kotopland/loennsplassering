@@ -311,7 +311,7 @@ class SalaryEstimationService
     {
         return [
             'title_workplace' => $education['topic_and_school'],
-            'percentage' => $education['percentage'],
+            'percentage' => floatval($education['percentage']),
             'start_date' => $education['start_date'],
             'end_date' => $education['end_date'],
             'workplace_type' => 'education_converted',
@@ -559,7 +559,7 @@ class SalaryEstimationService
                 $splitWork[] = [
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
-                    'percentage' => $allocatedPercentage,
+                    'percentage' => floatval($allocatedPercentage),
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
@@ -612,7 +612,7 @@ class SalaryEstimationService
             if (
                 $previous &&
                 $previous['title_workplace'] === $current['title_workplace'] &&
-                $previous['percentage'] === $current['percentage'] &&
+                $previous['percentage'] === floatval($current['percentage']) &&
                 Carbon::parse($previous['end_date'])->addDay()->equalTo(Carbon::parse($current['start_date']))
             ) {
                 // If consecutive, extend the previous segment's end date.
@@ -720,7 +720,8 @@ class SalaryEstimationService
                 if ($endDate->lessThan($startDate)) {
                     continue;
                 }
-                $factor = ($workExperience['relevance'] !== true) ? 0.5 : 1;
+                $factor = ($workExperience['relevance'] != true) ? 0.5 : 1;
+
                 // Calculate the difference in months
                 $diffInMonths = $startDate->diffInMonths($endDate);
                 // Adjust for partial percentages
@@ -728,6 +729,7 @@ class SalaryEstimationService
 
             } catch (\Exception $e) {
                 // Handle invalid date formats gracefully
+
                 continue;
             }
         }
@@ -810,7 +812,7 @@ class SalaryEstimationService
                 'title' => $education['topic_and_school'],
                 'start_date' => $education['start_date'],
                 'end_date' => $endDate,
-                'percentage' => $education['percentage'],
+                'percentage' => floatval($education['percentage']),
                 'type' => 'education',
                 'comments' => @$education['comments'],
             ];
@@ -827,7 +829,7 @@ class SalaryEstimationService
                 'title' => $workExperience['title_workplace'],
                 'start_date' => $workExperience['start_date'],
                 'end_date' => $endDate,
-                'percentage' => $workExperience['percentage'],
+                'percentage' => floatval($workExperience['percentage']),
                 'type' => 'work',
                 'comments' => @$workExperience['comments'],
             ];
@@ -870,7 +872,7 @@ class SalaryEstimationService
                 $item['id'] = Str::uuid()->toString(); // Generate a unique ID
             }
             if (! isset($item['percentage'])) {
-                $item['percentage'] = $item['study_percentage'] ?? $item['work_percentage'] ?? 0;
+                $item['percentage'] = floatval($item['study_percentage']) ?? floatval($item['work_percentage']) ?? 0;
             }
             if (@$item['workplace_type'] == 'freechurch') {
                 $item['relevance'] = true;
