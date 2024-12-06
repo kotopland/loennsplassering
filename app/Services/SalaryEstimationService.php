@@ -27,10 +27,20 @@ class SalaryEstimationService
         $applicationId = session('applicationId') ?? request('applicationId');
 
         if ($applicationId) {
-            return EmployeeCV::find($applicationId);
+            $employeeCv = EmployeeCV::find($applicationId);
+            $employeeCv->timestamps = false;
+            $employeeCv->last_viewed = now();
+            $employeeCv->save();
+            $employeeCv->timestamps = true;
+
+            return $employeeCv;
         }
 
         $newApplication = EmployeeCV::create();
+        $newApplication->timestamps = false;
+        $newApplication->last_viewed = now();
+        $newApplication->save();
+        $newApplication->timestamps = true;
         session(['applicationId' => $newApplication->id]);
 
         return $newApplication;

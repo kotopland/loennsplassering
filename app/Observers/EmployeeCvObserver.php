@@ -13,8 +13,11 @@ class EmployeeCvObserver
     public function retrieved(EmployeeCV $employeeCV)
     {
         try {
-            $employeeCV->update(['last_viewed' => now()]);
-            Log::channel('info_log')->info("EmployeeCV ID: {$employeeCV->id} - Last viewed updated.");
+            // $employeeCV->timestamps = false;
+            // $employeeCV->last_viewed = now();
+            // $employeeCV->save();
+            // $employeeCV->timestamps = true;
+            // Log::channel('info_log')->info("EmployeeCV ID: {$employeeCV->id} - Last viewed updated.");
 
         } catch (\Exception $e) {
             Log::error("Failed to update last viewed for EmployeeCV ID: {$employeeCV->id} - ".$e->getMessage());

@@ -36,7 +36,7 @@ class PositionController extends Controller
 
     public function edit(Position $position)
     {
-        return view('admin.positions.edit', compact('admin.position'));
+        return view('admin.positions.edit', compact('position'));
     }
 
     public function update(Request $request, Position $position)
