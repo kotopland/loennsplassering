@@ -43,9 +43,8 @@
                                                     <div class="row">
                                                         <!-- Title and Workplace -->
                                                         <div class="col-6 col-md-3">
-                                                            <label for="update_title_workplace" class="form-check-label">Tittel og
-                                                                arbeidssted:</label>
-                                                            <input type="text" id="update_title_workplace" name="title_workplace" value="{{ old('title_workplace', $item['title_workplace']) }}" class="form-control @error('title_workplace') is-invalid @enderror">
+                                                            <label for="update_title_workplace" class="form-check-label">Tittel og arbeidssted:</label>
+                                                            <textarea id="update_title_workplace" name="title_workplace" _="on keydown[event.key == 'Enter'] halt" class="form-control @error('title_workplace') is-invalid @enderror">{{ old('title_workplace', $item['title_workplace']) }}</textarea>
                                                             @error('title_workplace')
                                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                             @enderror
@@ -85,7 +84,7 @@
                                                         </div>
 
                                                         <!-- Workplace Type Section -->
-                                                        <div class="pe-4"><strong>Type arbeidssted:</strong></div>
+                                                        <div class="pe-4 mt-4"><strong>Type arbeidssted:</strong></div>
                                                         <div class="row p-2 ms-4">
                                                             <div class="col-auto p-2 pe-4">
                                                                 <input type="radio" id="update_normal" name="workplace_type" value="" class="form-check-input @error('workplace_type') is-invalid @enderror" @if (old('workplace_type', $item['workplace_type'] ?? '') === '') checked @endif>
@@ -118,7 +117,7 @@
                                                                 <div class="form-check form-switch px-1 my-2">
                                                                     <input type="checkbox" id="update_relevance" name="relevance" role="switch" value="true" class="form-check-input" @if (old('relevance', $item['relevance'] ?? '') != false) checked @endif>
                                                                     <label for="update_relevance" class="form-check-label">
-                                                                        Særdeles høy relevanse for stillingen du skal inn i?
+                                                                        Relevant for stillingen du skal inn i?
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -174,10 +173,9 @@
                         <div class="row">
                             <div class="col-auto">
                                 <label class="form-check-label" for="title_workplace">Tittel og arbeidssted:</label>
-                                <input type="text" id="title_workplace" name="title_workplace" value="{{ old('title_workplace') }}" placeholder="" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit else remove .disabled from #btn-next then add .disabled to #btn-submit end" class="form-control @error('title_workplace') is-invalid @enderror">
+                                <textarea id="title_workplace" name="title_workplace" placeholder="" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit else remove .disabled from #btn-next then add .disabled to #btn-submit end on keydown[event.key == 'Enter'] halt" class="form-control @error('title_workplace') is-invalid @enderror">{{ old('title_workplace') }}</textarea>
                                 @error('title_workplace')
-                                    <div class="alert alert-danger">{{ $message }}
-                                    </div>
+                                    <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-auto pe-4">
@@ -206,6 +204,7 @@
                             </div>
                         </div>
                         <div class="row p-2">
+                            <div class="pe-4 mt-4"><strong>Type arbeidssted:</strong></div>
 
                             <div class="col-auto p-2  pe-4">
                                 <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="normal" name="workplace_type" @if (!old('workplace_type')) checked @endif value="">
@@ -230,7 +229,7 @@
                                 <div class="form-check form-switch px-1 my-2">
                                     <input type="checkbox" class="form-check-input" role="switch" id="relevance" name="relevance" value="true">
                                     <label class="form-check-label" for="relevance">
-                                        Særdeles høy relevanse for stillingen du skal inn i?
+                                        Relevant for stillingen du skal inn i?
                                     </label>
                                 </div>
 

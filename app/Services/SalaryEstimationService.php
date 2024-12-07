@@ -373,6 +373,12 @@ class SalaryEstimationService
                         return 2;
                     }
                 }
+            case 'cand.theol.':
+                if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
+                    return 7;
+                } elseif ($employeeGroup['ladder'] === 'D') {
+                    return 4;
+                }
             default:
                 if ($education['study_points'] >= 60) {
 
@@ -471,7 +477,7 @@ class SalaryEstimationService
                 $eduEnd = Carbon::parse($edu['end_date']);
                 // Check if the work overlaps with education and meets the special conditions.
                 $overlapAllowed =
-                    $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master'], true)// || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')
+                    $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master', 'cand.theol.'], true)// || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')
                     && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {

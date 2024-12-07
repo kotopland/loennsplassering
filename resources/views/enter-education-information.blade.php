@@ -9,9 +9,8 @@
     </h2>
     <p>Dersom du har tatt en grad (bachelor- eller master-/sivilingeniørgrad) skal du samle alle utdanningene som hører til
         graden og registrere det samlet som en. Hver grad skal registreres hver for seg. Bachelor har normalt 180
-        studiepoeng, og Master har
-        180 studiepoeng. Annen utdanning skal registreres hver for seg. Bare utdanning etter fylte 18 år skal registreres.
-        Dette gjelder også folkehøgskole og bibelskole.</p>
+        studiepoeng, og Master har 120 studiepoeng når Bachelorgraden er registrert for seg. Annen utdanning som ikke er en del av en grad skal registreres hver for seg.
+        Bare utdanning etter fylte 18 år skal registreres. Dette gjelder også folkehøgskole og bibelskole. Videregående skole skal ikke registreres.</p>
     @if ($hasErrors)
         <div class="callout callout-danger bg-danger-subtle">
             Det er noen mangler i de registrerte opplysninger. Vennligst oppdater dem.
@@ -87,7 +86,7 @@
                                                         <div class="form-check form-switch px-1 my-2">
                                                             <input class="form-check-input" type="checkbox" role="switch" @if (old('study_points', $item['study_points']) == 'bestått') checked @endif id="register_studiepoeng" _="on change if my.checked then add @@disabled to #study_points then set #register_study_points.value to 'bestått' then set #study_points.placeholder to 'bestått' then set #study_points.value to '' else remove @@disabled from #study_points then set #register_study_points.value to #study_points.value then set #study_points.placeholder to '' end">
                                                             <label for="register_studiepoeng" class="form-check-label">
-                                                                Ingen studiepoeng eller bestått
+                                                                Bestått, ingen studiepoeng
                                                             </label>
                                                         </div>
                                                     </div>
@@ -97,19 +96,20 @@
                                                     <div class="col-12 d-flex flex-wrap my-3">
                                                         <div class="form-check pe-4">
                                                             <input type="radio" id="update_no_degree" name="highereducation" value="" class="form-check-input @error('highereducation') is-invalid @enderror" @if (empty(old('highereducation', $item['highereducation'] ?? ''))) checked @endif>
-                                                            <label for="update_no_degree" class="form-check-label">Normalt studie, ingen
-                                                                grad</label>
+                                                            <label for="update_no_degree" class="form-check-label">Normalt studie, ingen grad</label>
                                                         </div>
                                                         <div class="form-check pe-4">
                                                             <input type="radio" id="update_bachelor" name="highereducation" value="bachelor" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'bachelor') checked @endif>
-                                                            <label for="update_bachelor" class="form-check-label">Bachelorgrad eller
-                                                                Høgskolenivå (4 år)
+                                                            <label for="update_bachelor" class="form-check-label">Fullført Bachelorgrad eller Høgskolenivå (4 år)
                                                             </label>
                                                         </div>
                                                         <div class="form-check pe-4">
                                                             <input type="radio" id="update_master" name="highereducation" value="master" class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'master') checked @endif>
-                                                            <label for="update_master" class="form-check-label">Mastergrad,
-                                                                Sivilingeniør++</label>
+                                                            <label for="update_master" class="form-check-label">Fullført Mastergrad, Sivilingeniør++</label>
+                                                        </div>
+                                                        <div class="form-check pe-4">
+                                                            <input type="radio" id="update_master" name="highereducation" value="cand.theol." class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'cand.theol.') checked @endif>
+                                                            <label for="update_master" class="form-check-label">Fullført Cand.theol.</label>
                                                         </div>
                                                     </div>
 
@@ -118,9 +118,7 @@
                                                         <input type="hidden" name="relevance" value="false">
                                                         <div class="form-check form-switch px-1">
                                                             <input class="form-check-input" type="checkbox" role="switch" id="update_relevant" name="relevance" value="true" @if (old('relevance', $item['relevance'] ?? '') == 1) checked @endif>
-                                                            <label for="update_relevant" class="form-check-label">Særdeles høy relevanse
-                                                                for
-                                                                stillingen?</label>
+                                                            <label for="update_relevant" class="form-check-label">Relevant for stillingen?</label>
                                                         </div>
                                                     </div>
 
@@ -209,7 +207,7 @@
                             <div class="form-check form-switch px-1 my-2">
                                 <input class="form-check-input" type="checkbox" role="switch" @if (old('study_points') == 'bestått') checked @endif id="register_studiepoeng" _="on change if my.checked then add @@disabled to #study_points_entry then set #register_study_points.value to 'bestått' then set #study_points_entry.placeholder to 'bestått' then set #study_points_entry.value to '' else remove @@disabled from #study_points_entry then set #register_study_points.value to #study_points_entry.value then set #study_points_entry.placeholder to '' end">
                                 <label for="register_studiepoeng" class="form-check-label">
-                                    Ingen studiepoeng eller bestått
+                                    Bestått, ingen studiepoeng
                                 </label>
                             </div>
                         </div>
@@ -223,12 +221,15 @@
                             </div>
                             <div class="form-check pe-4">
                                 <input type="radio" class="form-check-input @error('highereducation') is-invalid @enderror" id="bachelor" name="highereducation" value="bachelor" @if (old('highereducation') === 'bachelor') checked @endif>
-                                <label class="form-check-label" for="bachelor">Bachelorgrad eller Høgskolenivå (4
-                                    år)</label>
+                                <label class="form-check-label" for="bachelor">Fullført Bachelorgrad eller Høgskolenivå (4 år)</label>
                             </div>
                             <div class="form-check pe-4">
                                 <input type="radio" class="form-check-input @error('highereducation') is-invalid @enderror" id="master" name="highereducation" value="master" @if (old('highereducation') === 'master') checked @endif>
-                                <label class="form-check-label" for="master">Mastergrad, Sivilingeniør++</label>
+                                <label class="form-check-label" for="master">Fullført Mastergrad, Sivilingeniør++</label>
+                            </div>
+                            <div class="form-check pe-4">
+                                <input type="radio" id="update_master" name="highereducation" value="cand.theol." class="form-check-input @error('highereducation') is-invalid @enderror" @if (old('highereducation', $item['highereducation'] ?? '') === 'cand.theol.') checked @endif>
+                                <label for="update_master" class="form-check-label">Fullført Cand.theol.</label>
                             </div>
                         </div>
 
@@ -237,7 +238,7 @@
                             <input type="hidden" name="relevance" value="false">
                             <div class="form-check form-switch px-1 my-2">
                                 <input type="checkbox" role="switch" class="form-check-input" id="relevant" name="relevance" value="true">
-                                <label class="form-check-label" for="relevant">Særdeles høy relevanse for
+                                <label class="form-check-label" for="relevant">Relevant for
                                     stillingen?</label>
                             </div>
                         </div>

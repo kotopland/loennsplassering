@@ -154,7 +154,7 @@ class EmployeeCVController extends Controller
                     'required', // Field is required
                     'regex:/^(bestått|[1-9][0-9]{0,2}|1000)$/',
                 ],
-                'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master,cand.theol.',
                 'relevance' => 'in:true,false|nullable',
             ],
             [
@@ -166,7 +166,7 @@ class EmployeeCVController extends Controller
                 'end_date.date' => 'Sluttdato må være en gyldig dato.',
                 'study_points.required' => 'Studiepoeng eller bestått mangler.',
                 'study_points.regex' => 'Ugyldig antall studiepoeng. 0-1000 eller "bestått".',
-                'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
+                'highereducation.in' => 'Ugyldig type studie.',
                 'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
         );
@@ -211,7 +211,7 @@ class EmployeeCVController extends Controller
                     'required', // Field is required
                     'regex:/^(bestått|[1-9][0-9]{0,2}|1000)$/',
                 ],
-                'highereducation' => 'string|sometimes|nullable|in:bachelor,master',
+                'highereducation' => 'string|sometimes|nullable|in:bachelor,master,cand.theol.',
                 'relevance' => 'in:true,false|nullable',
             ],
             [
@@ -225,7 +225,7 @@ class EmployeeCVController extends Controller
                 'end_date.date' => 'Sluttdato må være en gyldig dato.',
                 'study_points.required' => 'Studiepoeng eller bestått mangler.',
                 'study_points.regex' => 'Ugyldig antall studiepoeng. 1-1000 eller "bestått".',
-                'highereducation.in' => 'Ugyldig type studie. Velg "bachelor" eller "master".',
+                'highereducation.in' => 'Ugyldig type studie.',
                 'relevance.in' => 'Ugyldig verdi for relevans.',
             ]
         );
