@@ -9,13 +9,16 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExistingSheetExport
 {
-    protected $data;
+    protected $dataSheet1;
+
+    protected $dataSheet2;
 
     protected $filePath;
 
     public function __construct($data, $filePath)
     {
-        $this->data = $data;
+        $this->dataSheet1 = $data['sheet1'] ?? [];
+        $this->dataSheet2 = $data['sheet2'] ?? [];
         $this->filePath = $filePath;
     }
 
@@ -30,9 +33,24 @@ class ExistingSheetExport
         $spreadsheet = $reader->load(storage_path('app/public/'.$this->filePath));
 
         // Get the first sheet
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getSheet(0);
 
-        foreach ($this->data as $item) {
+        foreach ($this->dataSheet1 ?? [] as $item) {
+            $cell = $item['column'].$item['row'];
+            $value = $item['value'];
+
+            if ($item['datatype'] === 'date') {
+                $value = Date::dateTimeToExcel(new \DateTime($value));
+            }
+
+            $sheet->setCellValue($cell, $value);
+            // $sheet->getStyle('A2')->getFont()->getColor()->setARGB(Color::COLOR_BLUE);
+        }
+
+        // Get the second sheet
+        $sheet = $spreadsheet->getSheet(1);
+
+        foreach ($this->dataSheet2 ?? [] as $item) {
             $cell = $item['column'].$item['row'];
             $value = $item['value'];
 

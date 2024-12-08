@@ -129,27 +129,31 @@ class ExportExcelJob implements ShouldQueue
      */
     private function prepareExcelData(EmployeeCV $application, int $totalMonths): ?array
     {
-        $data = [
+        $sheet1 = [
             ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
             ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
             ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
         ];
+        $sheet2 = [];
 
-        $row = 15;
+        $rowSheet1 = 15;
+        $rowSheet2 = 4;
 
         $wECollection = collect(array_merge($application->education, $application->work_experience));
         foreach ($application->education_adjusted ?? [] as $item) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant.' : '';
-            $text .= isset($item['competence_points']) && intval($item['competence_points']) >= 0 ? ' Gitt '.$item['competence_points'].' kompetanasepoeng.' : '';
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
-            $row++;
+            $text .= isset($item['competence_points']) && intval($item['competence_points']) >= 0 ? ' Gitt '.$item['competence_points'].' kompetansepoeng.' : '';
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
+            $sheet2[] = ['row' => $rowSheet2, 'column' => 'H', 'value' => isset($item['competence_points']) && intval($item['competence_points']) == 0 ? ' Gitt bare ansiennitet. '.$item['competence_points'].' kompetansepoeng.' : '', 'datatype' => 'text'];
+            $rowSheet1++;
+            $rowSheet2++;
         }
         $adjustedEducation = collect($application->education_adjusted);
         $originalEducation = collect($application->education);
@@ -160,33 +164,33 @@ class ExportExcelJob implements ShouldQueue
             return ! in_array($item['topic_and_school'], $existingTopics);
         });
         foreach ($nonDuplicateOriginal ?? [] as $item) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
             $text .= ! isset($item['competence_points']) ? '. Flytet til ansiennitet og gir uttelling i perider som ikke overskrider 100% ansiennitet.' : '';
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
 
-            $row++;
+            $rowSheet1++;
         }
 
         if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines
-            $row = 28;
+            $rowSheet1 = 28;
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) <= 29) {
             // long education / experience lines
-            $row = 39;
+            $rowSheet1 = 39;
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-expanded-'.$application->id.'.xlsx'; // New modified file path
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) > 29) {
             // long education / experience lines
-            $row = 55;
+            $rowSheet1 = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'modified_14lonnsskjema-extraexpanded-'.$application->id.'.xlsx'; // New modified file path
             // return null;
@@ -195,42 +199,42 @@ class ExportExcelJob implements ShouldQueue
         }
 
         foreach ($application->work_experience ?? [] as $enteredItem) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => @$enteredItem['percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'B', 'value' => $enteredItem['title_workplace'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'P', 'value' => @$enteredItem['percentage'] / 100, 'datatype' => 'number'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker ';
             $text .= @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
-            $row++;
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
+            $rowSheet1++;
         }
 
         foreach ($application->work_experience_adjusted ?? [] as $adjustedItem) {
-            $data[] = ['row' => $row, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'P', 'value' => @floatval($wECollection->firstWhere('id', $adjustedItem['id'])['percentage'] ?? 0) / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'W', 'value' => $adjustedItem['percentage'] / 100, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'X', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'Y', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
-            $data[] = ['row' => $row, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
-            $data[] = ['row' => $row, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
-            $data[] = ['row' => $row, 'column' => 'AB', 'value' => 'Maskinelt behandlet felt', 'datatype' => 'text'];
-            $row++;
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'B', 'value' => $adjustedItem['title_workplace'], 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'P', 'value' => @floatval($wECollection->firstWhere('id', $adjustedItem['id'])['percentage'] ?? 0) / 100, 'datatype' => 'number'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $adjustedItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'W', 'value' => $adjustedItem['percentage'] / 100, 'datatype' => 'number'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'X', 'value' => $adjustedItem['start_date'], 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'Y', 'value' => $adjustedItem['end_date'], 'datatype' => 'date'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'T', 'value' => @$adjustedItem['relevance'] ? 1 : 0.5, 'datatype' => 'number'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => 'Maskinelt behandlet felt', 'datatype' => 'text'];
+            $rowSheet1++;
         }
 
         $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines
-            $row = 62;
+            $rowSheet1 = 62;
         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
             // long education / experience lines
-            $row = 88;
+            $rowSheet1 = 88;
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
             // long education / experience lines
-            $row = 126;
+            $rowSheet1 = 126;
         }
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
@@ -242,13 +246,13 @@ class ExportExcelJob implements ShouldQueue
         $ladder = $salaryCategory['ladder'];
         $group = in_array($salaryCategory['ladder'], ['B', 'D']) ? '' : $salaryCategory['group'];
         $salaryPlacement = EmployeeCV::getSalary($salaryCategory['ladder'], $salaryCategory['group'], $ladderPosition);
-        $data[] = ['row' => $row, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
-        $data[] = ['row' => $row + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
+        $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => $ladder, 'datatype' => 'text'];
+        $sheet1[] = ['row' => $rowSheet1 + 2, 'column' => 'S', 'value' => $group, 'datatype' => 'text'];
+        $sheet1[] = ['row' => $rowSheet1 + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
+        $sheet1[] = ['row' => $rowSheet1 + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
 
         return ['filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
-            'data' => $data,
+            'data' => ['sheet1' => $sheet1, 'sheet2' => $sheet2],
         ];
     }
 

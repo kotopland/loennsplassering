@@ -75,7 +75,7 @@ class SalaryEstimationService
         $application->competence_points = $this->capCompetencePoints($employeeGroup, $competencePoints);
 
         // Limit work experience to 18 or more years of age
-        $adjustedWorkExperience = $this->adjustWorkExperienceStartDate($application);
+        $adjustedWorkExperience = $this->adjustWorkExperienceStartDate($application, $adjustedWorkExperience);
 
         // Adjust education for overlaps
         $adjustedEducation = $this->adjustEducation($adjustedEducation);
@@ -103,9 +103,8 @@ class SalaryEstimationService
      * - If the start date is before the applicant turned 18, remove the entry.
      */
     /******  99be0cd1-0216-460a-b21c-2f9240f775a4  *******/
-    private function adjustWorkExperienceStartDate(EmployeeCV $application): array
+    private function adjustWorkExperienceStartDate(EmployeeCV $application, array $adjustedWorkExperience = []): array
     {
-        $adjustedWorkExperience = $application->work_experience ?? [];
 
         foreach ($adjustedWorkExperience as $id => $work) {
             $workStartDate = Carbon::parse($work['start_date']);
@@ -251,6 +250,7 @@ class SalaryEstimationService
         } elseif ($employeeGroup['ladder'] === 'D' && $competencePoints > 4) {
             $adjustedEducation = $this->moveExcessEducationToWork(4, $adjustedEducation, $adjustedWorkExperience, $competencePoints);
         }
+        $this->moveEducationWithZeroCompetenceToWork($adjustedEducation, $adjustedWorkExperience);
 
         return $adjustedEducation;
     }
@@ -358,6 +358,8 @@ class SalaryEstimationService
 
                         return $education['relevance'] ? 2 : 1;
                     }
+                } else {
+                    return 0;
                 }
             case 'master':
                 if ($education['study_points'] >= 300) {
@@ -372,12 +374,16 @@ class SalaryEstimationService
                     } elseif ($employeeGroup['ladder'] === 'D') {
                         return 2;
                     }
+                } else {
+                    return 0;
                 }
             case 'cand.theol.':
                 if (in_array($employeeGroup['ladder'], ['A', 'B', 'E', 'F'], true)) {
                     return 7;
                 } elseif ($employeeGroup['ladder'] === 'D') {
                     return 4;
+                } else {
+                    return 0;
                 }
             default:
                 if ($education['study_points'] >= 60) {
@@ -445,6 +451,28 @@ class SalaryEstimationService
     }
 
     /**
+     * Moves excess education that gives 0 points to work experience.
+     *
+
+     *
+     * @param  int  $maxCompetencePoints  The maximum allowed competence points.
+     * @param  array  $education  The original education array.
+     * @param  array  $workExperience  The array of work experience.
+     * @param  int  $competencePoints  The current competence points.
+     * @return array The new education array, with excess education moved to work experience.
+     */
+    /******  529b8cf6-8e2f-453d-8855-05ea070d301a  *******/
+    private function moveEducationWithZeroCompetenceToWork($education, &$workExperience)
+    {
+
+        foreach ($education ?? [] as $edu) {
+            if ($edu['competence_points'] == 0) {
+                $workExperience[] = $this->convertEducationToWork($edu);
+            }
+        }
+    }
+
+    /**
      * Adjusts work experiences based on overlapping education periods and special conditions.
      *
      * This method iterates through the given work experiences and adjusts the periods
@@ -475,10 +503,12 @@ class SalaryEstimationService
             foreach ($education ?? [] as $edu) {
                 $eduStart = Carbon::parse($edu['start_date']);
                 $eduEnd = Carbon::parse($edu['end_date']);
-                // Check if the work overlaps with education and meets the special conditions.
+
+                // Check if the work overlaps with education and meets the special conditions. If education has been moved to work, allow it to overlap.
                 $overlapAllowed =
                     $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master', 'cand.theol.'], true)// || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')
-                    && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian']);
+                    && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian'])
+                || $this->in_array_r($edu['topic_and_school'], $work);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
 
@@ -509,6 +539,27 @@ class SalaryEstimationService
 
         // Ensure no overlapping work percentages exceed 100%.
         return $this->enforceWorkPercentageLimit($adjustedWork);
+    }
+
+    /*************  ✨ Codeium Command ⭐  *************/
+    /**
+     * Recursively searches for a given value in a nested array.
+     *
+     * @param  mixed  $needle  The value to search for.
+     * @param  array  $haystack  The array to search in.
+     * @param  bool  $strict  Whether to perform a strict (===) comparison.
+     * @return bool True if the value is found, false otherwise.
+     */
+    /******  7cc01d96-585d-4210-8a03-e244285148aa  *******/
+    private function in_array_r($needle, $haystack, $strict = false)
+    {
+        foreach ($haystack as $item) {
+            if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && $this->in_array_r($needle, $item, $strict))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        EmployeeCV::observe(EmployeeCvObserver::class);
+        // EmployeeCV::observe(EmployeeCvObserver::class);
         $this->app->afterResolving(EncryptCookies::class, function ($middleware) {
             $middleware->disableFor('cookie_consent');
         });
