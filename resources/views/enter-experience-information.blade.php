@@ -53,7 +53,7 @@
                                                         <!-- Work Percentage -->
                                                         <div class="col-6 col-md-3">
                                                             <label for="update_percentage" class="form-check-label">Stillingsprosent:</label>
-                                                            <input type="number" id="update_percentage" name="percentage" min="0" max="100" value="{{ old('percentage', $item['percentage']) }}" required class="form-control @error('percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
+                                                            <input type="number" id="update_percentage" name="percentage" min="0" max="100" step="0.01" value="{{ old('percentage', $item['percentage']) }}" required class="form-control @error('percentage') is-invalid @enderror" placeholder="%" style="max-width: 100px">
                                                         </div>
 
                                                         <div class="col-12 col-md-6">
@@ -180,7 +180,7 @@
                             </div>
                             <div class="col-auto pe-4">
                                 <label class="form-check-label" for="percentage">Stillingsprosent:</label>
-                                <input type="number" min="0" max="100" required id="percentage" name="percentage" value="{{ old('percentage') }}" placeholder="%" class="form-control @error('percentage') is-invalid @enderror">
+                                <input type="number" min="0" max="100" step="0.01" required id="percentage" name="percentage" value="{{ old('percentage') }}" placeholder="%" class="form-control @error('percentage') is-invalid @enderror">
                             </div>
                             <div class="col-auto">
                                 <div class="row justify-content-center">

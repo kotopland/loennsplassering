@@ -241,7 +241,6 @@ class EmployeeCVController extends Controller
         }
 
         $educationItem = $educationData[$request->edit];
-
         $educationItem = [
             'topic_and_school' => $request->topic_and_school,
             'start_date' => $request->start_date,
