@@ -789,7 +789,7 @@ class SalaryEstimationService
                 }
                 $factor = ($workExperience['relevance'] != true) ? 0.5 : 1;
                 // Calculate the difference in months
-                $diffInMonths = $startDate->diffInMonths($endDate->addDay()); //add day is a workaround so it gets closer to the excel sheet
+                $diffInMonths = self::calculateDateDifference($workExperience['start_date'], $workExperience['end_date']); //$startDate->diffInMonths($endDate->addDay()); //add day is a workaround so it gets closer to the excel sheet
 
                 // Adjust for partial percentages
                 $totalMonths += ($diffInMonths * $workExperience['percentage'] * $factor) / 100;
@@ -801,6 +801,28 @@ class SalaryEstimationService
             }
         }
 
+        return $totalMonths;
+    }
+
+    // not accurate, but the same as the Excel calculations
+    public static function calculateDateDifference($xDate, $yDate)
+    {
+        // Parse the input dates
+        $startDate = Carbon::parse($xDate);
+        $endDate = Carbon::parse($yDate);
+
+        // Calculate the difference in months
+        $yearDiff = $endDate->year - $startDate->year;
+        $monthDiff = $endDate->month - $startDate->month;
+        $dayDiff = $endDate->day - $startDate->day;
+
+        // Determine the number of days in the endDate's month
+        $daysInMonth = in_array($endDate->month, [1, 3, 5, 7, 8, 10, 12]) ? 30 : 29;
+
+        // Calculate the total difference in months with fractional part
+        $totalMonths = ($yearDiff * 12) + $monthDiff + ($dayDiff / $daysInMonth);
+
+        // Return the result
         return $totalMonths;
     }
 
