@@ -775,7 +775,7 @@ class SalaryEstimationService
      * @return float The total work experience in months.
      */
     /******  7ce7ef75-bebc-4f26-b834-c801cb9a070b  *******/
-    public static function calculateTotalWorkExperienceMonths($workExperienceData)
+    public static function calculateTotalWorkExperienceMonths($workExperienceData): float
     {
         $totalMonths = 0;
         foreach ($workExperienceData ?? [] as $workExperience) {
@@ -788,9 +788,9 @@ class SalaryEstimationService
                     continue;
                 }
                 $factor = ($workExperience['relevance'] != true) ? 0.5 : 1;
-
                 // Calculate the difference in months
-                $diffInMonths = $startDate->diffInMonths($endDate);
+                $diffInMonths = $startDate->diffInMonths($endDate->addDay()); //add day is a workaround so it gets closer to the excel sheet
+
                 // Adjust for partial percentages
                 $totalMonths += ($diffInMonths * $workExperience['percentage'] * $factor) / 100;
 
@@ -835,21 +835,32 @@ class SalaryEstimationService
      * @return Carbon The modified date.
      */
     /******  5af4060f-387c-4c75-961b-5f9e863bb306  *******/
-    public static function addMonthsWithDecimals(Carbon $date, float $totalMonths): Carbon
+    public static function subMonthsWithDecimals(Carbon $date, float $totalMonths): Carbon
     {
         // Separate the integer and fractional parts of the total months
         $integerMonths = (int) $totalMonths;
         $fractionalMonths = $totalMonths - $integerMonths;
 
-        // Add the integer part to the date
+        // Subtract the integer months from the date
         $newDate = $date->copy()->subMonths($integerMonths);
 
-        // Calculate the days to add for the fractional part
-        $daysInMonth = $newDate->daysInMonth; // Get the number of days in the current month
-        $fractionalDays = ceil($fractionalMonths * $daysInMonth); // Round up fractional days
+        // Handle the fractional part
+        if ($fractionalMonths > 0) {
+            // Calculate days based on the average length of a month (30.44 days)
+            $fractionalDays = $fractionalMonths * 365.25 / 12;
+            $newDate = $newDate->subDays((int) round($fractionalDays));
+        }
 
-        // Add the fractional days
-        return $newDate->subDays($fractionalDays);
+        return $newDate;
+    }
+
+    public static function ladderPosition(Carbon $workStartDate, $calculatedTotalWorkExperienceMonths): int
+    {
+        $workExperienceStartDate = SalaryEstimationService::subMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths);
+        // $yearTilWorkStart = $workStartDate->diffInYears($workExperienceStartDate);
+        $yearTilNowDifference = $workExperienceStartDate->diffInYears(Carbon::now());
+
+        return intval($yearTilNowDifference);
     }
 
     /**

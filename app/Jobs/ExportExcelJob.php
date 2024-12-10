@@ -46,7 +46,7 @@ class ExportExcelJob implements ShouldQueue
 
             $application = $this->fetchApplication();
             $application = $salaryEstimationService->adjustEducationAndWork($application);
-            $totalMonths = $this->calculateTotalWorkExperienceMonths($application);
+            $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
             $data = $this->prepareExcelData($application, $totalMonths);
 
             $this->generateAndSendExcel($data, $application);
@@ -75,17 +75,6 @@ class ExportExcelJob implements ShouldQueue
         Log::channel('info_log')->info("Application fetched successfully for ID: {$this->applicationId}");
 
         return $application;
-    }
-
-    /**
-     * Calculate total work experience in months.
-     */
-    private function calculateTotalWorkExperienceMonths(EmployeeCV $application): int
-    {
-        $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
-        Log::channel('info_log')->info("Total work experience calculated for ID: {$this->applicationId}: {$totalMonths}");
-
-        return $totalMonths;
     }
 
     /**
@@ -127,7 +116,7 @@ class ExportExcelJob implements ShouldQueue
     /**
      * Prepare the data for Excel export.
      */
-    private function prepareExcelData(EmployeeCV $application, int $totalMonths): ?array
+    private function prepareExcelData(EmployeeCV $application, float $totalMonths): ?array
     {
         $sheet1 = [
             ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
@@ -238,10 +227,7 @@ class ExportExcelJob implements ShouldQueue
         }
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
-        $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
-            SalaryEstimationService::addMonthsWithDecimals(Carbon::parse($application->work_start_date), $totalMonths),
-            Carbon::parse($application->work_start_date))
-        );
+        $ladderPosition = SalaryEstimationService::ladderPosition(Carbon::parse($application->work_start_date), $totalMonths);
 
         $ladder = $salaryCategory['ladder'];
         $group = in_array($salaryCategory['ladder'], ['B', 'D']) ? '' : $salaryCategory['group'];

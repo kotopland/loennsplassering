@@ -400,10 +400,11 @@ class EmployeeCVController extends Controller
         $salaryCategory = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
-        $ladderPosition = intval(SalaryEstimationService::getYearsDifferenceWithDecimals(
-            SalaryEstimationService::addMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths),
-            $workStartDate)
-        );
+        $ladderPosition = SalaryEstimationService::ladderPosition($workStartDate, $calculatedTotalWorkExperienceMonths);
+        // dd(SalaryEstimationService::getYearsDifferenceWithDecimals(
+        //     SalaryEstimationService::subMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths),
+        //     $workStartDate));
+        // dd($ladderPosition, SalaryEstimationService::subMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths));
 
         return view('preview-and-estimated-salary', [
             'application' => $application,
