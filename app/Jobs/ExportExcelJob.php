@@ -105,9 +105,7 @@ class ExportExcelJob implements ShouldQueue
         $body .= $data
             ? ' Vedlagt ligger en maskinberegnet lønnsplassering (med forbehold om feil).'
             : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke bli behandlet maskinelt. Derimot kan du med linken nedenfor se plasseringen.';
-        $body .= ' Du kan se og endre ditt skjema ved å trykke på denne linken: <a href="'.
-                 route('open-application', $this->applicationId).'">'.
-                 route('open-application', $this->applicationId).'</a>.';
+        $body .= ' Du kan <a href="'.route('open-application', $this->applicationId).'">se og endre ditt skjema ved å trykke her</a>.';
         $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
 
         return $body;
