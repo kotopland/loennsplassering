@@ -2,7 +2,7 @@
 
 @section('content')
     <h2>Endre Lønnsstige</h2>
-
+    <p>Husk at du må også laste opp lønnsskjema for denne webappen via FTP så brukere som ønsker å få excel skjema vil få plasseringen riktig der også!</p>
     <form action="{{ route('admin.salary-ladders.update', $salaryLadder) }}" method="POST">
         @csrf
         @method('PUT')
@@ -19,29 +19,29 @@
             <label for="salaries" class="form-label">Lønnsstige:</label>
             <textarea class="form-control" name="salaries" id="salaries" required oninput="this.value = this.value.replace(/[^0-9,]/g, '').replace(/,,+/g, ',');" pattern="^(\d+)(,\d+)*$" title="Only numbers separated by commas are allowed.">{{ implode(',', $salaryLadder->salaries) }}</textarea>
             <a href="#" class="btn btn-primary btn-sm" _="
-                                on click
-                                    set numbersText to #salaries.value
-                                    set numbersArray to numbersText.split(',')
-                                    set incrementedNumbers to []
-                                    repeat for number in numbersArray
-                                        set incrementedNumber to (number as Number) -1
-                                        append incrementedNumber to incrementedNumbers
-                                    end
-                                    set #salaries.value to incrementedNumbers.join(',')
-                            ">
+                                            on click
+                                                set numbersText to #salaries.value
+                                                set numbersArray to numbersText.split(',')
+                                                set incrementedNumbers to []
+                                                repeat for number in numbersArray
+                                                    set incrementedNumber to (number as Number) -1
+                                                    append incrementedNumber to incrementedNumbers
+                                                end
+                                                set #salaries.value to incrementedNumbers.join(',')
+                                        ">
                 Decrease Numbers
             </a>
             <a href="#"class="btn btn-primary btn-sm" _="
-                                on click
-                                    set numbersText to #salaries.value
-                                    set numbersArray to numbersText.split(',')
-                                    set incrementedNumbers to []
-                                    repeat for number in numbersArray
-                                        set incrementedNumber to (number as Number) + 1
-                                        append incrementedNumber to incrementedNumbers
-                                    end
-                                    set #salaries.value to incrementedNumbers.join(',')
-                            ">
+                                            on click
+                                                set numbersText to #salaries.value
+                                                set numbersArray to numbersText.split(',')
+                                                set incrementedNumbers to []
+                                                repeat for number in numbersArray
+                                                    set incrementedNumber to (number as Number) + 1
+                                                    append incrementedNumber to incrementedNumbers
+                                                end
+                                                set #salaries.value to incrementedNumbers.join(',')
+                                        ">
                 Increase Numbers
             </a>
         </div>
