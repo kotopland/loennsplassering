@@ -47,7 +47,7 @@
                                                     <div class="col-6 col-md-3">
                                                         <label for="update_topic_and_school" class="form-check-label">Studienavn og
                                                             sted</label>
-                                                        <input type="text" id="update_topic_and_school" name="topic_and_school" value="{{ old('topic_and_school', $item['topic_and_school']) }}" class="form-control @error('topic_and_school') is-invalid @enderror">
+                                                        <textarea id="update_topic_and_school" name="topic_and_school" _="on keydown[event.key == 'Enter'] halt" class="form-control @error('topic_and_school') is-invalid @enderror">{{ old('topic_and_school', $item['topic_and_school']) }}</textarea>
                                                         @error('topic_and_school')
                                                             <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
@@ -171,7 +171,7 @@
                         <!-- Topic and School -->
                         <div class="col-6 col-md-3">
                             <label for="topic_and_school" class="form-check-label">Studienavn og sted</label>
-                            <input type="text" id="topic_and_school" name="topic_and_school" value="{{ old('topic_and_school') }}" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit else remove .disabled from #btn-next then add .disabled to #btn-submit end" class="form-control @error('topic_and_school') is-invalid @enderror">
+                            <textarea id="topic_and_school" name="topic_and_school" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit then remove .disabled from #btn-tilbake else remove .disabled from #btn-next then add .disabled to #btn-submit then add .disabled to #btn-tilbake end on keydown[event.key == 'Enter'] halt" class="form-control @error('topic_and_school') is-invalid @enderror">{{ old('topic_and_school') }}</textarea>
                             @error('topic_and_school')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -245,7 +245,8 @@
 
                         <!-- Submit Button -->
                         <div class="col-12 d-flex flex-wrap align-items-center">
-                            <input type="submit" class="form-control-input btn btn-sm btn-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer utdanning">
+                            <input type="submit" class="form-control-input btn btn-sm btn-primary me-2 @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer utdanning">
+                            <a href="{{ route('enter-education-information') }}" class="btn btn-sm btn-outline-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-tilbake">Tilbake</a>
                         </div>
                     </div>
                 </form>
