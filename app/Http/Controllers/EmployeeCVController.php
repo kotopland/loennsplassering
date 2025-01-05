@@ -260,6 +260,47 @@ class EmployeeCVController extends Controller
         return redirect()->route('enter-education-information', compact('application'));
     }
 
+    public function updateRelevanceOnEducationInformation(Request $request)
+    {
+
+        $request->validate(
+            [
+                'changeEdit' => 'numeric|required',
+                'changeRelevance' => 'in:true,false|nullable',
+            ],
+            [
+                'changeEdit.required' => 'ID mangler.', // Litt mer presis
+                'changeEdit.numeric' => 'ID må være et tall.', // Ny valideringsmelding
+                'changeRelevance.in' => 'Ugyldig verdi for relevans.',
+            ]
+        );
+
+        $application = EmployeeCV::find(session('applicationId'));
+        // dd($request->relevance);
+        $relevance = $request->changeRelevance === 'true' ? 1 : 0;
+        $educationData = $application->education;
+
+        $educationItem = $educationData[$request->changeEdit];
+        $educationItem = [
+            'topic_and_school' => $educationItem['topic_and_school'],
+            'start_date' => $educationItem['start_date'],
+            'end_date' => $educationItem['end_date'],
+            'study_points' => $educationItem['study_points'],
+            'percentage' => $educationItem['percentage'],
+            'highereducation' => $educationItem['highereducation'],
+            'relevance' => $relevance,
+            'id' => $educationItem['id'],
+        ];
+
+        // Update the model and save
+        $educationData[$request->changeEdit] = $educationItem;
+        $application->education = $educationData;
+        // dd($educationData);
+        $application->save();
+
+        return redirect()->route('enter-education-information', compact('application'));
+    }
+
     public function enterExperienceInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
         if (! session('applicationId')) {
@@ -369,6 +410,47 @@ class EmployeeCVController extends Controller
         ];
 
         $workExperienceData[$request->edit] = $workExperienceItem;
+        $application->work_experience = $workExperienceData;
+        $application->save();
+
+        return redirect()->route('enter-experience-information', compact('application'));
+    }
+
+    public function updateRelevanceOnExperienceInformation(Request $request)
+    {
+
+        $validatedData = $request->validate(
+            [
+                'changeEdit' => 'numeric|required',
+                'changeEelevance' => 'in:true,false|nullable',
+            ],
+            [
+                'changeEdit.required' => 'ID mangler.', // Litt mer presis
+                'changeEdit.numeric' => 'ID må være et tall.', // Ny valideringsmelding
+                'changeEelevance.in' => 'Ugyldig verdi for relevans.',
+            ]
+        );
+
+        $application = EmployeeCV::find(session('applicationId'));
+        // dd($request->relevance);
+        $relevance = $request->changeRelevance === 'true' ? 1 : 0;
+        $educationData = $application->education;
+
+        $workExperienceData = $application->work_experience ?? [];
+        $workExperienceItem = $workExperienceData[$request->changeEdit];
+
+        $workExperienceItem = [
+            'title_workplace' => $workExperienceItem['title_workplace'],
+            'percentage' => $workExperienceItem['percentage'],
+            'start_date' => $workExperienceItem['start_date'],
+            'end_date' => $workExperienceItem['end_date'],
+            'workplace_type' => $workExperienceItem['workplace_type'],
+            'relevance' => $relevance,
+            'id' => $workExperienceItem['id'],
+        ];
+
+        // Update the model and save
+        $workExperienceData[$request->changeEdit] = $workExperienceItem;
         $application->work_experience = $workExperienceData;
         $application->save();
 

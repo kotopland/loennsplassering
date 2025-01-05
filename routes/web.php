@@ -41,9 +41,11 @@ Route::post('/lonnsberegner/post-employment-information', [EmployeeCVController:
 Route::get('/lonnsberegner/enter-education-information/{application?}', [EmployeeCVController::class, 'enterEducationInformation'])->name('enter-education-information');
 Route::post('/lonnsberegner/post-education-information', [EmployeeCVController::class, 'postEducationInformation'])->name('post-education-information');
 Route::post('/lonnsberegner/update-single-education-information', [EmployeeCVController::class, 'updateSingleEducationInformation'])->name('update-single-education-information');
+Route::get('/lonnsberegner/update-relevance-on-education-information', [EmployeeCVController::class, 'updateRelevanceOnEducationInformation'])->name('update-relevance-on-education-information');
 Route::get('/lonnsberegner/enter-experience-information/{application?}', [EmployeeCVController::class, 'enterExperienceInformation'])->name('enter-experience-information');
 Route::post('/lonnsberegner/post-experience-information', [EmployeeCVController::class, 'postExperienceInformation'])->name('post-experience-information');
 Route::post('/lonnsberegner/update-single-experience-information', [EmployeeCVController::class, 'updateSingleExperienceInformation'])->name('update-single-experience-information');
+Route::get('/lonnsberegner/update-relevance-on-experience-information', [EmployeeCVController::class, 'updateRelevanceOnExperienceInformation'])->name('update-relevance-on-experience-information');
 Route::get('/lonnsberegner/enter-enter-courses-and-activities/{application?}', [EmployeeCVController::class, 'enterCoursesAndActivityInformation'])->name('enter-courses-and-activity-information');
 Route::get('/lonnsberegner/preview-and-estimated-lonnsberegner/{application?}', [EmployeeCVController::class, 'previewAndEstimatedSalary'])->name('preview-and-estimated-salary');
 Route::get('/lonnsberegner/export-as-xls', [EmployeeCVController::class, 'exportAsXls'])->name('export-as-xls');

@@ -29,7 +29,7 @@
                             <th scope="col">Studiepoeng</th>
                             <th scope="col">% Studie</th>
                             <th scope="col">Grad</th>
-                            <th scope="col"></th>
+                            <th scope="col">Relevant</th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -142,7 +142,16 @@
                                     <td id="study_points-{{ $id }}"><span>@lang('Studiepoeng')</span>{{ $item['study_points'] }}</td>
                                     <td id="percentage-{{ $id }}"><span>@lang('# Studie')</span>{{ @$item['percentage'] }} {{ is_numeric($item['percentage']) ? '%' : '' }}</td>
                                     <td id="highereducation-{{ $id }}"><span>@lang('Grad')</span>{{ @$item['highereducation'] }}</td>
-                                    <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
+                                    <td id="relevance-{{ $id }}"><span>@lang('Relevant for stillingen')</span>
+                                        <div class="form-check form-switch px-1 my-2">
+                                            <form id="form-{{ $id }}" action="{{ route('update-relevance-on-education-information') }}" method="get">
+                                                @csrf
+                                                <input type="hidden" name="changeEdit" value="{{ $id }}" />
+                                                <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == 1) checked @endif _="on click call #form-{{ $id }}.submit() end" />
+                                            </form>
+                                        </div>
+                                        {{-- {{ @$item['relevance'] == true ? 'relevant' : '' }} --}}
+                                    </td>
                                     <td>
                                         <a class="btn btn-sm @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-education-information', [$application, 'edit' => $id]) }}#update">
                                             @if (in_array(null, [@$item['topic_and_school'], @$item['start_date'], @$item['end_date'], @$item['study_points'], @$item['percentage'], @$item['relevance']], true))

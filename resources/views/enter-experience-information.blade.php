@@ -10,9 +10,12 @@
 
     @if ($hasErrors)
         <div class="callout callout-danger bg-danger-subtle">
-            Det er noen mangler i registrerte opplysninger. Vennligst oppdater dem.
+            Det er noen mangler i registrerte opplysninger. Gå inn Vennligst oppdater dem.
         </div>
     @endif
+    <div class="callout callout-dark bg-light-subtle">
+        Erfaring i kristne kirker/organisasjoner må spesifiseres i tillegg til relevanse da det gir bedre uttelling på ansiennitet.
+    </div>
 
     <div class="mb-2 py-3">
         <div class="vstack gap-3">
@@ -142,7 +145,17 @@
                                     <td id="percentage-{{ $id }}"><span>@lang('Stillingsprosent'): </span>{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
                                     <td id="start_date-{{ $id }}"><span>@lang('Fra'): </span>{{ $item['start_date'] }}</td>
                                     <td id="end_date-{{ $id }}"><span>@lang('Til'): </span>{{ $item['end_date'] }}</td>
-                                    <td id="relevance-{{ $id }}">{{ @$item['relevance'] == true ? 'relevant' : '' }}</td>
+                                    <td id="relevance-{{ $id }}"><span>@lang('Relevant for stillingen')</span>
+                                        <div class="form-check form-switch px-1 my-2">
+                                            <form id="form-{{ $id }}" action="{{ route('update-relevance-on-experience-information') }}" method="get">
+                                                @csrf
+                                                <input type="hidden" name="changeEdit" value="{{ $id }}" />
+                                                <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == true) checked @endif _="on click call #form-{{ $id }}.submit() end" />
+                                            </form>
+                                        </div>
+
+                                        {{-- {{ @$item['relevance'] == true ? 'relevant' : '' }} --}}
+                                    </td>
                                     <td>
                                         <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update">
                                             @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true))
