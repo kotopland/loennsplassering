@@ -444,7 +444,7 @@ class EmployeeCVController extends Controller
             'percentage' => $workExperienceItem['percentage'],
             'start_date' => $workExperienceItem['start_date'],
             'end_date' => $workExperienceItem['end_date'],
-            'workplace_type' => $workExperienceItem['workplace_type'],
+            'workplace_type' => @$workExperienceItem['workplace_type'],
             'relevance' => $relevance,
             'id' => $workExperienceItem['id'],
         ];
