@@ -342,6 +342,7 @@ class SalaryEstimationService
     /******  3eee7ad1-c5c3-46a4-a425-ea18977f73ff  *******/
     private function calculateCompetencePoints($application, $education)
     {
+
         if (strtolower($education['study_points']) === 'bestått') {
             $months = Carbon::parse($education['start_date'])->diffInMonths($education['end_date']);
 
@@ -386,10 +387,14 @@ class SalaryEstimationService
                     return 0;
                 }
             default:
-                if ($education['study_points'] >= 60) {
+                if ($education['study_points'] >= 60 && $education['relevance']) {
 
                     return 1;
+                } else {
+
+                    return 0;
                 }
+
         }
 
     }
