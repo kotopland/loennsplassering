@@ -191,8 +191,16 @@ class SalaryEstimationService
     private function calculateCompetencePointsForEducation(EmployeeCV $application, array $adjustedEducation): array
     {
         $competencePoints = 0;
+        $incompleteDegreeYears = 0;
+
         foreach ($adjustedEducation as $id => $education) {
             $competencePoint = $this->calculateCompetencePoints($application, $education);
+            if ($education['study_points'] >= 60 && $education['relevance'] && empty($education['highereducation'])) {
+                $incompleteDegreeYears += $education['study_points'] / 60;
+                if ($incompleteDegreeYears > 2) {
+                    $competencePoint = 0;
+                }
+            }
             $competencePoints += $competencePoint;
             $adjustedEducation[$id]['competence_points'] = $competencePoint;
         }
@@ -794,7 +802,7 @@ class SalaryEstimationService
                 }
                 $factor = ($workExperience['relevance'] != true) ? 0.5 : 1;
                 // Calculate the difference in months
-                $diffInMonths = self::calculateDateDifference($workExperience['start_date'], $workExperience['end_date']); //$startDate->diffInMonths($endDate->addDay()); //add day is a workaround so it gets closer to the excel sheet
+                $diffInMonths = self::calculateDateDifference($workExperience['start_date'], $workExperience['end_date']); // $startDate->diffInMonths($endDate->addDay()); //add day is a workaround so it gets closer to the excel sheet
 
                 // Adjust for partial percentages
                 $totalMonths += ($diffInMonths * $workExperience['percentage'] * $factor) / 100;
