@@ -195,7 +195,7 @@ class SalaryEstimationService
 
         foreach ($adjustedEducation as $id => $education) {
             $competencePoint = $this->calculateCompetencePoints($application, $education);
-            if ($education['study_points'] >= 60 && $education['relevance'] && empty($education['highereducation'])) {
+            if ($education['study_points'] != 'bestått' && $education['study_points'] >= 60 && $education['relevance'] && empty($education['highereducation'])) {
                 $incompleteDegreeYears += $education['study_points'] / 60;
                 if ($incompleteDegreeYears > 2) {
                     $competencePoint = 0;
