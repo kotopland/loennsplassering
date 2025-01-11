@@ -51,11 +51,11 @@
                 <!-- Logo Section -->
                 <div class="d-flex align-items-center">
                     {{-- <a href="{{ url('https://www.frikirken.no') }}" class="text-decoration-none"> --}}
-                    <img src="{{ url('images/logo-frikirken-w-.png') }}" alt="Gå til Frikirkens nettside" class="img-fluid py-2 app-logo" style="max-height: 65px">
+                    <img src="{{ url('images/logo-frikirken-w.png') }}" alt="Gå til Frikirkens nettside" class="img-fluid py-2 app-logo" style="max-height: 65px">
                     {{-- </a> --}}
                 </div>
                 <div class="d-flex align-items-center">
-                    <h1 class="m-0 p-0 app-header">{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-white-line-.png') }}" width="50px" style="margin-top: -40px" class="app-beta">
+                    <h1 class="m-0 p-0 app-header">{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-white-line.png') }}" width="50px" style="margin-top: -40px" class="app-beta">
                     </h1>
                 </div>
                 <!-- Button Section -->
