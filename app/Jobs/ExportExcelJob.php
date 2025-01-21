@@ -221,7 +221,7 @@ class ExportExcelJob implements ShouldQueue
             $rowSheet1 = 88;
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
             // long education / experience lines
-            $rowSheet1 = 126;
+            $rowSheet1 = 127;
         }
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
