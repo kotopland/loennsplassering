@@ -287,7 +287,7 @@ class EmployeeCVController extends Controller
             'end_date' => $educationItem['end_date'],
             'study_points' => $educationItem['study_points'],
             'percentage' => $educationItem['percentage'],
-            'highereducation' => $educationItem['highereducation'],
+            'highereducation' => @$educationItem['highereducation'],
             'relevance' => $relevance,
             'id' => $educationItem['id'],
         ];

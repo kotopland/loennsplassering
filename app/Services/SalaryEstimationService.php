@@ -63,7 +63,9 @@ class SalaryEstimationService
         $competencePoints = 0;
 
         // Limit education to 18 or more years of age
-        $adjustedEducation = $this->adjustEducationStartDate($adjustedEducation);
+        $adjustedEducation = $this->adjustEducationDate($application->work_start_date, $adjustedEducation);
+
+        // Limit education to work start date
 
         // calculate competence points
         [$adjustedEducation, $competencePoints] = $this->calculateCompetencePointsForEducation($application, $adjustedEducation);
@@ -154,7 +156,7 @@ class SalaryEstimationService
      * @return array The adjusted education array.
      */
     /******  4d22b404-9c9d-4b83-b4ab-511071b7c1f9  *******/
-    private function adjustEducationStartDate(array $education): array
+    private function adjustEducationDate($workStartDate, array $education): array
     {
 
         $educationAdjusted = [];
@@ -174,6 +176,13 @@ class SalaryEstimationService
             if ($this->dateAge18->diffInYears(Carbon::parse($edu['start_date'])) < 0) {
                 continue; // Remove if still under 18 after adjustment
             }
+
+            // if ($eduEndDate->greaterThan($workStartDate)) {
+
+            //     $edu['end_date'] = Carbon::parse($workStartDate)->subDay()->toDateString();
+            //     $edu['comments'] = @$edu['comments'].'Endret sluttdato til tiltredelsesdato. ';
+
+            // }
             $educationAdjusted[] = $edu;
         }
 
