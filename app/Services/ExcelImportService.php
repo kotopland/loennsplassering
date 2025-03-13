@@ -90,7 +90,8 @@ class ExcelImportService
             try {
                 $education[] = $this->formatEducationRow($column);
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException('Feil i datoformatet i excel-arket. Sjekk at alle datoer er på formatet ÅÅÅÅ-MM-DD.');
+                dd($e->getMessage());
+                throw new \InvalidArgumentException('Det er feil i dato(er) i excel-filen. Sjekk at start datoen ikke er etter slutt datoen, at datoer ikke er tomme, og at alle datoer er skrevet på et gyldig dato format som år-mnd-dag.');
             }
         }
 
