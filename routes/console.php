@@ -8,9 +8,10 @@ Schedule::command('employee-cvs:delete-emtpy-records')->dailyAt('08:00');
 // This is still not the recommended way to run a persistent queue worker
 Artisan::command('run-queue-worker', function () {
     $this->info('Starting queue worker...');
-    $this->call('queue:work', ['--tries' => 3, '--stop-when-empty' => true]);
-})->everyMinute()->withoutOverlapping()->runInBackground();
+    $this->call('queue:work', ['--timeout' => 0, '--tries' => 3, '--stop-when-empty' => true]);
+})->everyMinute()->withoutOverlapping();
 // Schedule::command("queue:work --once --name=default --queue=default --backoff=0 --memory=128 --sleep=3 --tries=1")
 //     ->everyMinute()
 //     ->withoutOverlapping(10)
 //     ->timeout(540);
+//->runInBackground()
