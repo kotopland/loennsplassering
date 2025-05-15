@@ -36,7 +36,7 @@
                 som Excel-dokument. Din e-postadresse brukes kun til å sende deg denne informasjonen og blir ikke lagret.
             </p>
             <div class="my-4">
-                <form action="{{ route('export-as-xls') }}" method="get" id="salary_form" _="on submit set #sendEmail.innerHTML to 'Behandler. Sjekk din epost om noen mulutter...'">
+                <form action="{{ route('export-as-xls') }}" method="get" id="salary_form" _="on submit set #sendEmail.innerHTML to 'Behandler. Sjekk din epost om noen minutter...'">
                     @csrf
                     <div class="pe-4">
                         <label for="email" class="form-label">E-post adresse</label>

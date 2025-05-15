@@ -25,7 +25,7 @@ class ExportExcelJob implements ShouldQueue
 
     private string $email;
 
-    public $timeout = 180;
+    public $timeout = 600;
 
     /**
      * Create a new job instance.
@@ -53,7 +53,7 @@ class ExportExcelJob implements ShouldQueue
 
             Log::channel('info_log')->info("Email sent successfully for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
-            Log::error("Error processing Application ID: {$this->applicationId} - ".$e->getMessage(), [
+            Log::error("Error processing Application ID: {$this->applicationId} - " . $e->getMessage(), [
                 'stack' => $e->getTraceAsString(),
             ]);
             $this->sendErrorNotification($e->getMessage());  // Send email with error
@@ -93,7 +93,7 @@ class ExportExcelJob implements ShouldQueue
         $subject = 'Foreløpig beregning av din lønnsplassering';
         $body = $this->generateEmailBody($data['data']);
         Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
-        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost: '.$subject, $body, $modifiedFilePath));
+        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost: ' . $subject, $body, $modifiedFilePath));
     }
 
     /**
@@ -101,11 +101,11 @@ class ExportExcelJob implements ShouldQueue
      */
     private function generateEmailBody(?array $data): string
     {
-        $body = 'Denne eposten ble generert på nettstedet '.config('app.name').'<br/><br/>';
+        $body = 'Denne eposten ble generert på nettstedet ' . config('app.name') . '<br/><br/>';
         $body .= $data
             ? ' Vedlagt ligger en maskinberegnet lønnsplassering (med forbehold om feil).'
             : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke bli behandlet maskinelt. Derimot kan du med linken nedenfor se plasseringen.';
-        $body .= ' Du kan <a href="'.route('open-application', $this->applicationId).'">se og endre ditt skjema ved å trykke her</a>.';
+        $body .= ' Du kan <a href="' . route('open-application', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
         $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
 
         return $body;
@@ -134,11 +134,11 @@ class ExportExcelJob implements ShouldQueue
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
-            $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
+            $text .= @$item['highereducation'] ? ' som ' . $item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant.' : '';
-            $text .= isset($item['competence_points']) && intval($item['competence_points']) >= 0 ? ' Gitt '.$item['competence_points'].' kompetansepoeng.' : '';
+            $text .= isset($item['competence_points']) && intval($item['competence_points']) >= 0 ? ' Gitt ' . $item['competence_points'] . ' kompetansepoeng.' : '';
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
-            $sheet2[] = ['row' => $rowSheet2, 'column' => 'H', 'value' => isset($item['competence_points']) && intval($item['competence_points']) == 0 ? ' Gitt bare ansiennitet. '.$item['competence_points'].' kompetansepoeng.' : '', 'datatype' => 'text'];
+            $sheet2[] = ['row' => $rowSheet2, 'column' => 'H', 'value' => isset($item['competence_points']) && intval($item['competence_points']) == 0 ? ' Gitt bare ansiennitet. ' . $item['competence_points'] . ' kompetansepoeng.' : '', 'datatype' => 'text'];
             $rowSheet1++;
             $rowSheet2++;
         }
@@ -157,7 +157,7 @@ class ExportExcelJob implements ShouldQueue
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
-            $text .= @$item['highereducation'] ? ' som '.$item['highereducation'] : '';
+            $text .= @$item['highereducation'] ? ' som ' . $item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
             $text .= ! isset($item['competence_points']) ? '. Flytet til ansiennitet og gir uttelling i perider som ikke overskrider 100% ansiennitet.' : '';
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
@@ -169,17 +169,17 @@ class ExportExcelJob implements ShouldQueue
             // short education / experience lines
             $rowSheet1 = 28;
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'generert-lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
+            $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
         } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) <= 29) {
             // long education / experience lines
             $rowSheet1 = 39;
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'generert-lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
+            $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
         } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) > 29) {
             // long education / experience lines
             $rowSheet1 = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
-            $modifiedFilePath = 'generert-lonnsskjema-'.$application->id.'.xlsx'; // New modified file path
+            $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
             // return null;
         } else {
             throw new InvalidArgumentException('Det er for mange linjer utdannelse eller ansiennitet at det ikke passer inni lønnsskjema excel arket.');
@@ -235,7 +235,8 @@ class ExportExcelJob implements ShouldQueue
         $sheet1[] = ['row' => $rowSheet1 + 5, 'column' => 'S', 'value' => $salaryPlacement, 'datatype' => 'text'];
         $sheet1[] = ['row' => $rowSheet1 + 9, 'column' => 'S', 'value' => $application->competence_points, 'datatype' => 'text'];
 
-        return ['filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
+        return [
+            'filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
             'data' => ['sheet1' => $sheet1, 'sheet2' => $sheet2],
         ];
     }
