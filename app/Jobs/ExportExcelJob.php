@@ -25,7 +25,7 @@ class ExportExcelJob implements ShouldQueue
 
     private string $email;
 
-    // public $timeout = 600;
+    public $timeout = 180;
 
     /**
      * Create a new job instance.
