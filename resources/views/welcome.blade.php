@@ -112,7 +112,7 @@
         <h3>Har du et utfylt lønnsplasseringsskjema?</h3>
         Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Vi kan bare behandle Lønnsskjema Excel dokumenter som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
         Dokumentet blir ikke lagret, men vi tar ut informasjon om stillingen, din fødselsdato, tiltredelsesdatoen, kompetansen og ansienniteten.
-        <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data" name="uploadForm">
             @csrf
             <div class="row my-3">
                 <div class="col-auto py-2">
@@ -120,11 +120,11 @@
                 </div>
                 <div class="col-auto text-start d-flex align-items-end py-2">
                     @if (session('applicationId'))
-                        <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
+                        <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Please Wait...' into my.innerHTML then wait 100ms then add @@disabled to me ">
                             Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
                         </button>
                     @else
-                        <button type="submit" class="btn btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">
+                        <button type="submit" class="btn btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Please Wait...' into my.innerHTML then wait 100ms then add @@disabled to me ">
                             Last opp og fortsett utfylling
                         </button>
                     @endif

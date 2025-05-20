@@ -25,7 +25,31 @@ class ExportExcelJob implements ShouldQueue
 
     private string $email;
 
-    public $timeout = 300;
+    /**
+     * The number of times the job may be attempted.
+     * Overrides worker's --tries option for this job.
+     *
+     * @var int
+     */
+    public $tries = 3; // Attempt this job up to 3 times
+
+    /**
+     * The maximum number of seconds the job can run before timing out.
+     * Overrides worker's --timeout option for this job.
+     * Set to 0 for no timeout (use with caution).
+     *
+     * @var int
+     */
+    public $timeout = 0; // Allowing unlimited time for potentially large Excel exports
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     * Overrides worker's --sleep option (if used) and global retry_after.
+     *
+     * @var int
+     */
+    public $backoff = 60; // Wait 60 seconds before retrying a failed job
+
 
     /**
      * Create a new job instance.
@@ -247,5 +271,23 @@ class ExportExcelJob implements ShouldQueue
         $subject = 'Feil ved prosessering av Lønnsplassering (Excel fil)';
         $body = $this->generateEmailBody(null);
         Mail::to($this->email)->send(new SimpleEmail($subject, $body, null));
+    }
+    /**
+     * Handle a job failure.
+     *
+     * @param \Throwable $exception
+     * @return void
+     */
+    public function failed(\Throwable $exception): void
+    {
+        // Log custom message when job fails
+        Log::critical('ExportExcelJob failed permanently after retries.', [
+            'job_id' => $this->job->getJobId(),
+            'message' => $exception->getMessage(),
+            'class' => get_class($exception),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+        // You can send notifications here, e.g., to an admin
+        // Mail::to('admin@example.com')->send(new JobFailedNotification($this, $exception));
     }
 }
