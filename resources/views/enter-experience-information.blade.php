@@ -29,7 +29,7 @@
                                 <th scope="col">Stillingsprosent</th>
                                 <th scope="col">Fra</th>
                                 <th scope="col">Til</th>
-                                <th scope="col">Relevanse</th>
+                                @auth <th scope="col">Relevanse</th> @endauth
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -38,7 +38,7 @@
                                 @if (request()->has('edit') && request()->edit == $id)
                                     <tr id="update">
                                         <td colspan="10">
-                                            <form action="{{ route('update-single-experience-information', ['edit' => $id]) }}" method="POST" id="salary_form">
+                                            <form action="{{ route('update-single-experience-information', ['edit' => $id]) }}" method="POST" id="updateExperienceForm">
                                                 @csrf
 
                                                 <div class="row g-3 my-2 border border-primary border-2 bg-info p-2 p-md-4">
@@ -129,8 +129,8 @@
                                                         <!-- Submit Button -->
                                                         <div class="row p-2">
                                                             <div class="col-auto p-2 pe-4">
-                                                                <input type="submit" id="update-btn-submit" name="submit" value="Oppdater erfaring" class="btn btn-primary me-2 @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif">
-                                                                <a href="{{ route('enter-experience-information') }}" class="btn btn-sm btn-outline-primary">Tilbake</a>
+                                                                <input type="submit" id="update-btn-submit" name="submit" value="Bekreft erfaring" class="btn btn-primary me-2 @if (null === old('title_workplace', $item['title_workplace'])) disabled @endif" _="on click if #updateExperienceForm.checkValidity() then put 'Vennligst vent...' into my.value then wait 20ms then add @@disabled to me end">
+                                                                <a href="{{ route('enter-experience-information') }}" class="btn btn-sm btn-outline-primary" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Tilbake</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -138,47 +138,49 @@
                                             </form>
                                         </td>
                                     </tr>
-                                @endif
+                                @else
+                                    <tr>
+                                        <th id="title_workplace-{{ $id }}">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
+                                        <td id="percentage-{{ $id }}"><span>@lang('Stillingsprosent'): </span>{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
+                                        <td id="start_date-{{ $id }}"><span>@lang('Fra'): </span>{{ $item['start_date'] }}</td>
+                                        <td id="end_date-{{ $id }}"><span>@lang('Til'): </span>{{ $item['end_date'] }}</td>
+                                        @auth
+                                            <td id="relevance-{{ $id }}"><span>@lang('Relevant for stillingen')</span>
+                                                <div class="form-check form-switch px-1 my-2">
+                                                    <form id="form-{{ $id }}" action="{{ route('update-relevance-on-experience-information') }}" method="get">
+                                                        @csrf
+                                                        <input type="hidden" name="changeEdit" value="{{ $id }}" />
+                                                        <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == true) checked @endif _="on click call #form-{{ $id }}.submit() end" />
+                                                    </form>
+                                                </div>
 
-                                <tr>
-                                    <th id="title_workplace-{{ $id }}">{{ strlen($item['title_workplace']) > 30 ? substr($item['title_workplace'], 0, 30) . '...' : $item['title_workplace'] }}</th>
-                                    <td id="percentage-{{ $id }}"><span>@lang('Stillingsprosent'): </span>{{ $item['percentage'] }}{{ is_numeric($item['percentage']) ? '%' : '' }}</td>
-                                    <td id="start_date-{{ $id }}"><span>@lang('Fra'): </span>{{ $item['start_date'] }}</td>
-                                    <td id="end_date-{{ $id }}"><span>@lang('Til'): </span>{{ $item['end_date'] }}</td>
-                                    <td id="relevance-{{ $id }}"><span>@lang('Relevant for stillingen')</span>
-                                        <div class="form-check form-switch px-1 my-2">
-                                            <form id="form-{{ $id }}" action="{{ route('update-relevance-on-experience-information') }}" method="get">
-                                                @csrf
-                                                <input type="hidden" name="changeEdit" value="{{ $id }}" />
-                                                <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == true) checked @endif _="on click call #form-{{ $id }}.submit() end" />
-                                            </form>
-                                        </div>
+                                                {{-- {{ @$item['relevance'] == true ? 'relevant' : '' }} --}}
+                                            </td>
+                                        @endauth
+                                        <td>
+                                            <a class="btn btn-sm m-1  @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
+                                                @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true))
+                                                    Vennligst bekreft
+                                                @else
+                                                    Endre
+                                                @endif
+                                            </a>
 
-                                        {{-- {{ @$item['relevance'] == true ? 'relevant' : '' }} --}}
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-sm @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update">
-                                            @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true))
-                                                Vennligst oppdater
-                                            @else
-                                                Endre
-                                            @endif
-                                        </a>
-
-                                        {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
+                                            {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
                                 _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #percentage to the innerText of #percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag
                                 ny basert på denne</a>
                         </td> --}}
-                                        <a class="btn btn-sm btn-outline-danger" href={{ route('destroy-experience-information', ['id' => $id]) }}>Slett linje</a>
-                                    </td>
-                                </tr>
+                                            <a class="btn btn-sm btn-outline-danger m-1" href={{ route('destroy-experience-information', ['id' => $id]) }} _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Slett linje</a>
+                                        </td>
+                                    </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @endisset
             <div class="mt-5">
-                <form action="{{ route('post-experience-information') }}" method="POST" id="salary_form">
+                <form action="{{ route('post-experience-information') }}" method="POST" id="addExperienceForm">
                     @csrf
 
                     <div class="row g-3 mb-2 border border-primary border-2 bg-success-subtle p-2 p-md-4">
@@ -247,7 +249,7 @@
                                 </div>
 
                                 <div class="col-auto p-2 pe-4">
-                                    <input type="submit" class="form-control-input btn btn-sm btn-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer erfaring">
+                                    <input type="submit" class="form-control-input btn btn-sm btn-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer erfaring" _="on click if #addEducationForm.checkValidity() then put 'Vennligst vent...' into my.value then wait 20ms then add @@disabled to me end">
                                 </div>
                             </div>
                         </div>
@@ -257,16 +259,16 @@
     </div>
 
     <div class="text-md-end text-center pb-1">
-        <a href={{ route('enter-education-information', $application) }} class="btn btn-outline-primary my-2" tabindex="99">
+        <a href={{ route('enter-education-information', $application) }} class="btn btn-outline-primary my-2" tabindex="99" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
             Forrige side
         </a>
         @if ($hasErrors)
-            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-primary my-2 disabled" id="btn-next">
+            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-primary my-2 disabled" id="btn-next" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
                 Neste: Kurs og Verv
             </a>
             <span class="badge text-bg-danger">Du må oppdatere felt med mangler før du kan gå videre</span>
         @else
-            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-primary my-2" id="btn-next">
+            <a href="{{ route('enter-courses-and-activity-information', $application) }}" class="btn btn-primary my-2" id="btn-next" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
                 Neste: Kurs og Verv
             </a>
         @endif

@@ -93,14 +93,14 @@
 
     @if (session('applicationId'))
         <div class="text-md-end text-center pb-1">
-            <a href="{{ route('enter-employment-information') }}" class="btn btn-lg btn-primary my-4 me-3">Fortsett med ditt
+            <a href="{{ route('enter-employment-information') }}" class="btn btn-lg btn-primary my-4 me-3" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Fortsett med ditt
                 registrete lønnsplasseringsskjema</a>
-            <a href="{{ route('enter-employment-information', ['createNew' => true]) }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse ved å trykke på knappen øverst på denne siden') halt" class="btn btn-lg btn-outline-primary my-2">Start på nytt<br /><small><small>med et tomt
+            <a href="{{ route('enter-employment-information', ['createNew' => true]) }}" _="on click if not confirm('Vil du starte på nytt? Ønsker du å beholde skjemaet, må du først bokmerke eller få sendt skjemaet til din e-post adresse ved å trykke på knappen øverst på denne siden') halt else put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end" class="btn btn-lg btn-outline-primary my-2">Start på nytt<br /><small><small>med et tomt
                         skjema</small></small></a>
         </div>
     @else
         <div class="text-center">
-            <a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}" class="btn btn-lg btn-primary my-4 @if (is_null(request()->cookie('cookie_consent'))) disabled @endif">Start
+            <a href="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('enter-employment-information', ['createNew' => true]) }}" class="btn btn-lg btn-primary my-4 @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Start
                 her for å
                 beregne lønnsplassering</a>
         </div>
@@ -112,7 +112,7 @@
         <h3>Har du et utfylt lønnsplasseringsskjema?</h3>
         Du kan laste opp et utfylt lønnsskjema og arbeide videre med det her. Vi kan bare behandle Lønnsskjema Excel dokumenter som du finner under punktet <i>Last ned lønnsplasseringsskjema (Excel)</i> på <a href="{{ url('https://frikirken.no/arbeid#itemid-639') }}">Frikirkens websider</a>.<br /><br />
         Dokumentet blir ikke lagret, men vi tar ut informasjon om stillingen, din fødselsdato, tiltredelsesdatoen, kompetansen og ansienniteten.
-        <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data" name="uploadForm">
+        <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             @csrf
             <div class="row my-3">
                 <div class="col-auto py-2">
@@ -120,11 +120,11 @@
                 </div>
                 <div class="col-auto text-start d-flex align-items-end py-2">
                     @if (session('applicationId'))
-                        <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Please Wait...' into my.innerHTML then wait 100ms then add @@disabled to me ">
+                        <button type="submit" class="btn btn-outline-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Vennligst vent...' into my.innerHTML then wait 20ms then add @@disabled to me end">
                             Last opp og bruk dette skjemaet <br /><small>(avslutter skjemaet som du allerede holder på med)</small>
                         </button>
                     @else
-                        <button type="submit" class="btn btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Please Wait...' into my.innerHTML then wait 100ms then add @@disabled to me ">
+                        <button type="submit" class="btn btn-primary @if (is_null(request()->cookie('cookie_consent'))) disabled @endif" _="on click if #uploadForm.checkValidity() then put 'Vennligst vent...' into my.innerHTML then wait 20ms then add @@disabled to me end">
                             Last opp og fortsett utfylling
                         </button>
                     @endif
