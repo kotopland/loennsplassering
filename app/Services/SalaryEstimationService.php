@@ -362,7 +362,7 @@ class SalaryEstimationService
         if (strtolower($education['study_points']) === 'bestått') {
             $months = Carbon::parse($education['start_date'])->diffInMonths($education['end_date']);
 
-            return ($months >= 8) && $education['relevance'] ? 1 : 0;
+            return ($months >= 9) && $education['relevance'] ? 1 : 0;
         }
         $employeeGroup = (new EmployeeCV)->getPositionsLaddersGroups()[$application->job_title];
         switch (@$education['highereducation']) {
@@ -510,16 +510,13 @@ class SalaryEstimationService
         $adjustedWork = [];
 
         foreach ($workExperience ?? [] as $work) {
-            $currentWorkItem = $work; // Use a copy to modify
-            $workStart = Carbon::parse($currentWorkItem['start_date']);
-            $workEnd = Carbon::parse($currentWorkItem['end_date']);
+            $workStart = Carbon::parse($work['start_date']);
+            $workEnd = Carbon::parse($work['end_date']);
             $currentStart = $workStart;
 
-            // Set relevance for "freechurch" type after May 1, 2014.
-            if (array_key_exists('workplace_type', $currentWorkItem) && $currentWorkItem['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
-                $currentWorkItem['percentage'] = 100; // Mark as relevant for seniority calculation
-                $currentWorkItem['relevance'] = 1; // Mark as relevant for seniority calculation
-                $currentWorkItem['comments'] = Str::finish(@$currentWorkItem['comments'], 'Frikirkestilling etter 1. mai 2014 gir spesiell ansiennitetsberegning. ');
+            // Adjust percentage for "freechurch" type after May 1, 2014.
+            if (array_key_exists('workplace_type', $work) && $work['workplace_type'] === 'freechurch' && $workStart->greaterThanOrEqualTo(Carbon::parse('2014-05-01'))) {
+                $work['percentage'] = 100;
             }
 
             foreach ($education ?? [] as $edu) {
@@ -529,16 +526,16 @@ class SalaryEstimationService
                 // Check if the work overlaps with education and meets the special conditions. If education has been moved to work, allow it to overlap.
                 $overlapAllowed =
                     $eduEnd->greaterThanOrEqualTo(Carbon::parse('2015-01-01')) && in_array($edu['highereducation'], ['bachelor', 'master', 'cand.theol.'], true) // || $eduStart->greaterThanOrEqualTo(Carbon::parse('2015-01-01')
-                    && $edu['relevance'] && array_key_exists('workplace_type', $currentWorkItem) && in_array($currentWorkItem['workplace_type'], ['freechurch', 'other_christian'])
-                    || $this->in_array_r($edu['topic_and_school'], $currentWorkItem);
+                    && $edu['relevance'] && array_key_exists('workplace_type', $work) && in_array($work['workplace_type'], ['freechurch', 'other_christian'])
+                    || $this->in_array_r($edu['topic_and_school'], $work);
 
                 if (! $overlapAllowed && $this->datesOverlap($currentStart, $workEnd, $eduStart, $eduEnd)) {
 
                     // Create a segment before the education starts.
-                    $currentWorkItem['comments'] = Str::finish(@$currentWorkItem['comments'], 'Følger regler for ansiennitet sammen med kompetansepoenggivende utdanning. ');
+                    $work['comments'] = Str::finish(@$work['comments'], 'Følger regler for ansiennitet sammen med kompetansepoenggivende utdanning. ');
 
                     if ($currentStart->lessThan($eduStart)) {
-                        $adjustedWork[] = array_merge($currentWorkItem, [
+                        $adjustedWork[] = array_merge($work, [
                             'start_date' => $currentStart->toDateString(),
                             'end_date' => $eduStart->subDay()->toDateString(),
                         ]);
@@ -551,7 +548,7 @@ class SalaryEstimationService
 
             // Add the remaining part of the work period.
             if ($currentStart->lessThanOrEqualTo($workEnd)) {
-                $adjustedWork[] = array_merge($currentWorkItem, [
+                $adjustedWork[] = array_merge($work, [
                     'start_date' => $currentStart->toDateString(),
                     'end_date' => $workEnd->toDateString(),
                 ]);
@@ -606,8 +603,17 @@ class SalaryEstimationService
             $workStart = Carbon::parse($work['start_date']);
             $workEnd = Carbon::parse($work['end_date']);
 
+            // Adjust percentage for "freechurch" type after May 1, 2014.
+            $workSpcialConditionDate = Carbon::parse('2014-05-01');
+
             while ($workStart->lessThanOrEqualTo($workEnd)) {
                 $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
+
+                if (Carbon::parse($monthKey . '-01')->greaterThanOrEqualTo($workSpcialConditionDate) && array_key_exists('workplace_type', $work) && $work['workplace_type'] === 'freechurch') {
+                    $work['percentage'] = 100;
+                    $work['relevance'] = 1;
+                    $work['comments'] = @$work['comments'] . '100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
+                }
 
                 // Calculate the available percentage for this month.
                 $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
@@ -634,13 +640,11 @@ class SalaryEstimationService
                 } else {
                     $arrayWorkEnd = $workStart->copy()->endOfMonth()->toDateString();
                 }
-
                 // Add the split segment to the collection.
                 $splitWork[] = [
                     'title_workplace' => $work['title_workplace'],
                     'workplace_type' => @$work['workplace_type'],
                     'percentage' => floatval($allocatedPercentage),
-                    'percentage_original' => floatval($work['percentage']),
                     'start_date' => $workStart->toDateString(),
                     'end_date' => $arrayWorkEnd,
                     'relevance' => @$work['relevance'],
