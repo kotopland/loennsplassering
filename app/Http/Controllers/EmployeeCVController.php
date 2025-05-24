@@ -57,7 +57,7 @@ class EmployeeCVController extends Controller
         ]);
 
         $subject = 'Lenke til foreløpig lønnsberegning';
-        $body = 'Denne lenken går til dine registrerte opplysninger <a href="'.route('open-application', session('applicationId')).'">'.route('open-application', session('applicationId')).'</a>';
+        $body = 'Denne lenken går til dine registrerte opplysninger <a href="' . route('open-application', session('applicationId')) . '">' . route('open-application', session('applicationId')) . '</a>';
         Mail::to($validatedData['email_address'])->send(new SimpleEmail($subject, $body, ''));
 
         // Remeber that an email has been sent
@@ -68,7 +68,6 @@ class EmployeeCVController extends Controller
         $this->flashMessage('Lenke til dette skjemaet er påkrevet. Vennligst sjekk at du har ått e-posten.');
 
         return response('Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.')->header('Content-Type', 'text/html');
-
     }
 
     public function enterEmploymentInformation(?EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
@@ -520,7 +519,6 @@ class EmployeeCVController extends Controller
             $this->flashMessage('Excel dokumentet er lastet inn og du kan arbeide videre med den her.');
 
             return redirect()->route('enter-employment-information');
-
         } catch (PhpSpreadsheetException $e) {
             $this->flashMessage('En ukjent feil oppstod. Bruk alltid siste utgave av lønnsskjemaet.', 'danger');
 
@@ -602,7 +600,6 @@ class EmployeeCVController extends Controller
         $this->flashMessage('En epost med et excel dokument blir sendt i løpet av et par minutter.');
 
         return redirect()->back();
-
     }
 
     private function isValidExcelDate($dateString)
@@ -613,6 +610,6 @@ class EmployeeCVController extends Controller
     private function flashMessage($message, $type = 'success')
     {
         session()->flash('message', $message);
-        session()->flash('alert-class', 'alert-'.$type); // Adjust your alert classes accordingly
+        session()->flash('alert-class', 'alert-' . $type); // Adjust your alert classes accordingly
     }
 }
