@@ -14,9 +14,9 @@ class EmployeeCVController extends Controller
         return view('admin.employee-cv.index', compact('employeeCV'));
     }
 
-    public function destroy(EmployeeCV $employeeCV)
+    public function destroy(EmployeeCV $employeeCv)
     {
-        $employeeCV->delete();
+        $employeeCv->delete();
 
         return redirect()->route('admin.employee-cv.index')->with('success', 'Lønnsskjema slettet!');
     }

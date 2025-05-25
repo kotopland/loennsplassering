@@ -21,7 +21,7 @@
                     <td>{{ $employee->email_sent }}</td>
                     <td>{{ $employee->last_viewed }}</td>
                     <td>
-                        <form action="{{ route('admin.employee-cv.destroy', $employee) }}" method="POST" style="display: inline-block;">
+                        <form action="{{ route('admin.employee-cv.destroy', $employee->id) }}" method="POST" style="display: inline-block;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Er du sikker på at du vil slette denne stillingen?')" class="btn btn-sm btn-danger mb-1">Slett</button>
