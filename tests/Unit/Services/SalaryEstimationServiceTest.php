@@ -314,7 +314,7 @@ test('adjustEducationAndWork freechurch work after 2014-05-01 is 100 percent rel
 
     $freechurchWork = $adjustedWork->firstWhere('title_workplace', 'Freechurch Pastor');
     expect($freechurchWork)->not->toBeNull()
-        ->and($freechurchWork['percentage'])->toBe(100.0)
+        ->and($freechurchWork['percentage'])->toBe(100)
         ->and($freechurchWork['relevance'])->toBe(1) // Should be true (1)
         ->and($freechurchWork['comments'])->toContain('100% Ansiennitet i Frikirkestillinger etter 1 mai 2014');
 });
