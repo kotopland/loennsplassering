@@ -509,87 +509,123 @@ class SalaryEstimationService
 
     /**
      * Enforces a 100% work percentage limit per month across all work experiences.
-     * Splits work experiences into month-by-month segments and adjusts the percentage
-     * for each segment to not exceed 100%. Additionally, it merges consecutive segments
-     * with the same title and percentage.
+     * Splits work experiences into accurately dated segments based on overlaps and enforces a 100% total work percentage limit
+     * across all concurrent work experiences within any given time interval.
+     * Original work experiences are prioritized (e.g., by their start date) when capping percentages.
+     * It also handles special conditions like the "freechurch" rule and merges consecutive segments
+     * that have the same title, (capped) percentage, and other relevant properties.
      */
     private function enforceWorkPercentageLimit($workExperience)
     {
-        // Step 1: Sort work experiences by start date.
-        $sortedWork = collect($workExperience)->sortBy('start_date')->values();
-        $monthlyPercentage = []; // Track work percentage per month.
+        // Sort original work experiences by start date to define priority for capping
+        $sortedOriginalWorkExperience = collect($workExperience)->sortBy('start_date')->values()->all();
+        if (empty($workExperience)) {
+            return [];
+        }
+
+        // Step 1: Collect all unique start and (end date + 1 day) to define atomic intervals
+        $eventPoints = [];
+        foreach ($workExperience as $work) {
+            try { // Use $sortedOriginalWorkExperience if priority is based on initial sort for event points
+                $eventPoints[] = Carbon::parse($work['start_date']);
+                $eventPoints[] = Carbon::parse($work['end_date'])->addDay();
+            } catch (\Exception $e) {
+                // Skip invalid date entries
+                continue;
+            }
+        }
+
+        if (empty($eventPoints)) {
+            return [];
+        }
+
+        // Sort and unique the event points
+        usort($eventPoints, function (Carbon $a, Carbon $b) {
+            return $a->timestamp <=> $b->timestamp;
+        });
+
+        $uniqueEventPoints = [];
+        if (!empty($eventPoints)) {
+            $uniqueEventPoints[] = $eventPoints[0];
+            for ($idx = 1; $idx < count($eventPoints); $idx++) {
+                if ($eventPoints[$idx]->notEqualTo($eventPoints[$idx - 1])) {
+                    $uniqueEventPoints[] = $eventPoints[$idx];
+                }
+            }
+        }
+        if (count($uniqueEventPoints) < 2) { // Need at least two points to form an interval
+            return [];
+        }
+
         $splitWork = [];
+        $workSpcialConditionDate = Carbon::parse('2014-05-01');
 
-        // Step 2: Split work experiences month-by-month.
-        foreach ($sortedWork ?? [] as $work) {
-            $workStart = Carbon::parse($work['start_date']);
-            $workEnd = Carbon::parse($work['end_date']);
+        // Step 2: Iterate through atomic intervals defined by unique event points
+        for ($i = 0; $i < count($uniqueEventPoints) - 1; $i++) {
+            $intervalStart = $uniqueEventPoints[$i];
+            $intervalEnd = $uniqueEventPoints[$i + 1]->copy()->subDay(); // End date of the interval (inclusive)
 
-            // Adjust percentage for "freechurch" type after May 1, 2014.
-            $workSpcialConditionDate = Carbon::parse('2014-05-01');
+            if ($intervalStart->greaterThan($intervalEnd)) {
+                continue; // Skip zero or negative length intervals
+            }
 
-            while ($workStart->lessThanOrEqualTo($workEnd)) {
-                $monthKey = $workStart->format('Y-m'); // Use year-month as a key.
+            $currentIntervalTotalPercentage = 0;
 
-                if (Carbon::parse($monthKey . '-01')->greaterThanOrEqualTo($workSpcialConditionDate) && array_key_exists('workplace_type', $work) && $work['workplace_type'] === 'freechurch') {
-                    $work['percentage'] = 100;
-                    $work['relevance'] = 1;
-                    $work['comments'] = @$work['comments'] . '100% Ansiennitet i Frikirkestillinger etter 1 mai 2014. ';
+            // Iterate through the *sorted* original work experiences to apply capping logic
+            foreach ($sortedOriginalWorkExperience as $originalWork) {
+                if ($currentIntervalTotalPercentage >= 100) {
+                    break; // This interval is full, no need to process more work items for it
                 }
 
-                // Calculate the available percentage for this month.
-                $availablePercentage = 100 - ($monthlyPercentage[$monthKey] ?? 0);
+                $originalWorkStart = Carbon::parse($originalWork['start_date']);
+                $originalWorkEnd = Carbon::parse($originalWork['end_date']);
 
-                if ($availablePercentage <= 0) {
-                    // If no available percentage, skip this month.
-                    $workStart->addMonth();
+                // Check if the original work period overlaps with the current atomic interval
+                if ($originalWorkStart->lte($intervalEnd) && $originalWorkEnd->gte($intervalStart)) {
+                    $requestedPercentage = floatval($originalWork['percentage']);
+                    $segmentRelevance = @$originalWork['relevance'];
+                    $segmentComments = $originalWork['comments'] ?? '';
+                    $workplaceType = @$originalWork['workplace_type'];
 
-                    continue;
+                    // Apply "freechurch" logic: if the type is 'freechurch' and the interval starts on/after the special date
+                    if (array_key_exists('workplace_type', $originalWork) && $workplaceType === 'freechurch' && $intervalStart->greaterThanOrEqualTo($workSpcialConditionDate)) {
+                        $requestedPercentage = 100;
+                        // Relevance and comments related to this rule will be set when creating the segment
+                    }
+
+                    $availablePercentageInInterval = 100 - $currentIntervalTotalPercentage;
+                    $allocatedPercentage = min($requestedPercentage, $availablePercentageInInterval);
+
+                    if ($allocatedPercentage > 0) {
+                        $finalSegmentComments = $segmentComments;
+                        $finalSegmentRelevance = $segmentRelevance;
+
+                        // If freechurch rule was triggered, update comments and relevance for the segment
+                        if (array_key_exists('workplace_type', $originalWork) && $workplaceType === 'freechurch' && $intervalStart->greaterThanOrEqualTo($workSpcialConditionDate)) {
+                            $newCommentPart = '100% Ansiennitet i Frikirkestillinger etter 1 mai 2014.';
+                            $finalSegmentComments = $segmentComments ? $segmentComments . ' ' . $newCommentPart : $newCommentPart;
+                            $finalSegmentRelevance = 1; // true
+                        }
+
+                        $splitWork[] = [
+                            'title_workplace' => $originalWork['title_workplace'],
+                            'workplace_type' => $workplaceType,
+                            'percentage' => $allocatedPercentage,
+                            'start_date' => $intervalStart->toDateString(),
+                            'end_date' => $intervalEnd->toDateString(),
+                            'relevance' => $finalSegmentRelevance,
+                            'comments' => trim($finalSegmentComments) ?: null,
+                            'original' => false,
+                            'id' => @$originalWork['id'],
+                        ];
+                        $currentIntervalTotalPercentage += $allocatedPercentage;
+                    }
                 }
-
-                // Calculate the percentage for this month.
-                $allocatedPercentage = min($work['percentage'], $availablePercentage);
-
-                // Split work into the required time range.
-                if ($workStart->lessThanOrEqualTo(Carbon::parse($work['start_date']))) {
-                    $workStart = Carbon::parse($work['start_date']);
-                } else {
-                    $workStart = $workStart->copy()->startOfMonth();
-                }
-
-                if ($workEnd->lessThanOrEqualTo($workStart->copy()->endOfMonth())) {
-                    $arrayWorkEnd = $workEnd->toDateString();
-                } else {
-                    $arrayWorkEnd = $workStart->copy()->endOfMonth()->toDateString();
-                }
-                // Add the split segment to the collection.
-                $splitWork[] = [
-                    'title_workplace' => $work['title_workplace'],
-                    'workplace_type' => @$work['workplace_type'],
-                    'percentage' => floatval($allocatedPercentage),
-                    'start_date' => $workStart->toDateString(),
-                    'end_date' => $arrayWorkEnd,
-                    'relevance' => @$work['relevance'],
-                    'comments' => @$work['comments'],
-                    'original' => false,
-                    'id' => @$work['id'],
-                ];
-
-                // Update the monthly percentage tracker.
-                $monthlyPercentage[$monthKey] = ($monthlyPercentage[$monthKey] ?? 0) + $allocatedPercentage;
-
-                // Move to the next month.
-                $workStart->addMonth();
             }
         }
 
         // Step 3: Merge consecutive segments with the same title and percentage.
-        $test = $this->mergeConsecutiveSegments($splitWork);
-        if (count($test) === 1) {
-            $test[0]['end_date'] = $work['end_date'];
-        }
-
-        return $test;
+        return $this->mergeConsecutiveSegments($splitWork);
     }
 
     /**
