@@ -306,7 +306,7 @@ class SalaryEstimationService
             'workplace_type' => 'education_converted',
             'relevance' => @$education['relevance'],
             'comments' => @$education['comments'] . 'Utdanning gjort om til å gi uttelling i ansiennitet. ',
-            'original' => false,
+            'adjusted_percentage' => false,
             'id' => $education['id'],
         ];
     }
@@ -615,7 +615,7 @@ class SalaryEstimationService
                             'end_date' => $intervalEnd->toDateString(),
                             'relevance' => $finalSegmentRelevance,
                             'comments' => trim($finalSegmentComments) ?: null,
-                            'original' => false,
+                            'adjusted_percentage' => true,
                             'id' => @$originalWork['id'],
                         ];
                         $currentIntervalTotalPercentage += $allocatedPercentage;

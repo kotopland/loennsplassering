@@ -156,7 +156,7 @@ class ExportExcelJob implements ShouldQueue
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $item['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som ' . $item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant.' : '';
@@ -179,7 +179,7 @@ class ExportExcelJob implements ShouldQueue
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'T', 'value' => @$wECollection->firstWhere('id', $item['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'U', 'value' => $item['study_points'], 'datatype' => 'text'];
-            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $item['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker';
             $text .= @$item['highereducation'] ? ' som ' . $item['highereducation'] : '';
             $text .= @$item['relevance'] ? ' og registrert som relevant' : '';
@@ -214,7 +214,7 @@ class ExportExcelJob implements ShouldQueue
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'P', 'value' => @$enteredItem['percentage'] / 100, 'datatype' => 'number'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
-            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $adjustedItem['comments'] ?? '', 'datatype' => 'text'];
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $enteredItem['comments'] ?? '', 'datatype' => 'text'];
             $text = 'Registrert av bruker ';
             $text .= @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $text, 'datatype' => 'text'];
