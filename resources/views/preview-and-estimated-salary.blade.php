@@ -47,7 +47,7 @@
                         beregning<br />
                     </button>
                     <div class="ms-1">
-                        <small>(du mottar den iløpet av 2-15 minutter)</small>
+                        <small>(du mottar den iløpet av et par minutter)</small>
                     </div>
                 </form>
             </div>

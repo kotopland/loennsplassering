@@ -88,7 +88,8 @@ container
                 @csrf
                 <a href="{{ route('admin.employee-cv.index') }}">Lønnskjemaer</a> -
                 <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
-                <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a>
+                <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a> -
+                <a href="{{ route('admin.readme.show') }}">Hva verktøyet gjør</a>
                 <button type="submit" class="btn btn-link">Logg ut av admin verktøyet</button>
             </form>
         @endauth
