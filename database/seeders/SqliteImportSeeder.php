@@ -13,11 +13,20 @@ class SqliteImportSeeder extends Seeder
     /**
      * The list of tables to exclude from the import process.
      * 'sqlite_sequence' is an internal SQLite table and should always be excluded.
-     * You can add other tables like 'migrations', 'jobs', 'cache', etc., if needed.
+     * Common Laravel tables are also included here by default.
      * @var array
      */
     protected array $excludedTables = [
         'sqlite_sequence',
+        'migrations',
+        'failed_jobs',
+        'jobs',
+        'job_batches',
+        'cache',
+        'cache_locks',
+        'sessions',
+        'password_reset_tokens',
+        // 'users', // Uncomment if you want to exclude users table by default
     ];
 
     /**
@@ -47,7 +56,11 @@ class SqliteImportSeeder extends Seeder
         try {
             $this->command->info("Starting import from SQLite: {$sqliteDbPath} to target connection: {$targetConnectionName}");
 
-            $sqliteTables = DB::connection($sqliteConnectionName)->getDoctrineSchemaManager()->listTableNames();
+            // Fetch table names directly from sqlite_master to avoid issues with getDoctrineSchemaManager on SQLite
+            $tableObjects = DB::connection($sqliteConnectionName)->select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+            $sqliteTables = array_map(fn($table) => $table->name, $tableObjects);
+
+            $this->command->info("Found tables in SQLite: " . implode(', ', $sqliteTables));
 
             $sqliteTables = array_filter($sqliteTables, function ($table) {
                 return !in_array($table, $this->excludedTables);
@@ -58,7 +71,7 @@ class SqliteImportSeeder extends Seeder
                 return;
             }
 
-            $this->command->info("Tables to process from SQLite: " . implode(', ', $sqliteTables));
+            $this->command->info("Tables to import (after exclusion): " . implode(', ', $sqliteTables));
 
             Schema::connection($targetConnectionName)->disableForeignKeyConstraints();
             $this->command->info("Foreign key checks disabled on target database ('{$targetConnectionName}').");
