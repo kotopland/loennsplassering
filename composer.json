@@ -10,10 +10,10 @@
     "require": {
         "php": "^8.3",
         "barryvdh/laravel-ide-helper": "^3.5.5",
-        "doctrine/dbal": "^4.2",
         "laravel/framework": "^12.0.1",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1.64",
+        "spatie/laravel-backup": "^9.3",
         "spatie/laravel-mail-preview": "^6.2.1",
         "symfony/mailer": "^7.2.3"
     },
