@@ -13,8 +13,9 @@ Frikirkens lønnsberegner er et verktøy som estimerer lønnsplassering basert p
 
 ## Begrensninger
 
-Verktøyet tar ikke hensyn til arbeidsgivers vurderinger, noe som kan føre til avvik på 1-2 lønnstrinn.
-
+- Verktøyet tar ikke hensyn til arbeidsgivers vurderinger, noe som kan føre til avvik på 1-2 lønnstrinn.
+- Verktøyet tar heller ikke hensyn til de som er allerede i toppen av lønnsstigen og kan få erfaringsbasert kompetansetillegg ofte gitt pr ytterligere 5 år, noe som kan føre til avvik på 1-5 lønnstrinn.
+- Verktøyet tar ikke hensyn til frivillig verv som kan benyttes i ulike tilfeller.
 ## Håndtering av Data
 
 - **E-postadresser** lagres kun midlertidig i en kø og slettes innen 2 minutter.
@@ -100,9 +101,10 @@ Dette systematiske regelsettet sikrer en konsistent og etterprøvbar beregning a
 
 ## Krav til System
 
+- Webserver (f.eks nginx eller apache)
 - PHP >= 8.2
 - Laravel 12
-- MySQL / PostgreSQL (valgfritt)  
+- MariaDB / MySQL / PostgreSQL
 
 ---
 
@@ -134,7 +136,6 @@ Dette systematiske regelsettet sikrer en konsistent og etterprøvbar beregning a
 php artisan tinker
 $user = User::insert(['name'=>'Your Name','email'=>'your.email@example.com', 'password'=>Hash::make(Str::random(10))]);
 ```
-You can then access the admin pages on [https://app.domain/admin] (https://app.domain/admin)
 
 ## Planlegging og Oppgaver
 Oppgaver er definert i

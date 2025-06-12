@@ -20,6 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'email_verified_at', // Added if you want to auto-verify admin-created users
+        'login_token', // If you ever need to set it directly, though usually handled by login flow
     ];
 
     /**
@@ -30,6 +32,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'login_token', // Good practice to hide tokens
     ];
 
     /**

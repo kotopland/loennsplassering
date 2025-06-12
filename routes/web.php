@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\ExcelTemplateController;
 use App\Http\Controllers\Admin\SalaryLadderController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EmployeeCVController;
@@ -23,8 +25,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::view('/', 'admin.index')->name('admin.index');
         Route::resource('positions', PositionController::class);
         Route::resource('salary-ladders', SalaryLadderController::class);
-        Route::resource('employee-cv', \App\Http\Controllers\Admin\EmployeeCVController::class);
-        Route::get('/readme', [\App\Http\Controllers\Admin\AdminPageController::class, 'showReadme'])->name('readme.show');
+        Route::resource('employee-cv', \App\Http\Controllers\Admin\EmployeeCVController::class)->only(['index', 'destroy']);
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::get('/readme', [AdminPageController::class, 'showReadme'])->name('readme.show');
+
+        Route::prefix('excel-templates')->name('excel-templates.')->controller(ExcelTemplateController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/download/{templateName}', 'download')->name('download')->where('templateName', '[a-zA-Z0-9_.-]+\.xlsx');
+            Route::post('/upload/{templateName}', 'upload')->name('upload')->where('templateName', '[a-zA-Z0-9_.-]+\.xlsx');
+        });
     });
 });
 

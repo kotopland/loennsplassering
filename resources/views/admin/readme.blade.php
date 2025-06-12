@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h2>Project README.md</h2>
+        <h2>Frikirkens lønnsberegner: README.md</h2>
 
         <div class="card">
             <div class="card-body">

@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>Stillinger</h2>
+    <h1>Stillinger</h1>
+    <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
+        Denne siden viser alle lønnskjemaer som er registrert i webappen. Trykker du på en av linkene til en stilling, vil du laste inn det skjemaet slik at du kan arbeide videre med den.
+        Linken kan videresendes til en annen person dersom du ønsker at andre skal kunne arbeide på den.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <table class="table table-sm" style="max-width: 100%">
         <thead>
             <tr>

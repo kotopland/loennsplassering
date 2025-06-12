@@ -19,12 +19,13 @@ namespace App\Models{
  * @property string|null $job_title
  * @property string|null $work_start_date
  * @property string|null $birth_date
- * @property array|null $education
- * @property array|null $work_experience
+ * @property array<array-key, mixed>|null $education
+ * @property array<array-key, mixed>|null $work_experience
  * @property int $email_sent
  * @property \Illuminate\Support\Carbon|null $last_viewed
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\EmployeeCVFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV query()
@@ -53,6 +54,7 @@ namespace App\Models{
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\PositionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Position newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Position newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Position query()
@@ -74,7 +76,7 @@ namespace App\Models{
  * @property int $id
  * @property string $ladder
  * @property int $group
- * @property array $salaries
+ * @property array<array-key, mixed> $salaries
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalaryLadder newModelQuery()
@@ -102,6 +104,7 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $login_token
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
@@ -112,6 +115,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLoginToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
