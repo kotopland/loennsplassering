@@ -24,14 +24,14 @@ Artisan::command('storage:group-read-access', function () {
         }
 
         // Set directory permissions: rwx for owner/group, rx for others (775)
-        $processDir = Process::fromShellCommandline("sudo find {$storageAppPath} -type d -exec chmod 775 {} \\;");
+        $processDir = Process::fromShellCommandline("sudo find \"{$storageAppPath}\" -type d -exec chmod 775 {} \\;");
         $processDir->run();
         if (!$processDir->isSuccessful()) {
             throw new \RuntimeException($processDir->getErrorOutput());
         }
 
         // Set file permissions: rw for owner/group, r for others (664)
-        $processFile = Process::fromShellCommandline("sudo find {$storageAppPath} -type f -exec chmod 664 {} \\;");
+        $processFile = Process::fromShellCommandline("sudo find \"{$storageAppPath}\" -type f -exec chmod 664 {} \\;");
         $processFile->run();
         if (!$processFile->isSuccessful()) {
             throw new \RuntimeException($processFile->getErrorOutput());
