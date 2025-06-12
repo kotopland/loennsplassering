@@ -17,7 +17,7 @@ Artisan::command('storage:group-read-access', function () {
 
     try {
         // Set ownership to current user and web group
-        $processChown = Process::fromShellCommandline("sudo chown -R {$currentUser}:{$webGroup} {$storageAppPath}");
+        $processChown = Process::fromShellCommandline("sudo chown -R {$currentUser}:{$webGroup} \"{$storageAppPath}\"");
         $processChown->run();
         if (!$processChown->isSuccessful()) {
             throw new \RuntimeException($processChown->getErrorOutput());
