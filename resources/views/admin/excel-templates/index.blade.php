@@ -8,7 +8,10 @@
             </div>
         </div>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            Får å sende excel skjemaer til brukere, må 3 lønnsskjemaer være lagt inn i systemet. Det er originalen som benyttes internt hos Frikirken, og to andre dersom det er behov for flere rader i excel arket under ansiennitetsopplysninger.
+            Får å sende excel skjemaer til brukere, må 3 utgaver av lønnsskjemaet (excel fil) være lagt inn i systemet. Det er originalen som benyttes internt hos Frikirken, og to andre dersom det er behov for flere rader i excel arket under ansiennitetsopplysninger.
+            <br>
+            <br>
+            Dersom dette ser komplisert ut, ta kontakt med utvikler.
             <br>
             <br>
             Under ser du at du kan laste ned malene som benyttes i webappen. Og du har mulighet for å laste opp nye. Dette skjer gjerne når ny lønnsstige er vedtatt og justert. Det er viktig å bemerke seg at de utvidede malene må følge bestemte regler for at webappen skal kunne generere excel skjemaer. Derfor anbefales det å benytte de som allerede er lagt inn i systemet og endre disse.
@@ -32,13 +35,13 @@
             @php $errorBagName = 'upload_' . str_replace('.', '_', $template['name']); @endphp
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">{{ $template['name'] }}</h5>
+                    <h5 class="mb-0">Excel mal: {{ $template['name'] }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-6 mb-3 mb-md-0">
-                            <h6>Viktig Informasjon!</h6>
-                            <p>{{ $template['help'] }}</p>
+                            <h6>Viktig Informasjon:</h6>
+                            <p class="text-muted small">{{ $template['help'] }}</p>
                         </div>
                     </div>
                     <div class="row align-items-center">
@@ -46,7 +49,7 @@
                             <h6>Last ned den gjeldende malen</h6>
                             @if ($template['exists'])
                                 <a href="{{ route('admin.excel-templates.download', ['templateName' => $template['name']]) }}" class="btn btn-info">
-                                    <i class="bi bi-download"></i> Download {{ $template['name'] }}
+                                    <i class="bi bi-download"></i> Last ned {{ $template['name'] }}
                                 </a>
                             @else
                                 <p class="text-muted">Malen eksisterer ikke.</p>

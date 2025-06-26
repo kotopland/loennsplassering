@@ -13,15 +13,15 @@ class ExcelTemplateController extends Controller
     private array $allowedTemplateFiles = [
         [
             'filename' => '14lonnsskjema.xlsx',
-            'help' => 'Dette er ofte originalskjemaet som vi ofte har på frikirkens sine hjemmesider. Dersom skjemaet endrer seg på rader og plassering av informasjon, må webappen oppdateres av utvikler.'
+            'help' => 'Dette er originalskjemaet som vi gir arbeidsgivere/ansatte og som gjøres tilgjengelig på frikirkens sine hjemmesider. Dersom skjemaet endrer seg på rader og plassering av informasjon, må webappen oppdateres av utvikler.'
         ],
         [
             'filename' => '14lonnsskjema-expanded.xlsx',
-            'help' => 'Dette er et skjema som webappen benytter dersom ansienniteten er lengre enn hva som er tillatt i originalskjemaet (over). Utdanning starter fra celle B15 som er den samme som originalskjemaet. Derimot starter Ansiennitetsopplysninger fra B39! Det er viktig å oppdatere formlene der du har opprettet nye rader. Pass også på at ark2 er oppdatert.'
+            'help' => 'Ofte er deet behov for flere linjer i excel filen på ansiennitet. Utdanning starter fra celle B15 som er den samme som originalskjemaet. Derimot starter Ansiennitetsopplysninger fra B39! Det er viktig å oppdatere formlene der du har opprettet nye rader. Pass også på at ark2 er oppdatert.'
         ],
         [
             'filename' => '14lonnsskjema-extraexpanded.xlsx',
-            'help' => 'Dette er et skjema som webappen benytter dersom ansienniteten er lengre enn hva som er tillatt i originalskjemaet (over). Utdanning starter fra celle B15 som er den samme som originalskjemaet. Derimot starter Ansiennitetsopplysninger fra B55! Det er viktig å oppdatere formlene der du har opprettet nye rader. Pass også på at ark2 er oppdatert.'
+            'help' => 'Dette skjemaet er når listen over ansiennitet blir enda lengre enn skjemaet over. Utdanning starter fra celle B15 som er den samme som originalskjemaet. Derimot starter Ansiennitetsopplysninger fra B55! Det er viktig å oppdatere formlene der du har opprettet nye rader. Pass også på at ark2 er oppdatert.'
         ],
     ];
 
