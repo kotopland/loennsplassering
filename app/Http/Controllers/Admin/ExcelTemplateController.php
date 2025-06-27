@@ -34,6 +34,22 @@ class ExcelTemplateController extends Controller
     }
 
     /**
+     * Helper method to find a template configuration by its filename.
+     *
+     * @param string $templateName
+     * @return array|null
+     */
+    private function findTemplateConfig(string $templateName): ?array
+    {
+        foreach ($this->allowedTemplateFiles as $fileConfig) {
+            if ($fileConfig['filename'] === $templateName) {
+                return $fileConfig;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Display a listing of the excel templates and forms to manage them.
      *
      * @return \Illuminate\View\View
@@ -60,7 +76,8 @@ class ExcelTemplateController extends Controller
      */
     public function download(string $templateName)
     {
-        if (!in_array($templateName, $this->allowedTemplateFiles)) {
+        // Validate if the templateName is one of the allowed filenames
+        if (!$this->findTemplateConfig($templateName)) {
             return redirect()->route('admin.excel-templates.index')->with('error', 'Invalid template file specified.');
         }
 
@@ -82,7 +99,8 @@ class ExcelTemplateController extends Controller
      */
     public function upload(Request $request, string $templateName)
     {
-        if (!in_array($templateName, $this->allowedTemplateFiles)) {
+        // Validate if the templateName is one of the allowed filenames
+        if (!$this->findTemplateConfig($templateName)) {
             return redirect()->route('admin.excel-templates.index')->with('error', 'Invalid template file specified for upload.');
         }
 
