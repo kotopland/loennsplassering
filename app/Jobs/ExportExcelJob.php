@@ -261,7 +261,7 @@ class ExportExcelJob implements ShouldQueue
 
         return [
             'filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
-            'data' => ['sheet1' => $sheet1, 'sheet2' => $sheet2, 'salaryPlacement' => $salaryPlacement],
+            'data' => ['sheet1' => $sheet1, 'sheet2' => $sheet2, 'salaryPlacement' => $salaryPlacement + $application->competence_points],
         ];
     }
 
