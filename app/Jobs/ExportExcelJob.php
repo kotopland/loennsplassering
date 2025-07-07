@@ -127,7 +127,7 @@ class ExportExcelJob implements ShouldQueue
     {
         $body = 'Denne eposten ble generert på nettstedet ' . config('app.name') . '<br/><br/>';
         $body .= $data
-            ? ' Vedlagt ligger et midlertidig lønnsskjema med en beregnet lønnsplassering.<br/><br/>Din folreløpige plassering er:' . $data['salaryPlacement'] . '<br/><br/><strong>DETTE ER IKKE EN ENDELIG LØNNSPLASSERING.</strong> Den er maskinberegnet og kan resultere i avvik (1-2 lønnstrinn).<br/><br/><strong>For en endelig lønnsplassering må du:</strong> <ul><li>åpne vedlegget i denne eposten</li><li>fylle ut personalia og eventuelt delen medfrivillige verv</li><li>sendes skjemaet til hr@frikirken.no for beslutning av lønnsplasseringen</li></ul>'
+            ? ' Vedlagt ligger et midlertidig lønnsskjema med en beregnet lønnsplassering.<br/><br/>Din foreløpige plassering er lønnstrinn ' . $data['salaryPlacement'] . '.<br/><br/><strong>DETTE ER IKKE EN ENDELIG LØNNSPLASSERING.</strong> Den er maskinberegnet og kan resultere i avvik (1-2 lønnstrinn).<br/><br/><strong>For en endelig lønnsplassering må du:</strong> <ul><li>åpne vedlegget i denne eposten</li><li>fylle ut personalia og eventuelt delen medfrivillige verv</li><li>sendes skjemaet til hr@frikirken.no for beslutning av lønnsplasseringen</li></ul>'
             : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke bli behandlet maskinelt. Derimot kan du med linken nedenfor se plasseringen.';
         $body .= ' Du kan <a href="' . route('open-application', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
         $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
