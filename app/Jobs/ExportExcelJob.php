@@ -125,8 +125,11 @@ class ExportExcelJob implements ShouldQueue
         $subject = 'Det beregnede lønnsskjema er klart for nedlasting';
         $body = $this->generateEmailBody($data);
 
+        //do not send to the applicant if the admin (an authorized user) is logged in.
+        if (! auth()->check())
+            Mail::to($userEmail)->send(new SimpleEmail($subject, $body, null));
 
-        Mail::to($userEmail)->send(new SimpleEmail($subject, $body, null));
+        //send to the admin
         Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost med nedlastingslenke: ' . $subject, $body, null));
     }
 

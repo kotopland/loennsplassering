@@ -162,8 +162,12 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
+                                @if (auth()->check())
+                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ config('app.report_email') }} og ikke til kandidaten</button>
+                                @else
+                                    <button type="submit" class="btn btn-primary">Send til behandling</button>
+                                @endif
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt og gå tilbake</button>
-                                <button type="submit" class="btn btn-primary">Send til behandling</button>
                             </div>
                         </form>
                     </div>
