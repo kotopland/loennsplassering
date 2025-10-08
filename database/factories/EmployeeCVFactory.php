@@ -80,6 +80,23 @@ class EmployeeCVFactory extends Factory
             'work_experience' => $workExperienceData,
             'email_sent' => false,
             'last_viewed' => now(),
+            'personal_info' => $this->faker->boolean(25) ? [
+                'name' => $this->faker->name(),
+                'mobile' => $this->faker->phoneNumber(),
+                'address' => $this->faker->streetAddress(),
+                'postal_code' => $this->faker->postcode(),
+                'postal_place' => $this->faker->city(),
+                'email' => $this->faker->safeEmail(),
+                'employer_and_place' => $this->faker->company(),
+                'position_size' => $this->faker->randomElement([20, 50, 80, 100]),
+                'bank_account' => $this->faker->iban('NO'), // Added bank_account
+                'manager_name' => $this->faker->name(),
+                'manager_mobile' => $this->faker->phoneNumber(),
+                'manager_email' => $this->faker->safeEmail(),
+                'congregation_name' => $this->faker->name(),
+                'congregation_mobile' => $this->faker->phoneNumber(),
+                'congregation_email' => $this->faker->safeEmail(),
+            ] : null,
             // Add education_adjusted and work_experience_adjusted if they are actual db columns
             // 'education_adjusted' => [],
             // 'work_experience_adjusted' => [],

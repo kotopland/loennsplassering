@@ -35,7 +35,7 @@
                         </thead>
                         <tbody>
                             @foreach ($application->work_experience as $id => $item)
-                                @if (request()->has('edit') && request()->edit == $id)
+                                @if (!$application->isReadOnly() && request()->has('edit') && request()->edit == $id)
                                     <tr id="update">
                                         <td colspan="10">
                                             <form action="{{ route('update-single-experience-information', ['edit' => $id]) }}" method="POST" id="updateExperienceForm">
@@ -150,7 +150,7 @@
                                                     <form id="form-{{ $id }}" action="{{ route('update-relevance-on-experience-information') }}" method="get">
                                                         @csrf
                                                         <input type="hidden" name="changeEdit" value="{{ $id }}" />
-                                                        <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == true) checked @endif _="on click call #form-{{ $id }}.submit() end" />
+                                                        <input type="checkbox" role="switch" class="form-check-input" id="changeRelevant-{{ $id }}" name="changeRelevance" value="true" @if (@$item['relevance'] == true) checked @endif @if ($application->isReadOnly()) disabled @else _="on click call #form-{{ $id }}.submit() end" @endif />
                                                     </form>
                                                 </div>
 
@@ -158,19 +158,21 @@
                                             </td>
                                         @endauth
                                         <td>
-                                            <a class="btn btn-sm m-1  @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
-                                                @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true))
-                                                    Vennligst bekreft
-                                                @else
-                                                    Endre
-                                                @endif
-                                            </a>
+                                            @if (!$application->isReadOnly())
+                                                <a class="btn btn-sm m-1  @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true)) btn-danger @else btn-outline-primary @endif" href="{{ route('enter-experience-information', [$application, 'edit' => $id]) }}#update" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
+                                                    @if (in_array(null, [@$item['title_workplace'], @$item['percentage'] == '' ? null : '', @$item['start_date'] == '' ? null : '', @$item['end_date'] == '' ? null : '', @$item['relevance']], true))
+                                                        Vennligst bekreft
+                                                    @else
+                                                        Endre
+                                                    @endif
+                                                </a>
 
-                                            {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
+                                                {{-- <td><a class=" btn btn-sm btn-outline-primary" href="#"
                                 _="on click set the value of #title_workplace to the innerText of #title_workplace-{{ $id }} then set the value of #workplace_type to the innerText of #workplace_type-{{ $id }} then set the value of #percentage to the innerText of #percentage-{{ $id }} then set the value of #start_date to the innerText of #start_date-{{ $id }} then set the value of #end_date to the innerText of #end_date-{{ $id }} then set the value of #study_points to the innerText of #study_points-{{ $id }} then add .disabled to #btn-next then remove .disabled from #btn-submit">Lag
                                 ny basert på denne</a>
                         </td> --}}
-                                            <a class="btn btn-sm btn-outline-danger m-1" href={{ route('destroy-experience-information', ['id' => $id]) }} _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Slett linje</a>
+                                                <a class="btn btn-sm btn-outline-danger m-1" href={{ route('destroy-experience-information', ['id' => $id]) }} _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">Slett linje</a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endif
@@ -179,82 +181,84 @@
                     </table>
                 </div>
             @endisset
-            <div class="mt-5">
-                <form action="{{ route('post-experience-information') }}" method="POST" id="addExperienceForm">
-                    @csrf
+            @if (!$application->isReadOnly())
+                <div class="mt-5">
+                    <form action="{{ route('post-experience-information') }}" method="POST" id="addExperienceForm">
+                        @csrf
 
-                    <div class="row g-3 mb-2 border border-primary border-2 bg-success-subtle p-2 p-md-4">
-                        <h4 class="mb-4">Legg til erfaring:</h4>
-                        <div class="row">
-                            <div class="col-auto">
-                                <label class="form-check-label" for="title_workplace">Tittel og arbeidssted:</label>
-                                <textarea id="title_workplace" name="title_workplace" placeholder="" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit else remove .disabled from #btn-next then add .disabled to #btn-submit end on keydown[event.key == 'Enter'] halt" class="form-control @error('title_workplace') is-invalid @enderror">{{ old('title_workplace') }}</textarea>
-                                @error('title_workplace')
-                                    <div class="alert alert-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-auto pe-4">
-                                <label class="form-check-label" for="percentage">Stillingsprosent:</label>
-                                <input type="number" min="0" max="100" step="0.01" required id="percentage" name="percentage" value="{{ old('percentage') }}" placeholder="%" class="form-control @error('percentage') is-invalid @enderror">
-                            </div>
-                            <div class="col-auto">
-                                <div class="row justify-content-center">
-                                    <div class="col-auto pe-4">
-                                        <label class="form-check-label" for="start_date">Ansatt fra:</label>
-                                        <input type="date" id="start_date" name="start_date" min="1950-01-01" value="{{ old('start_date') }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
-                                        @error('start_date')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-auto pe-4">
-                                        <label class="form-check-label" for="end_date">Ansatt til:</label>
-                                        <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date') }}" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date') }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock" style="max-width: 150px;">
-                                        <div id="endDateHelpBlock" class="form-text">(er du fortsatt i stillingen skriver du
-                                            dato for tiltredelse i ny stilling)</div>
-                                        @error('end_date')
-                                            <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
+                        <div class="row g-3 mb-2 border border-primary border-2 bg-success-subtle p-2 p-md-4">
+                            <h4 class="mb-4">Legg til erfaring:</h4>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <label class="form-check-label" for="title_workplace">Tittel og arbeidssted:</label>
+                                    <textarea id="title_workplace" name="title_workplace" placeholder="" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit else remove .disabled from #btn-next then add .disabled to #btn-submit end on keydown[event.key == 'Enter'] halt" class="form-control @error('title_workplace') is-invalid @enderror">{{ old('title_workplace') }}</textarea>
+                                    @error('title_workplace')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-auto pe-4">
+                                    <label class="form-check-label" for="percentage">Stillingsprosent:</label>
+                                    <input type="number" min="0" max="100" step="0.01" required id="percentage" name="percentage" value="{{ old('percentage') }}" placeholder="%" class="form-control @error('percentage') is-invalid @enderror">
+                                </div>
+                                <div class="col-auto">
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto pe-4">
+                                            <label class="form-check-label" for="start_date">Ansatt fra:</label>
+                                            <input type="date" id="start_date" name="start_date" min="1950-01-01" value="{{ old('start_date') }}" max="{{ date('Y-m-d') }}" class="form-control @error('start_date') is-invalid @enderror" style="max-width: 150px;">
+                                            @error('start_date')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-auto pe-4">
+                                            <label class="form-check-label" for="end_date">Ansatt til:</label>
+                                            <input type="date" id="end_date" name="end_date" min="1950-01-01" value="{{ old('end_date') }}" max="{{ \Carbon\Carbon::parse($application->work_start_date)->subDay() }}" value="{{ old('end_date') }}" class="form-control @error('end_date') is-invalid @enderror" aria-describedby="endDateHelpBlock" style="max-width: 150px;">
+                                            <div id="endDateHelpBlock" class="form-text">(er du fortsatt i stillingen skriver du
+                                                dato for tiltredelse i ny stilling)</div>
+                                            @error('end_date')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row p-2">
-                            <div class="pe-4 mt-4"><strong>Type arbeidssted:</strong></div>
+                            <div class="row p-2">
+                                <div class="pe-4 mt-4"><strong>Type arbeidssted:</strong></div>
 
-                            <div class="col-auto p-2  pe-4">
-                                <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="normal" name="workplace_type" @if (!old('workplace_type')) checked @endif value="">
-                                <label class="form-check-label" for="normal">Ikke kristen organisasjon/kirke</label>
-                            </div>
-                            <div class="col-auto p-2  pe-4">
-                                <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="freechurch" name="workplace_type" value="freechurch" @if (old('workplace_type') === 'freechurch') checked @endif>
-                                <label class="form-check-label" for="freechurch">Frikirken</label>
-                            </div>
-                            <div class="col-auto p-2  pe-4">
-                                <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="other_christian" name="workplace_type" value="other_christian" @if (old('workplace_type') === 'other_christian') checked @endif>
-                                <label class="form-check-label" for="other_christian">Annen kristen
-                                    organisasjon/kirke</label>
-                            </div>
-                            <div class="col-auto p-2  pe-4">
-                                <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="elder" name="workplace_type" value="elder" @if (old('workplace_type') === 'elder') checked @endif>
-                                <label class="form-check-label" for="elder">Eldste i Frikirken</label>
-                            </div>
-                        </div>
-                        <div class="row p-2">
-                            <div class="col-auto p-2 pe-4">
-                                <div class="form-check form-switch px-1 my-2">
-                                    <input type="checkbox" class="form-check-input" role="switch" id="relevance" name="relevance" value="true">
-                                    <label class="form-check-label" for="relevance">
-                                        Relevant for stillingen du skal inn i?
-                                    </label>
+                                <div class="col-auto p-2  pe-4">
+                                    <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="normal" name="workplace_type" @if (!old('workplace_type')) checked @endif value="">
+                                    <label class="form-check-label" for="normal">Ikke kristen organisasjon/kirke</label>
                                 </div>
-
+                                <div class="col-auto p-2  pe-4">
+                                    <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="freechurch" name="workplace_type" value="freechurch" @if (old('workplace_type') === 'freechurch') checked @endif>
+                                    <label class="form-check-label" for="freechurch">Frikirken</label>
+                                </div>
+                                <div class="col-auto p-2  pe-4">
+                                    <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="other_christian" name="workplace_type" value="other_christian" @if (old('workplace_type') === 'other_christian') checked @endif>
+                                    <label class="form-check-label" for="other_christian">Annen kristen
+                                        organisasjon/kirke</label>
+                                </div>
+                                <div class="col-auto p-2  pe-4">
+                                    <input type="radio" class="form-check-input @error('workplace_type') is-invalid @enderror" id="elder" name="workplace_type" value="elder" @if (old('workplace_type') === 'elder') checked @endif>
+                                    <label class="form-check-label" for="elder">Eldste i Frikirken</label>
+                                </div>
+                            </div>
+                            <div class="row p-2">
                                 <div class="col-auto p-2 pe-4">
-                                    <input type="submit" class="form-control-input btn btn-sm btn-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer erfaring" _="on click if #addEducationForm.checkValidity() then put 'Vennligst vent...' into my.value then wait 20ms then add @@disabled to me end">
+                                    <div class="form-check form-switch px-1 my-2">
+                                        <input type="checkbox" class="form-check-input" role="switch" id="relevance" name="relevance" value="true">
+                                        <label class="form-check-label" for="relevance">
+                                            Relevant for stillingen du skal inn i?
+                                        </label>
+                                    </div>
+
+                                    <div class="col-auto p-2 pe-4">
+                                        <input type="submit" class="form-control-input btn btn-sm btn-primary @if (null === old('topic_and_school')) disabled @endif" id="btn-submit" name="submit" value="Registrer erfaring" _="on click if #addEducationForm.checkValidity() then put 'Vennligst vent...' into my.value then wait 20ms then add @@disabled to me end">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                </form>
-            </div>
+                    </form>
+                </div>
+            @endif
         </div>
     </div>
 

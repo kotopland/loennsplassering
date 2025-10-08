@@ -13,12 +13,14 @@
 
 namespace App\Models{
 /**
- * 
- *
  * @property string $id
  * @property string|null $job_title
  * @property string|null $work_start_date
  * @property string|null $birth_date
+ * @property array<array-key, mixed>|null $personal_info Personal information for submission
+ * @property string|null $status
+ * @property string|null $generated_file_path
+ * @property string|null $generated_file_timestamp
  * @property array<array-key, mixed>|null $education
  * @property array<array-key, mixed>|null $work_experience
  * @property int $email_sent
@@ -33,9 +35,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereEducation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereEmailSent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereGeneratedFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereGeneratedFileTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereJobTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereLastViewed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV wherePersonalInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereWorkExperience($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EmployeeCV whereWorkStartDate($value)
@@ -45,8 +51,6 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $ladder
@@ -71,8 +75,6 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
- *
  * @property int $id
  * @property string $ladder
  * @property int $group
@@ -94,8 +96,6 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $email

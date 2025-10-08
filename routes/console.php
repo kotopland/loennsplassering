@@ -43,3 +43,26 @@ Artisan::command('storage:group-read-access', function () {
         $this->warn("Ensure the user '{$currentUser}' has sudo privileges configured to run 'chmod' and 'chown' without a password for '{$storageAppPath}'.");
     }
 })->purpose('Sets read/write permissions for the web server group on storage/app directory.'); // Laravel 8+ for purpose()
+
+Artisan::command('app:restoredb', function () {
+    $path = base_path('storage/app/databaseimport/latest_live_database.sql');
+
+    if (App::environment('production') && ! $this->confirm('Heads Up! This App (' . config('app.name') . ') is running in PRODUCTION MODE!! The database will be wiped with the backup. Do you wish to continue?')) {
+        exit();
+    }
+
+    if (file_exists($path)) {
+        Artisan::call('db:wipe');
+        $sql = file_get_contents($path);
+        DB::unprepared($sql);
+        if (App::environment('local') && $this->confirm('Would you like to reset all the passwords?')) {
+            DB::table('users')->update(['password' => Hash::make('password')]);
+            dump('Backup Restored completely. All passwords are set to  \'password\' for testing purpose.');
+        } else {
+
+            dump('Backup Restored completely');
+        }
+    } else {
+        dump('File does not exist.');
+    }
+})->purpose('Restore a backup of the database');

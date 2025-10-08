@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
+use Illuminate\Support\Facades\Log;
+
 
 class EmployeeCVController extends Controller
 {
@@ -171,6 +173,12 @@ class EmployeeCVController extends Controller
         );
 
         $application = EmployeeCV::find(session('applicationId'));
+
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-education-information', compact('application'));
+        }
+
         $relevance = $request->relevance === 'true' ? 1 : 0;
         $education = $application->education ?? [];
 
@@ -230,6 +238,11 @@ class EmployeeCVController extends Controller
         );
 
         $application = EmployeeCV::find(session('applicationId'));
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-education-information', compact('application'));
+        }
+
         $relevance = $request->relevance === 'true' ? 1 : 0;
         $educationData = $application->education;
 
@@ -275,7 +288,12 @@ class EmployeeCVController extends Controller
         );
 
         $application = EmployeeCV::find(session('applicationId'));
-        // dd($request->relevance);
+
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-education-information', compact('application'));
+        }
+
         $relevance = $request->changeRelevance === 'true' ? 1 : 0;
         $educationData = $application->education;
 
@@ -350,6 +368,12 @@ class EmployeeCVController extends Controller
             'relevance.in' => 'Ugyldig verdi for relevans.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
+
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-experience-information', compact('application'));
+        }
+
         $relevance = $validatedData['workplace_type'] === 'freechurch' ? 1 : $validatedData['relevance'] ?? 0;
         $work_experience = $application->work_experience ?? [];
         $work_experience[] = [
@@ -394,6 +418,12 @@ class EmployeeCVController extends Controller
         ]);
 
         $application = EmployeeCV::find(session('applicationId'));
+
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-experience-information', compact('application'));
+        }
+
         $relevance = $validatedData['workplace_type'] === 'freechurch' ? 1 : $validatedData['relevance'] ?? 0;
         $workExperienceData = $application->work_experience ?? [];
         $workExperienceItem = $workExperienceData[$request->edit];
@@ -431,7 +461,12 @@ class EmployeeCVController extends Controller
         );
 
         $application = EmployeeCV::find(session('applicationId'));
-        // dd($request->relevance);
+
+        // saving not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('enter-experience-information', compact('application'));
+        }
+
         $relevance = $request->changeRelevance === 'true' ? 1 : 0;
         $educationData = $application->education;
 
@@ -482,10 +517,6 @@ class EmployeeCVController extends Controller
 
         // Calculating the ladder position based on the employee’s total work experience in years, rounded down to the nearest integer
         $ladderPosition = SalaryEstimationService::ladderPosition($workStartDate, $calculatedTotalWorkExperienceMonths);
-        // dd(SalaryEstimationService::getYearsDifferenceWithDecimals(
-        //     SalaryEstimationService::subMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths),
-        //     $workStartDate));
-        // dd($ladderPosition, SalaryEstimationService::subMonthsWithDecimals($workStartDate, $calculatedTotalWorkExperienceMonths));
 
         return view('preview-and-estimated-salary', [
             'application' => $application,
@@ -535,6 +566,11 @@ class EmployeeCVController extends Controller
         $itemId = $request->input('id');
         $application = EmployeeCV::find(session('applicationId'));
 
+        // destroying not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->back();
+        }
+
         if ($application) {
             $educationData = $application->education;
 
@@ -555,6 +591,11 @@ class EmployeeCVController extends Controller
     {
         $itemId = $request->input('id');
         $application = EmployeeCV::find(session('applicationId'));
+
+        // destroying not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->back();
+        }
 
         if ($application) {
             $workExperienceData = $application->work_experience;
@@ -601,6 +642,107 @@ class EmployeeCVController extends Controller
 
         return redirect()->back();
     }
+
+    public function submitForProcessing(Request $request)
+    {
+        if (! session('applicationId')) {
+            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
+
+            return redirect()->route('welcome');
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'mobile' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:255',
+            'postal_place' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'employer_and_place' => 'required|string|max:255',
+            'position_size' => 'required|integer|min:0|max:100',
+            'manager_name' => 'required|string|max:255',
+            'bank_account' => 'required|string|max:255', // Added bank_account validation
+            'manager_mobile' => 'required|string|max:255',
+            'manager_email' => 'required|email|max:255',
+            'congregation_name' => 'required|string|max:255',
+            'congregation_mobile' => 'required|string|max:255',
+            'congregation_email' => 'required|email|max:255',
+        ]);
+
+        $application = EmployeeCV::find(session('applicationId'));
+
+        // submitting not allowed when generated
+        if ($application->isReadOnly()) {
+            return redirect()->route('welcome');
+        }
+
+        $application->personal_info = $validatedData;
+        $application->status = 'submitted';
+        $application->save();
+
+
+        // Dispatch job without email, as it will be sent from the job with a download link
+        ExportExcelJob::dispatch(session('applicationId'));
+
+        // Optional: Dispatch a job to notify admin, etc.
+        // NotifyAdminOfSubmission::dispatch($application);
+
+        // You might want to clear the session and redirect the user to a thank you page
+        $request->session()->forget('applicationId');
+
+        $this->flashMessage(
+            'Takk! Ditt skjema er mottatt og vil bli behandlet av Frikirkens hovedkontor.',
+            'success'
+        );
+
+        return redirect()->route('welcome');
+    }
+
+    public function showDownloadForm($applicationId)
+    {
+        $application = EmployeeCV::find($applicationId);
+        if (! $application) {
+            abort(404, 'Filen ble ikke funnet.');
+        }
+
+        // Check if the file has been generated and the status is correct
+        // if ($application->status !== 'generated' || ! $application->generated_file_path) {
+        //     abort(404, 'Filen er ikke tilgjengelig for nedlasting.');
+        // }
+
+        return view('download-form', compact('application'));
+    }
+
+    public function downloadFile(Request $request, EmployeeCV $application)
+    {
+        $request->validate([
+            'birth_date' => 'required|date',
+            'postal_code' => 'required|string',
+        ]);
+
+        // Verify credentials
+        $birthDateMatch = $application->birth_date === $request->birth_date;
+        $postalCodeMatch = ($application->personal_info['postal_code'] ?? null) === $request->postal_code;
+
+        if (! $birthDateMatch || ! $postalCodeMatch) {
+            return back()->withErrors(['credentials' => 'Ugyldig fødselsdato eller postnummer.'])->withInput();
+        }
+
+        // Check if file exists
+        // if ($application->status !== 'generated' || ! $application->generated_file_path || ! \Storage::disk('local')->exists($application->generated_file_path)) {
+        //     abort(404, 'Filen ble ikke funnet.');
+        // }
+
+        // Log the download and then offer the file
+        Log::channel('info_log')->info("File downloaded for Application ID: {$application->id}");
+
+        // Invalidate the link after download by updating status
+        $application->status = 'downloaded';
+        $application->save();
+
+        return \Storage::disk('public')->download($application->generated_file_path);
+    }
+
 
     private function isValidExcelDate($dateString)
     {

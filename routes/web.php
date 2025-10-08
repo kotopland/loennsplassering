@@ -26,6 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('positions', PositionController::class);
         Route::resource('salary-ladders', SalaryLadderController::class);
         Route::resource('employee-cv', \App\Http\Controllers\Admin\EmployeeCVController::class)->only(['index', 'destroy']);
+        Route::post('employee-cv/{employeeCv}/toggle-status', [\App\Http\Controllers\Admin\EmployeeCVController::class, 'toggleStatus'])->name('employee-cv.toggle-status');
+        Route::get('employee-cv/download-file/{application}', [\App\Http\Controllers\Admin\EmployeeCVController::class, 'downloadFile'])->name('employee-cv.download-file');
+
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'store', 'destroy']);
         Route::get('/readme', [AdminPageController::class, 'showReadme'])->name('readme.show');
 
@@ -63,6 +66,10 @@ Route::get('/lonnsberegner/export-as-xls', [EmployeeCVController::class, 'export
 Route::get('/lonnsberegner/destroy-education-information', [EmployeeCVController::class, 'destroyEducationInformation'])->name('destroy-education-information');
 Route::get('/lonnsberegner/destroy-experience-information', [EmployeeCVController::class, 'destroyWorkExperienceInformation'])->name('destroy-experience-information');
 
+Route::get('/download-form/{applicationId}', [EmployeeCVController::class, 'showDownloadForm'])->name('download-form');
+Route::post('/download-file/{application}', [EmployeeCVController::class, 'downloadFile'])->name('download-file');
+
+Route::post('/lonnsberegner/submit-for-processing', [EmployeeCVController::class, 'submitForProcessing'])->name('submit-for-processing');
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'upload'])->name('lonnsberegner.upload');
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'store'])->name('lonnsberegner.calculate');
 

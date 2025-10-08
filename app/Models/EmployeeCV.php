@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeCV extends Model
 {
-    use HasFactory,HasUuids;
+    use HasFactory, HasUuids;
 
     protected $protected = [];
 
@@ -17,6 +17,7 @@ class EmployeeCV extends Model
     protected $table = 'employee_cvs';
 
     protected $casts = [
+        'personal_info' => 'json',
         'education' => 'json',
         'work_experience' => 'json',
         'last_viewed' => 'datetime',
@@ -57,5 +58,13 @@ class EmployeeCV extends Model
         $position = max(0, min($position, count($ladder) - 1));
 
         return $ladder[$position];
+    }
+
+    public function isReadOnly()
+    {
+        if (auth()->check())
+            return false;
+
+        return ($this->status === 'generated' || $this->status === 'submitted') ? true : false;
     }
 }

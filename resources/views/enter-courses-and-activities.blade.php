@@ -17,7 +17,8 @@
         </p>
     </div>
     @php
-        $salaryCategory = (new \app\Models\EmployeeCV())->getPositionsLaddersGroups()[$application->job_title];
+        $empoyeeCV = new \app\Models\EmployeeCV();
+        $salaryCategory = $empoyeeCV->getPositionsLaddersGroups()[$application->job_title];
     @endphp
 
     @if ($salaryCategory['ladder'] === 'A')
@@ -58,7 +59,7 @@
     @endif
 
     <div class="text-md-end text-center pb-1">
-        <a href={{ route('enter-experience-information', $application) }} class="btn btn-outline-primary my-2" tabindex="99" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
+        <a href={{ route('enter-experience-information', $application) }} class="btn btn-outline-primary my-2 @if ($application->isReadOnly()) disabled @endif" tabindex="99" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">
             Forrige side
         </a>
         <a href="{{ route('preview-and-estimated-salary', $application) }}" class="btn btn-primary my-2" id="btn-next" _="on click put 'Vennligst vent...' into my.innerHTML then wait 20ms then add .disabled to me end">

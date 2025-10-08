@@ -14,7 +14,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class ExportExcelJob implements ShouldQueue
@@ -22,8 +24,6 @@ class ExportExcelJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private string $applicationId;
-
-    private string $email;
 
     /**
      * The number of times the job may be attempted.
@@ -54,10 +54,9 @@ class ExportExcelJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(string $applicationId, string $email)
+    public function __construct(string $applicationId)
     {
         $this->applicationId = $applicationId;
-        $this->email = $email;
     }
 
     /**
@@ -73,9 +72,9 @@ class ExportExcelJob implements ShouldQueue
             $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
             $data = $this->prepareExcelData($application, $totalMonths);
 
-            $this->generateAndSendExcel($data, $application);
+            $this->generateAndStoreExcel($data, $application->personal_info['email']);
 
-            Log::channel('info_log')->info("Email sent successfully for Application ID: {$this->applicationId}");
+            Log::channel('info_log')->info("Excel file generated and email with download link sent for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
             Log::error("Error processing Application ID: {$this->applicationId} - " . $e->getMessage(), [
                 'stack' => $e->getTraceAsString(),
@@ -104,7 +103,7 @@ class ExportExcelJob implements ShouldQueue
     /**
      * Generate the Excel file and send it via email.
      */
-    private function generateAndSendExcel(?array $data): void
+    private function generateAndStoreExcel(?array $data, string $userEmail): void
     {
         $originalFilePath = $data['filepaths']['originalFilePath'];
         $modifiedFilePath = $data['filepaths']['modifiedFilePath'];
@@ -112,12 +111,23 @@ class ExportExcelJob implements ShouldQueue
         $export = new ExistingSheetExport($data['data'], $originalFilePath);
         $export->modifyAndSave($modifiedFilePath);
 
-        Log::channel('info_log')->info("Excel file saved successfully for Application ID: {$this->applicationId}");
+        // Update application record
+        EmployeeCV::where('id', $this->applicationId)->update(
+            [
+                'status' => 'generated',
+                'generated_file_path' => $modifiedFilePath,
+                'generated_file_timestamp' => now()
+            ]
+        );
 
-        $subject = 'Foreløpig beregning av din lønnsplassering';
-        $body = $this->generateEmailBody($data['data']);
-        Mail::to($this->email)->send(new SimpleEmail($subject, $body, $modifiedFilePath));
-        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost: ' . $subject, $body, $modifiedFilePath));
+        Log::channel('info_log')->info("Excel file stored locally and database updated for Application ID: {$this->applicationId}");
+
+        $subject = 'Det beregnede lønnsskjema er klart for nedlasting';
+        $body = $this->generateEmailBody($data);
+
+
+        Mail::to($userEmail)->send(new SimpleEmail($subject, $body, null));
+        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost med nedlastingslenke: ' . $subject, $body, null));
     }
 
     /**
@@ -125,10 +135,13 @@ class ExportExcelJob implements ShouldQueue
      */
     private function generateEmailBody(?array $data): string
     {
+        $downloadLink = route('download-form', $this->applicationId);
         $body = 'Denne eposten ble generert på nettstedet ' . config('app.name') . '<br/><br/>';
-        $body .= $data
-            ? ' Vedlagt ligger et midlertidig lønnsskjema med en beregnet lønnsplassering.<br/><br/>Din foreløpige plassering er lønnstrinn ' . $data['salaryPlacement'] . '.<br/><br/><strong>DETTE ER IKKE EN ENDELIG LØNNSPLASSERING.</strong> Den er maskinberegnet og kan resultere i avvik (1-2 lønnstrinn).<br/><br/><strong>For en endelig lønnsplassering må du:</strong> <ul><li>åpne vedlegget i denne eposten</li><li>fylle ut personalia og eventuelt delen medfrivillige verv</li><li>sendes skjemaet til hr@frikirken.no for beslutning av lønnsplasseringen</li></ul>'
-            : ' Det ble generert for mange linjer, og Excel-skjemaet kunne ikke bli behandlet maskinelt. Derimot kan du med linken nedenfor se plasseringen.';
+        $body .= 'Takk for din innsending. Ditt lønnsskjema er nå generert og klart for nedlasting.<br/><br/>';
+        $body .= 'Din foreløpige plassering er lønnstrinn ' . $data['data']['salaryPlacement'] . '.<br/><br/>';
+        $body .= '<strong><a href="' . $downloadLink . '">Klikk her for å laste ned ditt lønnsskjema</a></strong><br/><br/>';
+        $body .= 'For å få tilgang til filen må du oppgi din fødselsdato og postnummeret du registrerte.<br/><br/>';
+        $body .= '<strong>MERK:</strong> Dette er en maskinberegnet, foreløpig lønnsplassering og kan ha avvik. For endelig fastsettelse, send det utfylte skjemaet til HR.<br/><br/>';
         $body .= ' Du kan <a href="' . route('open-application', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
         $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
 
@@ -141,9 +154,24 @@ class ExportExcelJob implements ShouldQueue
     private function prepareExcelData(EmployeeCV $application, float $totalMonths): ?array
     {
         $sheet1 = [
-            ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
+            ['row' => 3, 'column' => 'E', 'value' => $application->personal_info['name'], 'datatype' => 'text'],
+            ['row' => 4, 'column' => 'E', 'value' => $application->personal_info['mobile'], 'datatype' => 'text'],
+            ['row' => 4, 'column' => 'Q', 'value' => $application->personal_info['email'], 'datatype' => 'text'],
+            ['row' => 5, 'column' => 'E', 'value' => $application->personal_info['address'], 'datatype' => 'text'],
+            ['row' => 6, 'column' => 'E', 'value' => $application->personal_info['postal_code'], 'datatype' => 'text'],
+            ['row' => 6, 'column' => 'H', 'value' => $application->personal_info['postal_place'], 'datatype' => 'text'],
+            ['row' => 7, 'column' => 'Q', 'value' => "'" . $application->personal_info['bank_account'], 'datatype' => 'text'], // Added bank_account
             ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
+            ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
             ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
+            ['row' => 10, 'column' => 'E', 'value' => $application->personal_info['position_size'], 'datatype' => 'text'],
+            ['row' => 11, 'column' => 'E', 'value' => $application->personal_info['employer_and_place'], 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'G', 'value' => "{$application->personal_info['manager_name']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'P', 'value' => "{$application->personal_info['manager_mobile']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'R', 'value' => "{$application->personal_info['manager_email']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'G', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'P', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'R', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
         ];
         $sheet2 = [];
 
@@ -268,7 +296,7 @@ class ExportExcelJob implements ShouldQueue
     public function sendErrorNotification(string $message): void
     {
         // Send email with error
-        $subject = 'Feil ved prosessering av Lønnsplassering (Excel fil)';
+        $subject = 'Feil ved generering av lønnsskjema';
         $body = $this->generateEmailBody(null);
         Mail::to($this->email)->send(new SimpleEmail($subject, $body, null));
     }
