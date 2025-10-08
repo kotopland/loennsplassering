@@ -163,7 +163,7 @@
                             </div>
                             <div class="modal-footer">
                                 @if (auth()->check())
-                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ config('app.report_email') }} og ikke til kandidaten</button>
+                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ \App\Models\Setting::where('key', 'report_email')->first()?->report_email ?? 'EMAIL ADDRESS MISSING IN SETTINGS' }} og ikke til kandidaten</button>
                                 @else
                                     <button type="submit" class="btn btn-primary">Send til behandling</button>
                                 @endif

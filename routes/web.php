@@ -31,6 +31,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'store', 'destroy']);
         Route::get('/readme', [AdminPageController::class, 'showReadme'])->name('readme.show');
+        Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 
         Route::prefix('excel-templates')->name('excel-templates.')->controller(ExcelTemplateController::class)->group(function () {
             Route::get('/', 'index')->name('index');

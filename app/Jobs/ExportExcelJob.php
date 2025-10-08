@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Exports\ExistingSheetExport;
 use App\Mail\SimpleEmail;
 use App\Models\EmployeeCV;
+use App\Models\Setting;
 use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
 use Exception;
@@ -130,7 +131,12 @@ class ExportExcelJob implements ShouldQueue
             Mail::to($userEmail)->send(new SimpleEmail($subject, $body, null));
 
         //send to the admin
-        Mail::to(config('app.report_email'))->send(new SimpleEmail('Sendt epost med nedlastingslenke: ' . $subject, $body, null));
+        $reportEmail = Setting::where('key', 'report_email')->first()->report_email;
+        if (!$reportEmail) {
+            Log::channel('info_log')->info("Report email address missing");
+        } else {
+            Mail::to($reportEmail)->send(new SimpleEmail('Sendt epost med nedlastingslenke: ' . $subject, $body, null));
+        }
     }
 
     /**

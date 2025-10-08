@@ -91,6 +91,7 @@ container
                 <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
                 <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a> -
                 <a href="{{ route('admin.users.index') }}">Brukere</a> -
+                <a href="{{ route('admin.settings.index') }}">Innstillinger</a> -
                 <a href="{{ route('admin.excel-templates.index') }}">Lønnskjema Mal</a> -
                 <button type="submit" class="btn btn-link ps-0 pt-1">Logg ut av admin verktøyet</button>
             </form>
