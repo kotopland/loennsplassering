@@ -22,7 +22,7 @@ Route::post('/logout', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::view('/', 'admin.index')->name('admin.index');
+        Route::view('/', 'admin.index')->name('index');
         Route::resource('positions', PositionController::class);
         Route::resource('salary-ladders', SalaryLadderController::class);
         Route::resource('employee-cv', \App\Http\Controllers\Admin\EmployeeCVController::class)->only(['index', 'destroy']);

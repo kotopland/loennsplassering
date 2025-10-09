@@ -65,6 +65,12 @@
                             Forsiden
                         </a>
 
+                        @auth
+                            <a href="{{ route('admin.index') }}" class="btn btn-sm btn-outline-light my-1">
+                                Admin
+                            </a>
+                        @endauth
+
                         <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal" data-bs-target="#yourModal">
                             Lagre skjemaet
                         </a>
@@ -82,20 +88,6 @@
 @else
 container
 @endif">
-        @auth
-            Administrere:
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <a href="{{ route('admin.readme.show') }}">Hva verktøyet gjør</a> -
-                <a href="{{ route('admin.employee-cv.index') }}">Lønnskjemaer</a> -
-                <a href="{{ route('admin.positions.index') }}">Stillinger</a> -
-                <a href="{{ route('admin.salary-ladders.index') }}">Lønnsstiger</a> -
-                <a href="{{ route('admin.users.index') }}">Brukere</a> -
-                <a href="{{ route('admin.settings.index') }}">Innstillinger</a> -
-                <a href="{{ route('admin.excel-templates.index') }}">Lønnskjema Mal</a> -
-                <button type="submit" class="btn btn-link ps-0 pt-1">Logg ut av admin verktøyet</button>
-            </form>
-        @endauth
 
         <main class="my-4">
             @if ($errors->any())
