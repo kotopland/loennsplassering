@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($employeeCV as $employee)
+            @foreach ($employeeCV->sortByDesc('updated_at') as $employee)
                 <tr>
                     <td class="py-4">{{ $employee->job_title }}</td>
                     <td class="py-4">{{ $employee->birth_date }}</td>

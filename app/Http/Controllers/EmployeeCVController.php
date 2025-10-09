@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ExportExcelJob;
+use App\Jobs\NotifyAdminOfSubmissionJob;
+use App\Jobs\ProcessUserSubmissionJob;
 use App\Mail\SimpleEmail; // We'll create this import class later
 use App\Models\EmployeeCV;
 use App\Services\ExcelImportService;
@@ -613,35 +614,37 @@ class EmployeeCVController extends Controller
         return redirect()->back();
     }
 
-    public function exportAsXls()
-    {
-        if (! session('applicationId')) {
-            $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
+    // public function exportAsXls()
+    // {
+    //     if (! session('applicationId')) {
+    //         $this->flashMessage('Din sesjon er utløpt og du må starte på nytt.', 'danger');
 
-            return redirect()->route('welcome');
-        }
+    //         return redirect()->route('welcome');
+    //     }
 
-        request()->validate([
-            'email' => 'email|required',
-        ], [
-            'email.required' => 'E-postadressefeltet er obligatorisk.',
-            'email.email' => 'E-postadressen må være en gyldig e-postadresse.',
-        ]);
+    //     request()->validate([
+    //         'email' => 'email|required',
+    //     ], [
+    //         'email.required' => 'E-postadressefeltet er obligatorisk.',
+    //         'email.email' => 'E-postadressen må være en gyldig e-postadresse.',
+    //     ]);
 
-        // Get the user's email from the request
-        $email = request()->email;
+    //     // Get the user's email from the request
+    //     $email = request()->email;
 
-        // Remeber that an email has been sent
-        $application = EmployeeCV::find(session('applicationId'));
-        $application->email_sent = true;
-        $application->save();
+    //     // Remeber that an email has been sent
+    //     $application = EmployeeCV::find(session('applicationId'));
+    //     $application->email_sent = true;
+    //     $application->save();
 
-        // Dispatch the job
-        ExportExcelJob::dispatch(session('applicationId'), $email);
-        $this->flashMessage('En epost med et excel dokument blir sendt i løpet av et par minutter.');
+    //     // Dispatch the job
+    //     $processedByAdmin = auth()->check();
 
-        return redirect()->back();
-    }
+    //     ExportExcelJob::dispatch(session('applicationId'), $email, $processedByAdmin);
+    //     $this->flashMessage('En epost med et excel dokument blir sendt i løpet av et par minutter.');
+
+    //     return redirect()->back();
+    // }
 
     public function submitForProcessing(Request $request)
     {
@@ -680,14 +683,13 @@ class EmployeeCVController extends Controller
         $application->status = 'submitted';
         $application->save();
 
+        // Dispatch jobs for user and admin notifications
+        if (!auth()->check()) {
+            ProcessUserSubmissionJob::dispatch(session('applicationId'));
+        }
+        NotifyAdminOfSubmissionJob::dispatch(session('applicationId'));
 
-        // Dispatch job without email, as it will be sent from the job with a download link
-        ExportExcelJob::dispatch(session('applicationId'));
-
-        // Optional: Dispatch a job to notify admin, etc.
-        // NotifyAdminOfSubmission::dispatch($application);
-
-        // You might want to clear the session and redirect the user to a thank you page
+        // Clear the session and redirect the user to a thank you page
         $request->session()->forget('applicationId');
 
         $this->flashMessage(

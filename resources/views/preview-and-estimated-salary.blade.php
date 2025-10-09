@@ -28,30 +28,6 @@
                 endelig lønn fastsettes. Det du har valg som relevant vil nødvendigvis ikke arbeidsgiver vektlegge.
             </p>
         </div>
-        {{-- <div class="border border-primary border-1 bg-info px-3 ">
-            <h3>Motta lønnsskjema med beregning pr e-post!</h3>
-            <p><strong>For å unngå å miste informasjonen du har fylt inn</strong>, anbefaler vi at du skriver inn e-postadressen
-                din i feltet
-                under. Da sender vi deg en lenke til dette skjemaet og et ferdig utfylt lønnsskjema med beregnet lønnsplassering
-                som Excel-dokument. Din e-postadresse brukes kun til å sende deg denne informasjonen og blir ikke lagret.
-            </p>
-            <div class="my-4">
-                <form action="{{ route('export-as-xls') }}" method="get" id="salary_form" _="on submit set #sendEmail.innerHTML to 'Behandler. Sjekk din epost om noen minutter...'">
-                    @csrf
-                    <div class="pe-4">
-                        <label for="email" class="form-label">E-post adresse</label>
-                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required style="max-width: 300px">
-                    </div>
-                    <button type="submit" name="submit" id="sendEmail" value="" class="btn btn-primary my-2">
-                        Send Lønnsskjema (Excel) med
-                        beregning<br />
-                    </button>
-                    <div class="ms-1">
-                        <small>(du mottar den iløpet av et par minutter)</small>
-                    </div>
-                </form>
-            </div>
-        </div> --}}
         <div class="border border-primary border-1 bg-info px-3 my-4">
             <h3>Se lønnsplasseringen her:</h3>
             <div class="my-4">
@@ -163,7 +139,7 @@
                             </div>
                             <div class="modal-footer">
                                 @if (auth()->check())
-                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ \App\Models\Setting::where('key', 'report_email')->first()?->report_email ?? 'EMAIL ADDRESS MISSING IN SETTINGS' }} og ikke til kandidaten</button>
+                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ \App\Models\Setting::where('key', 'report_email')->first()->value ?? 'ADMIN EPOST ADRESSE MANGLER I INNSTILLINGER' }} og ikke til kandidaten</button>
                                 @else
                                     <button type="submit" class="btn btn-primary">Send til behandling</button>
                                 @endif

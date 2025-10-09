@@ -1,110 +1,52 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Services;
 
 use App\Exports\ExistingSheetExport;
-use App\Mail\SimpleEmail;
 use App\Models\EmployeeCV;
-use App\Models\Setting;
-use App\Services\SalaryEstimationService;
 use Carbon\Carbon;
-use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
-class ExportExcelJob implements ShouldQueue
+class ExcelGenerationService
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    private SalaryEstimationService $salaryEstimationService;
 
-    private string $applicationId;
-
-    /**
-     * The number of times the job may be attempted.
-     * Overrides worker's --tries option for this job.
-     *
-     * @var int
-     */
-    public $tries = 3; // Attempt this job up to 3 times
-
-    /**
-     * The maximum number of seconds the job can run before timing out.
-     * Overrides worker's --timeout option for this job.
-     * Set to 0 for no timeout (use with caution).
-     *
-     * @var int
-     */
-    public $timeout = 0; // Allowing unlimited time for potentially large Excel exports
-
-    /**
-     * The number of seconds to wait before retrying the job.
-     * Overrides worker's --sleep option (if used) and global retry_after.
-     *
-     * @var int
-     */
-    public $backoff = 60; // Wait 60 seconds before retrying a failed job
-
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(string $applicationId)
+    public function __construct(SalaryEstimationService $salaryEstimationService)
     {
-        $this->applicationId = $applicationId;
+        $this->salaryEstimationService = $salaryEstimationService;
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(SalaryEstimationService $salaryEstimationService): void
+    public function generateExcel(string $applicationId): array
     {
-        try {
-            Log::channel('info_log')->info("Starting Excel generation for Application ID: {$this->applicationId}");
+        Log::channel('info_log')->info("Starting Excel generation for Application ID: {$applicationId}");
 
-            $application = $this->fetchApplication();
-            $application = $salaryEstimationService->adjustEducationAndWork($application);
-            $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
-            $data = $this->prepareExcelData($application, $totalMonths);
+        $application = $this->fetchApplication($applicationId);
+        $application = $this->salaryEstimationService->adjustEducationAndWork($application);
+        $totalMonths = SalaryEstimationService::calculateTotalWorkExperienceMonths($application->work_experience_adjusted);
+        $data = $this->prepareExcelData($application, $totalMonths);
 
-            $this->generateAndStoreExcel($data, $application->personal_info['email']);
+        $this->generateAndStoreExcel($data, $applicationId);
 
-            Log::channel('info_log')->info("Excel file generated and email with download link sent for Application ID: {$this->applicationId}");
-        } catch (Exception $e) {
-            Log::error("Error processing Application ID: {$this->applicationId} - " . $e->getMessage(), [
-                'stack' => $e->getTraceAsString(),
-            ]);
-            $this->sendErrorNotification($e->getMessage());  // Send email with error
-            throw $e;  // Rethrow to mark job as failed
-        }
+        Log::channel('info_log')->info("Excel file generated for Application ID: {$applicationId}");
+
+        return $data;
     }
 
-    /**
-     * Fetch the application by ID.
-     */
-    private function fetchApplication(): EmployeeCV
+    private function fetchApplication(string $applicationId): EmployeeCV
     {
-        $application = EmployeeCV::find($this->applicationId);
+        $application = EmployeeCV::find($applicationId);
 
         if (! $application) {
-            throw new Exception("Application not found for ID: {$this->applicationId}");
+            throw new \Exception("Application not found for ID: {$applicationId}");
         }
 
-        Log::channel('info_log')->info("Application fetched successfully for ID: {$this->applicationId}");
+        Log::channel('info_log')->info("Application fetched successfully for ID: {$applicationId}");
 
         return $application;
     }
 
-    /**
-     * Generate the Excel file and send it via email.
-     */
-    private function generateAndStoreExcel(?array $data, string $userEmail): void
+    private function generateAndStoreExcel(array $data, string $applicationId): void
     {
         $originalFilePath = $data['filepaths']['originalFilePath'];
         $modifiedFilePath = $data['filepaths']['modifiedFilePath'];
@@ -112,55 +54,16 @@ class ExportExcelJob implements ShouldQueue
         $export = new ExistingSheetExport($data['data'], $originalFilePath);
         $export->modifyAndSave($modifiedFilePath);
 
-        // Update application record
-        EmployeeCV::where('id', $this->applicationId)->update(
-            [
-                'status' => 'generated',
-                'generated_file_path' => $modifiedFilePath,
-                'generated_file_timestamp' => now()
-            ]
-        );
+        EmployeeCV::where('id', $applicationId)->update([
+            'status' => 'generated',
+            'generated_file_path' => $modifiedFilePath,
+            'generated_file_timestamp' => now(),
+        ]);
 
-        Log::channel('info_log')->info("Excel file stored locally and database updated for Application ID: {$this->applicationId}");
-
-        $subject = 'Det beregnede lønnsskjema er klart for nedlasting';
-        $body = $this->generateEmailBody($data);
-
-        //do not send to the applicant if the admin (an authorized user) is logged in.
-        if (! auth()->check())
-            Mail::to($userEmail)->send(new SimpleEmail($subject, $body, null));
-
-        //send to the admin
-        $reportEmail = Setting::where('key', 'report_email')->first()->report_email;
-        if (!$reportEmail) {
-            Log::channel('info_log')->info("Report email address missing");
-        } else {
-            Mail::to($reportEmail)->send(new SimpleEmail('Sendt epost med nedlastingslenke: ' . $subject, $body, null));
-        }
+        Log::channel('info_log')->info("Excel file stored locally and database updated for Application ID: {$applicationId}");
     }
 
-    /**
-     * Generate the email body.
-     */
-    private function generateEmailBody(?array $data): string
-    {
-        $downloadLink = route('download-form', $this->applicationId);
-        $body = 'Denne eposten ble generert på nettstedet ' . config('app.name') . '<br/><br/>';
-        $body .= 'Takk for din innsending. Ditt lønnsskjema er nå generert og klart for nedlasting.<br/><br/>';
-        $body .= 'Din foreløpige plassering er lønnstrinn ' . $data['data']['salaryPlacement'] . '.<br/><br/>';
-        $body .= '<strong><a href="' . $downloadLink . '">Klikk her for å laste ned ditt lønnsskjema</a></strong><br/><br/>';
-        $body .= 'For å få tilgang til filen må du oppgi din fødselsdato og postnummeret du registrerte.<br/><br/>';
-        $body .= '<strong>MERK:</strong> Dette er en maskinberegnet, foreløpig lønnsplassering og kan ha avvik. For endelig fastsettelse, send det utfylte skjemaet til HR.<br/><br/>';
-        $body .= ' Du kan <a href="' . route('open-application', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
-        $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
-
-        return $body;
-    }
-
-    /**
-     * Prepare the data for Excel export.
-     */
-    private function prepareExcelData(EmployeeCV $application, float $totalMonths): ?array
+    private function prepareExcelData(EmployeeCV $application, float $totalMonths): array
     {
         $sheet1 = [
             ['row' => 3, 'column' => 'E', 'value' => $application->personal_info['name'], 'datatype' => 'text'],
@@ -241,7 +144,6 @@ class ExportExcelJob implements ShouldQueue
             $rowSheet1 = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
-            // return null;
         } else {
             throw new InvalidArgumentException('Det er for mange linjer utdannelse eller ansiennitet at det ikke passer inni lønnsskjema excel arket.');
         }
@@ -299,32 +201,7 @@ class ExportExcelJob implements ShouldQueue
         return [
             'filepaths' => ['modifiedFilePath' => $modifiedFilePath, 'originalFilePath' => $originalFilePath],
             'data' => ['sheet1' => $sheet1, 'sheet2' => $sheet2, 'salaryPlacement' => ($salaryPlacement + $application->competence_points)],
+            'application' => $application,
         ];
-    }
-
-    public function sendErrorNotification(string $message): void
-    {
-        // Send email with error
-        $subject = 'Feil ved generering av lønnsskjema';
-        $body = $this->generateEmailBody(null);
-        Mail::to($this->email)->send(new SimpleEmail($subject, $body, null));
-    }
-    /**
-     * Handle a job failure.
-     *
-     * @param \Throwable $exception
-     * @return void
-     */
-    public function failed(\Throwable $exception): void
-    {
-        // Log custom message when job fails
-        Log::critical('ExportExcelJob failed permanently after retries.', [
-            'job_id' => $this->job->getJobId(),
-            'message' => $exception->getMessage(),
-            'class' => get_class($exception),
-            'trace' => $exception->getTraceAsString(),
-        ]);
-        // You can send notifications here, e.g., to an admin
-        // Mail::to('admin@example.com')->send(new JobFailedNotification($this, $exception));
     }
 }

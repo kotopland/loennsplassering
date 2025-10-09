@@ -77,7 +77,7 @@ class ExportExcelJobTest extends TestCase
         });
 
         // Assert email was sent to report email
-        $emailAddress = Setting::where('key', 'report_email')->first()?->report_email;
+        $emailAddress = Setting::where('key', 'report_email')->first()?->value;
         if (!$emailAddress) {
             Log::channel('info_log')->info("Report email address missing");
         } else {
@@ -173,7 +173,7 @@ class ExportExcelJobTest extends TestCase
         $job->handle(new SalaryEstimationService);
 
         // Assert email was sent with correct salary placement
-        $emailAddress = Setting::where('key', 'report_email')->first()?->report_email;
+        $emailAddress = Setting::where('key', 'report_email')->first()?->value;
         if (!$emailAddress) {
             Log::channel('info_log')->info("Report email address missing");
         } else {
