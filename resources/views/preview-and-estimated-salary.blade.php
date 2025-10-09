@@ -49,12 +49,18 @@
                 </a>
             </div>
             <div class="my-4 text-end">
-                <a href={{ route('enter-employment-information', $application) }} class="btn btn-outline-primary">
-                    Gå tilbake og gjør endringer i skjemaet
-                </a>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#submitToOfficeModal">
-                    Send inn til Frikirkens hovedkontor for behandling
-                </button>
+                @if (!$application->isReadOnly())
+                    <a href={{ route('enter-employment-information', $application) }} class="btn btn-outline-primary">
+                        Gå tilbake og gjør endringer i skjemaet
+                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#submitToOfficeModal">
+                        Send inn til Frikirkens hovedkontor for behandling
+                    </button>
+                @else
+                    <a href={{ route('enter-employment-information', $application) }} class="btn btn-outline-primary">
+                        Gå tilbake
+                    </a>
+                @endif
             </div>
 
             <div class="my-4 text-end">
