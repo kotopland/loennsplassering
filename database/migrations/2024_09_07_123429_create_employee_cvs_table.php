@@ -18,8 +18,8 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->json('education')->nullable();
             $table->json('work_experience')->nullable();
-            $table->boolean('email_sent')->default(false)->after('work_experience');
-            $table->timestamp('last_viewed')->nullable()->after('updated_at');
+            $table->boolean('email_sent')->default(false);
+            $table->timestamp('last_viewed')->nullable();
             $table->timestamps();
         });
     }
