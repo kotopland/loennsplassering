@@ -85,12 +85,28 @@ class EmployeeCVController extends Controller
         $application->birth_date = $application->birth_date ?? null;
         $application->save();
 
-        $positionsLaddersGroups = (new EmployeeCV)->getPositionsLaddersGroups();
-        ksort($positionsLaddersGroups);
+        $allPositions = (new EmployeeCV)->getPositionsLaddersGroups();
+        ksort($allPositions);
+
+        $groupedPositions = [
+            'Menighet' => [],
+            'FriBU' => [],
+            'Hovedkontoret' => [],
+        ];
+
+        foreach ($allPositions as $position => $details) {
+            $parts = explode(':', $position, 2);
+            $category = $parts[0];
+            if (isset($groupedPositions[$category])) {
+                $groupedPositions[$category][$position] = $details;
+            } elseif (in_array($category, ['Lederstilling Fellesarbeidet'])) {
+                $groupedPositions['Hovedkontoret'][$position] = $details;
+            }
+        }
 
         $hasNull = false; // Initialize the flag to false
 
-        return view('enter-employment-information', compact('application', 'positionsLaddersGroups'));
+        return view('enter-employment-information', compact('application', 'groupedPositions'));
     }
 
     public function postEmploymentInformation(Request $request)

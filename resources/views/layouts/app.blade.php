@@ -177,6 +177,7 @@ container
                 <a class="text-light" href="{{ url('/login') }}">login</a>
         </div>
     </div>
+    @stack('scripts')
 </body>
 
 </html>

@@ -67,4 +67,24 @@ class EmployeeCV extends Model
 
         return ($this->status === 'generated' || $this->status === 'submitted') ? true : false;
     }
+
+    public function getWorkplaceCategory()
+    {
+        if (!$this->job_title) {
+            return null;
+        }
+
+        $parts = explode(':', $this->job_title, 2);
+        $category = $parts[0];
+
+        if (in_array($category, ['Menighet', 'FriBU', 'Hovedkontoret'])) {
+            return $category;
+        }
+
+        if (in_array($category, ['Lederstilling Fellesarbeidet'])) {
+            return 'Hovedkontoret';
+        }
+
+        return null;
+    }
 }
