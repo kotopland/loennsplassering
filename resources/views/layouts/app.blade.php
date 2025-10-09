@@ -60,21 +60,25 @@
                 </div>
                 <!-- Button Section -->
                 <div class="d-flex align-items-center gap-2">
-                    @if (session('applicationId'))
+                    @if (auth()->check() || session('applicationId'))
                         <a href="{{ route('welcome') }}" class="btn btn-sm btn-outline-light my-1">
                             Forsiden
                         </a>
+                    @endif
 
-                        @auth
-                            <a href="{{ route('admin.index') }}" class="btn btn-sm btn-outline-light my-1">
-                                Admin
-                            </a>
-                        @endauth
-
+                    @if (session('applicationId'))
                         <a href="#" class="btn btn-sm btn-outline-light my-1" data-bs-toggle="modal" data-bs-target="#yourModal">
                             Lagre skjemaet
                         </a>
+                    @endif
 
+                    @if (auth()->check())
+                        <a href="{{ route('admin.index') }}" class="btn btn-sm btn-outline-light my-1">
+                            Admin
+                        </a>
+                    @endif
+
+                    @if (auth()->check() || session('applicationId'))
                         <a href="{{ route('signout') }}" class="btn btn-sm btn-outline-light my-1" onclick="if (!confirm('Har du husket å lagre dette skjemaet og fått lenken til på e-post? Svarer du ja/ok logges du ut.')) return false;">
                             Logg ut
                         </a>
@@ -121,8 +125,7 @@ container
                         Bokmerk denne siden eller få en lenke til din e-postadresse:
                         <div class="pt-2 ps-2 text-success" id="email-result">
                             <div class=" my-4">
-                                <input type="email" class="form-control" id="email-input" name="email_address" required placeholder="Din e-postadresse...">
-                                <div id="emailHelp" class="form-text">Vi lagrer ikke e-postadressen din.</div>
+                                <input type="email" class="form-control" id="email-input" placeholder="E-postadresse" name="email_address" required>
                             </div>
                         </div>
 
