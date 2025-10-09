@@ -1,15 +1,17 @@
 # Frikirkens Lønnsberegner
 
 ## Beskrivelse
-
 Frikirkens lønnsberegner er et verktøy som estimerer lønnsplassering basert på ansiennitet, kompetansepoeng og den vedtatte lønnstabell. Det hjelper ansatte med å få en sannsynlig lønnsplassering etter ansettelse, basert på synodestyrets lønnsavtale.
 
 ## Funksjonalitet
-
-- Beregner kompetansepoeng og ansiennitet.  
-- Viser tidslinjer over kompetanse og ansiennitet.  
-- Genererer et Excel-vedlegg med beregnet lønnsplassering.  
-- Mulighet for å laste opp eksisterende lønnsskjema for videre arbeid.
+*   **Steg-for-steg datainnsamling:** Brukere kan enkelt legge inn informasjon om utdanning, arbeidserfaring, kurs og andre aktiviteter gjennom et guidet forløp.
+*   **Beregning av ansiennitet og kompetansepoeng:** Systemet analyserer og justerer innsendt data for å beregne ansiennitet og kompetansepoeng i henhold til gjeldende regler.
+*   **Estimering av lønnsplassering:** Gir et estimat på lønnstrinn basert på de beregnede poengene og ansienniteten.
+*   **Tidslinjevisualisering:** Viser en oversiktlig tidslinje for utdanning og arbeidserfaring.
+*   **Lagre og fortsett senere:** Brukere kan få tilsendt en lenke på e-post for å fortsette utfyllingen på et senere tidspunkt.
+*   **Excel-eksport:** Genererer et Excel-dokument med den beregnede lønnsplasseringen og detaljert grunnlag.
+*   **Opplasting av eksisterende skjema:** Mulighet for å laste opp et tidligere utfylt Excel-skjema for å fortsette arbeidet.
+*   **Administrasjonsgrensesnitt:** Et eget panel for administratorer for å håndtere innsendte søknader, brukere, stillinger, lønnsstiger og maler.
 
 ## Begrensninger
 
@@ -17,10 +19,9 @@ Frikirkens lønnsberegner er et verktøy som estimerer lønnsplassering basert p
 - Verktøyet tar heller ikke hensyn til de som er allerede i toppen av lønnsstigen og kan få erfaringsbasert kompetansetillegg ofte gitt pr ytterligere 5 år, noe som kan føre til avvik på 1-5 lønnstrinn.
 - Verktøyet tar ikke hensyn til frivillig verv som kan benyttes i ulike tilfeller.
 ## Håndtering av Data
-
-- **E-postadresser** lagres kun midlertidig i en kø og slettes innen 2 minutter.
-- Kun **fødselsdato** lagres for beregningsformål.
-
+*   **E-postadresser:** Brukes for å sende engangslenker for å gjenoppta en økt. Adressene lagres kun midlertidig.
+*   **Personopplysninger:** Nødvendig personinformasjon lagres for å utføre beregningene.
+*   **Sletting:** Data knyttet til en økt slettes automatisk etter en viss tid.
 ---
 ## Detaljert Beregningsgrunnlag
 
@@ -110,32 +111,31 @@ Dette systematiske regelsettet sikrer en konsistent og etterprøvbar beregning a
 
 ## Installering
 
-1. **Klon prosjektet:**
-   ```
-   bash
+1.  **Klon prosjektet:**
+    ```bash
    git clone <repo-url>
-   cd prosjekt-mappe
-   ```
-2. **Installer avhengigheter:**
-   ```
-   composer install
+    cd prosjekt-mappe
+    ```
+2.  **Installer avhengigheter:**
+    ```bash
+    composer install
    npm install && npm run build
    ```
-3. **Konfigurer .env:**
-   ```
-   cp .env.example .env
+3.  **Konfigurer .env:**
+    ```bash
+    cp .env.example .env
    php artisan key:generate
    ```
-4. **Kjør migrasjoner:**
-   ```
-   php artisan migrate:fresh --seed
-   ```
-
-5. **Sett opp admin bruker:**
-```
-php artisan tinker
-$user = User::insert(['name'=>'Your Name','email'=>'your.email@example.com', 'password'=>Hash::make(Str::random(10))]);
-```
+4.  **Kjør migrasjoner og seeding:**
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+5.  **Sett opp adminbruker:**
+    For å opprette en administrator, kan du kjøre følgende i `tinker`:
+    ```php
+    php artisan tinker
+    \App\Models\User::create(['name' => 'Admin Name', 'email' => 'admin@example.com', 'password' => Illuminate\Support\Facades\Hash::make(Illuminate\Support\Str::random(16))]);
+    ```
 
 ## Planlegging og Oppgaver
 Oppgaver er definert i
