@@ -9,9 +9,9 @@
             <div class="progress-bar bg-success" style="width: 81%">81%</div>
         </div>
 
-        <h2>
+        <h1>
             Forhåndsvisning av din lønnsplassering
-        </h2>
+        </h1>
         <div class="border rounded-2 p-2 border-danger">NB! Skjemaet er ennå ikke sendt inn til behandling hos Frikriken før du trykker på "Fyll ut Personalia og Send inn for behandling"</div>
 
         @if (session()->has('message'))

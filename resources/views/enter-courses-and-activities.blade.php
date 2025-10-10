@@ -5,9 +5,9 @@
         <div class="progress-bar bg-success" style="width: 65%">65%</div>
     </div>
 
-    <h2>
+    <h1>
         Kurs, verv og frivillig arbeid, relevant for stillingen.
-    </h2>
+    </h1>
 
     <div class="my-2 py-3">
         <p>

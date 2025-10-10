@@ -6,7 +6,7 @@
     @endif
 
     <div class="">
-        <h3>Beregn din lønnsplassering</h3>
+        <h1>Beregn din lønnsplassering</h1>
         <p class="small">Oppdatert etter 2024 forhandlingene</p>
         <p class="teaser">
             Lurer du på hva lønnen din bør være?

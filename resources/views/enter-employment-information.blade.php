@@ -7,16 +7,17 @@
     <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar bg-success" style="width: 16%">16%</div>
     </div>
+    <h1>
+        Informasjon om stillingen
+    </h1>
+
     <form action="{{ route('post-employment-information', $application) }}" method="POST" id="salaryForm" novalidate>
         @csrf
-        <h2>
-            Informasjon om stillingen
-        </h2>
 
         <div class="card my-4 bg-light">
             <div class="card-body">
-                <h3 class="card-header">
-                    Informasjon om stillingen
+                <h3 class="">
+                    Arbeidssted og stilling
                 </h3>
                 <div class="card-text">
 

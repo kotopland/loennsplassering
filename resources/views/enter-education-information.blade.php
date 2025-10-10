@@ -4,9 +4,11 @@
     <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar bg-success" style="width: 32%">32%</div>
     </div>
-    <h2>
+
+    <h1>
         Utdanning
-    </h2>
+    </h1>
+
     <p>Dersom du har tatt en grad (bachelor- eller master-/sivilingeniørgrad) skal du samle alle utdanningene som hører til
         graden og registrere det samlet som en. Hver grad skal registreres hver for seg. Bachelor har normalt 180
         studiepoeng, og Master har 120 studiepoeng når Bachelorgraden er registrert for seg. Annen utdanning som ikke er en del av en grad skal registreres hver for seg.
