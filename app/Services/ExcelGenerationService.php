@@ -155,8 +155,9 @@ class ExcelGenerationService
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'Q', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['start_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'R', 'value' => @$wECollection->firstWhere('id', $enteredItem['id'])['end_date'] ?? '', 'datatype' => 'date'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'AB', 'value' => $enteredItem['comments'] ?? '', 'datatype' => 'text'];
-            $text = 'Registrert av bruker ';
-            $text .= @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
+            $text = 'Opprinnelig registrert av kandidaten ';
+            $sheet1[] = ['row' => $rowSheet1, 'column' => 'V', 'value' => $text  ?? '', 'datatype' => 'text'];
+            $text = @$enteredItem['relevance'] ? ' og registrert som relevant. Se beregninger av ansiennitet gjort maskinelt under.' : '';
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'AC', 'value' => $text, 'datatype' => 'text'];
             $rowSheet1++;
         }

@@ -121,7 +121,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="bank_account" class="form-label">Bankkontonummer:</label>
-                                <input type="text" class="form-control" id="bank_account" name="bank_account" value="{{ old('bank_account', $application->personal_info['bank_account'] ?? '') }}" required>
+                                <input type="text" class="form-control" id="bank_account" name="bank_account" value="{{ old('bank_account', $application->personal_info['bank_account'] ?? '') }}">
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Nærmeste overordnede:</label>

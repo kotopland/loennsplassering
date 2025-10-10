@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\NotifyAdminOfSubmissionJob;
-use App\Jobs\ProcessUserSubmissionJob;
+use App\Jobs\GenerateExcelJob;
 use App\Mail\SimpleEmail; // We'll create this import class later
 use App\Models\EmployeeCV;
 use App\Services\ExcelImportService;
@@ -713,7 +712,7 @@ class EmployeeCVController extends Controller
             'employer_and_place' => 'required|string|max:255',
             'position_size' => 'required|integer|min:0|max:100',
             'manager_name' => 'required|string|max:255',
-            'bank_account' => 'required|string|max:255', // Added bank_account validation
+            'bank_account' => 'nullable|string|max:255', // Added bank_account validation
             'manager_mobile' => 'required|string|max:255',
             'manager_email' => 'required|email|max:255',
             'congregation_name' => 'required|string|max:255',
@@ -732,11 +731,8 @@ class EmployeeCVController extends Controller
         $application->status = 'submitted';
         $application->save();
 
-        // Dispatch jobs for user and admin notifications
-        if (!auth()->check()) {
-            ProcessUserSubmissionJob::dispatch(session('applicationId'));
-        }
-        NotifyAdminOfSubmissionJob::dispatch(session('applicationId'));
+        // Dispatch a single job to generate excel and then notify
+        GenerateExcelJob::dispatch(session('applicationId'), !auth()->check());
 
         // Clear the session and redirect the user to a thank you page
         $request->session()->forget('applicationId');
@@ -778,9 +774,8 @@ class EmployeeCVController extends Controller
         if (! $birthDateMatch || ! $postalCodeMatch) {
             return back()->withErrors(['credentials' => 'Ugyldig fødselsdato eller postnummer.'])->withInput();
         }
-
         // Check if file exists
-        if ($application->status !== 'generated' || ! $application->generated_file_path || ! \Storage::disk('local')->exists($application->generated_file_path)) {
+        if ($application->status !== 'generated' || ! $application->generated_file_path || ! \Storage::disk('public')->exists($application->generated_file_path)) {
             abort(404, 'Filen ble ikke funnet.');
         }
 

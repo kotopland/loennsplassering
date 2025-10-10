@@ -30,10 +30,10 @@
 
                             <div class="mb-3">
                                 <label for="postal_code" class="form-label">Postnummer</label>
-                                <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code') }}" required>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code') }}">
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Last ned fil</button>
+                            <button type="submit" class="btn btn-primary">Last inn lønnsskjema</button>
                         </form>
                     </div>
                 </div>

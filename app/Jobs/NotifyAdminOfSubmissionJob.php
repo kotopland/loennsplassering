@@ -19,21 +19,22 @@ class NotifyAdminOfSubmissionJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $applicationId;
+    public array $data;
     public int $tries = 3;
     public int $timeout = 0;
     public int $backoff = 60;
 
-    public function __construct(string $applicationId)
+    public function __construct(string $applicationId, array $data)
     {
         $this->applicationId = $applicationId;
+        $this->data = $data;
     }
 
-    public function handle(ExcelGenerationService $excelGenerationService): void
+    public function handle(): void
     {
         try {
-            $data = $excelGenerationService->generateExcel($this->applicationId);
-
-            $this->sendAdminEmail($data);
+            // The data is now passed in via the constructor
+            $this->sendAdminEmail($this->data);
 
             Log::channel('info_log')->info("Admin notification email sent for Application ID: {$this->applicationId}");
         } catch (Exception $e) {
