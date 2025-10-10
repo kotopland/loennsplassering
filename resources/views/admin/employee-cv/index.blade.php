@@ -3,8 +3,9 @@
 @section('content')
     <h1>Lønnskjemaer</h1>
     <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
-        Denne siden viser alle lønnskjemaer som er registrert i webappen. Trykker du på en av linkene til en stilling, vil du laste inn det skjemaet slik at du kan arbeide videre med den.
-        Linken kan videresendes til en annen person dersom du ønsker at andre skal kunne arbeide på den.
+        Denne siden viser alle lønnskjemaer som er registrert i webappen.
+        <br />
+        Status kan ha "generert" er lønnsskjemaer der brukeren eller deg har sendt til behandling. Da genereres en Excel fil med lønnsplassering og du kan laste den ned med "Last ned XLS". Når en fil er sendt inn til behandling vil skjemaet bli lesbart for kandidaten, men uten mulighet for å endre lønnsskjemaet. Du som admin kan endre skjemaet, og du trenger ikke å låse skjemaet opp. "Slett" sletter hele lønnsplasseringen.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <table class="table table-sm small">
@@ -13,7 +14,7 @@
                 <th>Stillingstittel</th>
                 <th>Fødselsdato</th>
                 <th>Ansettelse</th>
-                <th>E-post sendt</th>
+                {{-- <th>E-post sendt</th> --}}
                 <th>Status</th>
                 <th>Sist åpnet</th>
                 <th>Valg</th>
@@ -25,12 +26,17 @@
                     <td>{{ $employee->job_title }}</td>
                     <td>{{ $employee->birth_date }}</td>
                     <td>{{ $employee->work_start_date }}</td>
-                    <td>{{ $employee->email_sent ? 'Ja' : 'Nei' }}</td>
+                    {{-- <td>{{ $employee->email_sent ? 'Ja' : 'Nei' }}</td> --}}
                     <td>{{ $employee->status }}</td>
                     <td>{{ $employee->last_viewed }}</td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Actions for employee CV">
-                            <a class="btn btn-sm btn-outline-primary" href="{{ route('open-application', ['application' => $employee->id]) }}">Endre skjema</a>
+                            <form method="POST" action="{{ route('open-application', ['application' => $employee->id]) }}">
+                                @csrf
+                                <input type="hidden" name="birth_date" value="{{ @$employee->birth_date }}">
+                                <input type="hidden" name="postal_code" value="{{ @$employee->personal_info['postal_code'] }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Endre skjema</button>
+                            </form>
                             @if ($employee->generated_file_path !== null)
                                 <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.employee-cv.download-file', ['application' => $employee->id]) }}">Last ned XLS</a>
                             @endif

@@ -61,7 +61,6 @@ class NotifyAdminOfSubmissionJob implements ShouldQueue
     {
         $body = 'Denne eposten ble generert på nettstedet ' . config('app.name') . '<br/><br/>';
         $body .= 'Et lønnsskjema for stillingen ' . $data['application']->job_title . ' på ' . $data['application']->personal_info['employer_and_place'] . ' er nå generert og klart for nedlasting. <br/><br/><a href="' . route('admin.employee-cv.index') . '">Du finner det på admin sidene i lønnsberegner webappen.</a> <br/><br/>';
-        $body .= ' Du kan også <a href="' . route('open-application', $this->applicationId) . '">se eller endre skjemaet på web ved å trykke her</a>.';
 
         return $body;
     }

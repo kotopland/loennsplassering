@@ -175,26 +175,10 @@ td:first-child {
 }
 
 
-
-.card-body {
-    padding: 0.5rem;
+.highlight-toolbar {
+    background-color: var(--bd-pre-bg);
 }
 
-@media(min-width: 415px) {
-    .card-body {
-        padding: 2rem;
-    }
-}
-
-.card-header {
-    padding: 0.5rem;
-}
-
-@media(min-width: 415px) {
-    .card-header {
-        padding: 2rem;
-    }
-}
 
 label {
     font-weight: 700;

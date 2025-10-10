@@ -33,10 +33,35 @@ class EmployeeCVController extends Controller
         return redirect()->route('welcome');
     }
 
-    public function openApplication(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
+    public function showOpenApplicationForm($applicationId)
     {
+        $application = EmployeeCV::find($applicationId);
+        if (! $application) {
+            abort(404, 'Skjemaet ble ikke funnet.');
+        }
+
+        return view('open-application-form', compact('application'));
+    }
+
+    public function openApplication(Request $request, EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
+    {
+        $request->validate([
+            'birth_date' => 'nullable|date',
+            'postal_code' => 'nullable|string',
+        ]); //using nullable instead of required for backward compatibility for lønnsskjemaer who do not have the postal address. This is ONLY for admin
+
+
+        // Verify credentials
+        $birthDateMatch = $application->birth_date === $request->birth_date;
+        $postalCodeMatch = ($application->personal_info['postal_code'] ?? null) === $request->postal_code;
+
+        if (! $birthDateMatch || ! $postalCodeMatch) {
+            return back()->withErrors(['credentials' => 'Ugyldig fødselsdato eller postnummer.'])->withInput();
+        }
+
         session(['applicationId' => $application->id]);
-        $this->flashMessage('Dine lagrede opplysninger er lastet inn.');
+
+        $this->flashMessage('Lønnsskjemaet er nå åpnet og lastet inn.');
 
         // update missing attributes
         $updatedEducation = $salaryEstimationService->updateMissingDatasetItems($application->education);
@@ -68,7 +93,7 @@ class EmployeeCVController extends Controller
         $application->email_sent = true;
         $application->save();
 
-        $this->flashMessage('Lenke til dette skjemaet er påkrevet. Vennligst sjekk at du har ått e-posten.');
+        $this->flashMessage('Lenke til dette skjemaet er påkrevet. Vennligst sjekk at du har fått e-posten.');
 
         return response('Lenke til dette skjemaet er nå sendt. Vennligst sjekk at du har fått e-posten.')->header('Content-Type', 'text/html');
     }
@@ -126,6 +151,7 @@ class EmployeeCVController extends Controller
         $application->job_title = $request->job_title;
         $application->birth_date = $request->birth_date;
         $application->work_start_date = $request->work_start_date;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-education-information', compact('application'));
@@ -217,6 +243,7 @@ class EmployeeCVController extends Controller
             'id' => Str::uuid()->toString(),
         ];
         $application->education = $education;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-education-information', compact('application'));
@@ -284,6 +311,7 @@ class EmployeeCVController extends Controller
         // Update the model and save
         $educationData[$request->edit] = $educationItem;
         $application->education = $educationData;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-education-information', compact('application'));
@@ -329,7 +357,7 @@ class EmployeeCVController extends Controller
         // Update the model and save
         $educationData[$request->changeEdit] = $educationItem;
         $application->education = $educationData;
-        // dd($educationData);
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-education-information', compact('application'));
@@ -403,6 +431,7 @@ class EmployeeCVController extends Controller
             'id' => Str::uuid()->toString(),
         ];
         $application->work_experience = $work_experience;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-experience-information', compact('application'));
@@ -457,6 +486,7 @@ class EmployeeCVController extends Controller
 
         $workExperienceData[$request->edit] = $workExperienceItem;
         $application->work_experience = $workExperienceData;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-experience-information', compact('application'));
@@ -503,6 +533,7 @@ class EmployeeCVController extends Controller
         // Update the model and save
         $workExperienceData[$request->changeEdit] = $workExperienceItem;
         $application->work_experience = $workExperienceData;
+        $application->status = 'modified';
         $application->save();
 
         return redirect()->route('enter-experience-information', compact('application'));
@@ -596,6 +627,7 @@ class EmployeeCVController extends Controller
 
             // Update the model and save
             $application->education = $educationData;
+            $application->status = 'modified';
             $application->save();
 
             return redirect()->back();
@@ -622,6 +654,7 @@ class EmployeeCVController extends Controller
 
             // Update the model and save
             $application->work_experience = $workExperienceData;
+            $application->status = 'modified';
             $application->save();
 
             return redirect()->back();
@@ -724,9 +757,9 @@ class EmployeeCVController extends Controller
         }
 
         // Check if the file has been generated and the status is correct
-        // if ($application->status !== 'generated' || ! $application->generated_file_path) {
-        //     abort(404, 'Filen er ikke tilgjengelig for nedlasting.');
-        // }
+        if ($application->status !== 'generated' || ! $application->generated_file_path) {
+            abort(404, 'Filen er ikke tilgjengelig for nedlasting.');
+        }
 
         return view('download-form', compact('application'));
     }
@@ -747,9 +780,9 @@ class EmployeeCVController extends Controller
         }
 
         // Check if file exists
-        // if ($application->status !== 'generated' || ! $application->generated_file_path || ! \Storage::disk('local')->exists($application->generated_file_path)) {
-        //     abort(404, 'Filen ble ikke funnet.');
-        // }
+        if ($application->status !== 'generated' || ! $application->generated_file_path || ! \Storage::disk('local')->exists($application->generated_file_path)) {
+            abort(404, 'Filen ble ikke funnet.');
+        }
 
         // Log the download and then offer the file
         Log::channel('info_log')->info("File downloaded for Application ID: {$application->id}");

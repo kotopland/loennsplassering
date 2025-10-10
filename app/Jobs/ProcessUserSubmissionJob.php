@@ -61,7 +61,7 @@ class ProcessUserSubmissionJob implements ShouldQueue
         $body .= '<strong><a href="' . $downloadLink . '">Klikk her for å laste ned ditt lønnsskjema</a></strong><br/><br/>';
         $body .= 'For å få tilgang til filen må du oppgi din fødselsdato og postnummeret du registrerte.<br/><br/>';
         $body .= '<strong>MERK:</strong> Dette er en maskinberegnet, foreløpig lønnsplassering og kan ha avvik. For endelig fastsettelse, send det utfylte skjemaet til HR.<br/><br/>';
-        $body .= ' Du kan <a href="' . route('open-application', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
+        $body .= ' Du kan <a href="' . route('open-application-form', $this->applicationId) . '">se og endre ditt skjema ved å trykke her</a>.';
         $body .= ' Skjemaer slettes ett år etter at det er blitt åpnet.';
 
         return $body;

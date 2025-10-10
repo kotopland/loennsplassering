@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar bg-success" style="width: 40%">40%</div>
+        <div class="progress-bar bg-success" style="width: 32%">32%</div>
     </div>
     <h2>
         Utdanning

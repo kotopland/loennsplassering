@@ -48,7 +48,8 @@ Route::get('/', function () {
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/lonnsberegner', [EmployeeCVController::class, 'index'])->name('welcome');
 Route::post('/lonnsberegner/upload-excel', [EmployeeCVController::class, 'loadExcel'])->name('loadExcel');
-Route::get('/open-application/{application?}', [EmployeeCVController::class, 'openApplication'])->name('open-application');
+Route::get('/open-application-form/{application?}', [EmployeeCVController::class, 'showOpenApplicationForm'])->name('open-application-form');
+Route::post('/open-application/{application?}', [EmployeeCVController::class, 'openApplication'])->name('open-application');
 Route::post('/send-email', [EmployeeCVController::class, 'sendEmailLink'])->name('send-application-link-to-email');
 Route::view('/lonnsberegner/steps', 'steps')->name('steps');
 Route::get('/lonnsberegner/enter-employment-information/{application?}', [EmployeeCVController::class, 'enterEmploymentInformation'])->name('enter-employment-information');

@@ -23,6 +23,10 @@ $success: #2e657d;
 $info: #ebe9e4;
 $warning: #fccb4d;
 $danger: #f56553;
+$light: #e9ecef;
+$dark: #212529;
+$light-bg-subtle: $light;
+
 
 $accordion-button-color: $primary;
 $accordion-button-active-color: $primary;
@@ -30,3 +34,26 @@ $accordion-button-bg: #EBE9E3;
 $accordion-button-active-bg: #e2dfd5;
 $accordion-button-focus-border-color: $primary;
 $accordion-button-focus-box-shadow: none;
+
+$white: #fff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000;
+
+$theme-colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
+);
