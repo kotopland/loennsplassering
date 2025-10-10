@@ -79,12 +79,11 @@
                 </h5>
                 <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionInfoBox">
                     <div class="accordion-body">
+                        Frem til og med beregning av lønnsplassering vil personopplysninger som navn, adresse, overordnede og epost adresse ikke bli lagret.
+                        Når du velger å trykke på "Fyll ut Personalia og Send inn for behandling" på siste side av skjemaet, vil det som du har sendt inn bli lagret. Det blir lagret slik at det er nok informasjon og kontaktopplysninger for at Frikirken kan behandle ditt lønnsskjema.
 
-                        Denne beregningen er anonym. Din e-postadresse lagres ikke, men brukes kun til å sende deg resultatet som en
-                        Excel-fil.
-                        Slik kan du enkelt hente frem beregningen senere.
                         <br />Informasjonen du registrerer i skjemaet lagres i en database, slik at du også kan hente den frem igjen ved
-                        behov. Det brukes også for lønnsutvalget til å forbedre og finjustere verktøyet.
+                        behov. Det brukes også for lønnsutvalget og dem de bemyndiger til å behandle lønnsplasseringen og til utvikler for å forbedre og finjustere verktøyet.
                     </div>
                 </div>
             </div>
