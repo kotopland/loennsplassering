@@ -145,7 +145,7 @@
                             </div>
                             <div class="modal-footer">
                                 @if (auth()->check())
-                                    <button type="submit" class="btn btn-primary">Generer skjemaet som sendes på epost bare til {{ \App\Models\Setting::where('key', 'report_email')->first()->value ?? 'ADMIN EPOST ADRESSE MANGLER I INNSTILLINGER' }} og ikke til kandidaten</button>
+                                    <button type="submit" class="btn btn-primary">Generer skjemaet<br /><span class="small">Sendes på epost bare til {{ \App\Models\Setting::where('key', 'report_email')->first()->value ?? 'ADMIN EPOST ADRESSE MANGLER I INNSTILLINGER' }} og ikke til kandidaten.</span></button>
                                 @else
                                     <button type="submit" class="btn btn-primary">Send til behandling</button>
                                 @endif
