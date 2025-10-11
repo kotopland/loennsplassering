@@ -84,7 +84,7 @@ class EmployeeCVController extends Controller
         ]);
 
         $subject = 'Lenke til foreløpig lønnsberegning';
-        $body = 'Denne lenken går til dine registrerte opplysninger <a href="' . route('open-application', session('applicationId')) . '">' . route('open-application', session('applicationId')) . '</a>';
+        $body = 'Denne lenken går til dine registrerte opplysninger <a href="' . route('open-application-form', session('applicationId')) . '">' . route('open-application', session('applicationId')) . '</a>';
         Mail::to($validatedData['email_address'])->send(new SimpleEmail($subject, $body, ''));
 
         // Remeber that an email has been sent

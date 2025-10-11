@@ -28,10 +28,12 @@
                                 <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date') }}" required>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="postal_code" class="form-label">Postnummer</label>
-                                <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code') }}">
-                            </div>
+                            @if (!empty($application->personal_info['postal_code']))
+                                <div class="mb-3">
+                                    <label for="postal_code" class="form-label">Postnummer</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code') }}">
+                                </div>
+                            @endif
 
                             <button type="submit" class="btn btn-primary">Last inn lønnsskjema</button>
                         </form>
