@@ -113,6 +113,7 @@
         Dokumentet blir ikke lagret, men vi tar ut informasjon om stillingen, din fødselsdato, tiltredelsesdatoen, kompetansen og ansienniteten.
         <form action="{{ is_null(request()->cookie('cookie_consent')) ? '#' : route('loadExcel') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             @csrf
+            {!! RecaptchaV3::field('uploadForm') !!}
             <div class="row my-3">
                 <div class="col-auto py-2">
                     <input type="file" name="excel_file" id="excelFile" required class="form-control">

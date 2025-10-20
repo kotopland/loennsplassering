@@ -15,6 +15,9 @@ class LoginController extends Controller
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
+            'g-recaptcha-response' => 'required|recaptchav3:login,0.5',
+        ], [
+            'g-recaptcha-response.recaptchav3' => 'ReCAPTCHA, sjekk for at du er menneske og ikke maskin, godkjenningen feilet. Prøv igjen.',
         ]);
 
         $user = User::where('email', $request->email)->first();

@@ -6,6 +6,7 @@
     @else
         <form method="POST" action="{{ route('login') }}" id="loginForm">
             @csrf
+            {!! RecaptchaV3::field('login') !!}
             <div>Du logger inn i admin verktøyet ved å fylle inn din e-postadresse og klikke "Send login link". E-postadressen må være registrert som administrator i verktøyet.</div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>

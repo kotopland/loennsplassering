@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.33.0.
+ * Generated for Laravel 12.34.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -3869,7 +3869,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Attempt to find the batch with the given ID.
          *
-         * @param string $batchId
          * @return \Illuminate\Bus\Batch|null
          * @static
          */
@@ -3962,7 +3961,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Set the pipes through which commands should be piped before dispatching.
          *
-         * @param array $pipes
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -3975,7 +3973,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Map a command to a handler.
          *
-         * @param array $map
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -13375,6 +13372,33 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the queue configuration array.
+         *
+         * @return array
+         * @static
+         */
+        public static function getConfig()
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->getConfig();
+        }
+
+        /**
+         * Set the queue configuration array.
+         *
+         * @param array $config
+         * @return \Illuminate\Queue\DatabaseQueue
+         * @static
+         */
+        public static function setConfig($config)
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->setConfig($config);
+        }
+
+        /**
          * Get the container instance being used by the connection.
          *
          * @return \Illuminate\Container\Container
@@ -18056,7 +18080,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Specify the cache store that should be used to store mutexes.
          *
-         * @param string $store
+         * @param \UnitEnum|string $store
          * @return \Illuminate\Console\Scheduling\Schedule
          * @static
          */
@@ -22943,6 +22967,52 @@ namespace Illuminate\Support\Facades {
         public static function flushMacros()
         {
             \Illuminate\Foundation\Vite::flushMacros();
+        }
+
+            }
+    }
+
+namespace Lunaweb\RecaptchaV3\Facades {
+    /**
+     */
+    class RecaptchaV3 {
+        /**
+         * @static
+         */
+        public static function verify($token, $action = null)
+        {
+            /** @var \Lunaweb\RecaptchaV3\RecaptchaV3 $instance */
+            return $instance->verify($token, $action);
+        }
+
+        /**
+         * @return string
+         * @static
+         */
+        public static function sitekey()
+        {
+            /** @var \Lunaweb\RecaptchaV3\RecaptchaV3 $instance */
+            return $instance->sitekey();
+        }
+
+        /**
+         * @return string
+         * @static
+         */
+        public static function initJs()
+        {
+            /** @var \Lunaweb\RecaptchaV3\RecaptchaV3 $instance */
+            return $instance->initJs();
+        }
+
+        /**
+         * @param $action
+         * @static
+         */
+        public static function field($action, $name = 'g-recaptcha-response')
+        {
+            /** @var \Lunaweb\RecaptchaV3\RecaptchaV3 $instance */
+            return $instance->field($action, $name);
         }
 
             }
@@ -28435,6 +28505,7 @@ namespace  {
     class Validator extends \Illuminate\Support\Facades\Validator {}
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
+    class RecaptchaV3 extends \Lunaweb\RecaptchaV3\Facades\RecaptchaV3 {}
     class Excel extends \Maatwebsite\Excel\Facades\Excel {}
     class sentMails extends \Spatie\MailPreview\Facades\SentMails {}
     class Signal extends \Spatie\SignalAwareCommand\Facades\Signal {}

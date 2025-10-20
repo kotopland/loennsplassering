@@ -78,9 +78,11 @@ class EmployeeCVController extends Controller
     {
         $validatedData = $request->validate([
             'email_address' => 'email|required',
+            'g-recaptcha-response' => 'required|recaptchav3:saveToEmail,0.5',
         ], [
             'email_address.email' => 'E-postadressen må være en gyldig e-postadresse.',
             'email_address.required' => 'E-postadressefeltet er obligatorisk.',
+            'g-recaptcha-response.recaptchav3' => 'ReCAPTCHA, sjekk for at du er menneske og ikke maskin, godkjenningen feilet. Prøv igjen.',
         ]);
 
         $subject = 'Lenke til foreløpig lønnsberegning';
@@ -139,12 +141,14 @@ class EmployeeCVController extends Controller
             'job_title' => 'required|string',
             'birth_date' => 'required|date',
             'work_start_date' => 'required|date',
+            'g-recaptcha-response' => 'required|recaptchav3:startApplication,0.5',
         ], [
             'job_title.required' => 'Type stilling er et obligatorisk felt.',
             'birth_date.required' => 'Fødselsdato er et obligatorisk felt.',
             'birth_date.date' => 'Fødselsdato må være en gyldig dato.',
             'work_start_date.required' => 'Start på stilling er et obligatorisk felt.',
             'work_start_date.date' => 'Start på stilling må være en gyldig dato.',
+            'g-recaptcha-response.recaptchav3' => 'ReCAPTCHA, sjekk for at du er menneske og ikke maskin, godkjenningen feilet. Prøv igjen.',
         ]);
         $application = EmployeeCV::find(session('applicationId'));
         $application->job_title = $request->job_title;
@@ -584,10 +588,12 @@ class EmployeeCVController extends Controller
     {
         $request->validate([
             'excel_file' => 'required|file|mimes:xlsx,xls,csv',
+            'g-recaptcha-response' => 'required|recaptchav3:uploadForm,0.5',
         ], [
             'excel_file.required' => 'Du må velge en fil.',
             'excel_file.file' => 'Den opplastede filen må være en fil.',
             'excel_file.mimes' => 'Filen må være en Excel-fil (xlsx, xls) eller en CSV-fil (csv).',
+            'g-recaptcha-response.recaptchav3' => 'ReCAPTCHA, sjekk for at du er menneske og ikke maskin, godkjenningen feilet. Prøv igjen.',
         ]);
 
         try {

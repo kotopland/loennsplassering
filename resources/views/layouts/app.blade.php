@@ -29,7 +29,7 @@
 
     <!-- Scripts -->
     @vite(['resources/js/app.js'])
-
+    {!! RecaptchaV3::initJs() !!}
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             document.body.addEventListener('htmx:configRequest', (event) => {
@@ -130,8 +130,9 @@ container
                         </div>
 
                     </div>
+                    {!! RecaptchaV3::field('saveToEmail') !!}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address']" hx-target="#email-result" hx-validate="true" _="on click wait 500ms then remove me">Send</button>
+                        <button type="button" class="btn btn-success" hx-post="{{ route('send-application-link-to-email', session('applicationId')) }}" hx-trigger="click" hx-include="[name='email_address'],[name='g-recaptcha-response']" hx-target="#email-result" hx-validate="true" _="on click wait 500ms then remove me">Send</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -141,7 +142,12 @@ container
             <p>
                 Dette nettstedet bruker informasjonskapsler for å sikre at du får den beste opplevelsen på nettstedet
                 vårt.
-                <a href="{{ route('privacy-policy') }}">Finn ut mer.</a>
+                <a href="{{ route('privacy-policy') }}" class="link-light">Finn ut mer.</a>
+                <br />
+                Nettstedet er også beskyttet med reCAPTCHA som følger Googles
+                <a href="https://policies.google.com/privacy" class="link-light">personvernerklæring</a> og
+                <a href="https://policies.google.com/terms" class="link-light">vilkår for bruk</a>.
+
             </p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-primary border border-light rounded my-3 me-4" _="on click wait 500ms then reload() the location of the window">Aksept</button>

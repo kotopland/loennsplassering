@@ -13,7 +13,6 @@
 
     <form action="{{ route('post-employment-information', $application) }}" method="POST" id="salaryForm" novalidate>
         @csrf
-
         <div class="card my-4 bg-light">
             <div class="card-body">
                 <h3 class="">
@@ -76,6 +75,7 @@
                 </div>
             </div>
         </div>
+        {!! RecaptchaV3::field('startApplication') !!}
 
         <!-- Submit buttons -->
         <div class="fixed-bottom sticky-top text-md-end text-center pb-1 my-4">
