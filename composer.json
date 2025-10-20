@@ -16,7 +16,9 @@
         "maatwebsite/excel": "^3.1.64",
         "spatie/laravel-backup": "^9.3",
         "spatie/laravel-mail-preview": "^6.2.1",
-        "symfony/mailer": "^7.2.3"
+        "symfony/http-client": "^7.3",
+        "symfony/mailer": "^7.2.3",
+        "symfony/mailgun-mailer": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24.1",

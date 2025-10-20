@@ -50,6 +50,13 @@ return [
             'scheme' => env('MAIL_SCHEME', 'smtp'),
         ],
 
+        'mailgun' => [
+            'transport' => 'mailgun',
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],
