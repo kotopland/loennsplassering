@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
 
 Schedule::command('employee-cvs:delete-old-records')->dailyAt('00:00')->timezone('Europe/Oslo');;
-Schedule::command('employee-cvs:delete-emtpy-records')->everyMinute()->timezone('Europe/Oslo');;
+Schedule::command('employee-cvs:delete-emtpy-records')->everyHour()->timezone('Europe/Oslo');;
 Schedule::command('backup:run')->dailyAt('23:30')->timezone('Europe/Oslo');
 Schedule::command('storage:group-read-access')->dailyAt('23:40')->timezone('Europe/Oslo');
 
