@@ -38,7 +38,6 @@ class DeleteEmptyRecords extends Command
             ->whereNull('job_title')
             ->whereNull('education')
             ->whereNull('work_experience')
-            ->where('email_sent', 0)
             ->where('created_at', '<', $cutoffDate)->delete();
 
         // Output the result.
