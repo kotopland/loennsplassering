@@ -30,7 +30,7 @@ class DeleteEmptyRecords extends Command
     public function handle()
     {
         // Calculate the cutoff date (1 year ago from today).
-        $cutoffDate = Carbon::now()->subDay();
+        $cutoffDate = Carbon::now()->subHour();
 
         // Delete old EmployeeCV records and log the count.
         $deletedCount = EmployeeCV::whereNull('work_start_date')
