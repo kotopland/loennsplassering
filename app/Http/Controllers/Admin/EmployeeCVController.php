@@ -12,7 +12,13 @@ class EmployeeCVController extends Controller
 {
     public function index()
     {
-        $employeeCV = EmployeeCV::select(['id', 'job_title', 'work_start_date', 'birth_date', 'email_sent', 'last_viewed', 'status', 'generated_file_path', 'personal_info', 'updated_at'])->get();
+        $employeeCV = EmployeeCV::select(['id', 'job_title', 'work_start_date', 'birth_date', 'email_sent', 'last_viewed', 'status', 'generated_file_path', 'personal_info', 'updated_at'])
+            ->whereNotNull('work_start_date')
+            ->whereNotNull('job_title')
+            ->whereNotNull('birth_date')
+            ->whereNotNull('education')
+            ->whereNotNull('work_experience')
+            ->get();
 
         return view('admin.employee-cv.index', compact('employeeCV'));
     }

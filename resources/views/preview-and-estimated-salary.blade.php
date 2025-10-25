@@ -117,7 +117,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="position_size" class="form-label">Stillingsstørrelse:</label>
-                                <input type="number" class="form-control" id="position_size" name="position_size" value="{{ old('position_size', $application->personal_info['position_size'] ?? '') }}" required>
+                                <input type="number" class="form-control" id="position_size" name="position_size" min="0" max="100" step="0.1" pattern="\d+(\.\d{1,1})?" value="{{ old('position_size', $application->personal_info['position_size'] ?? '') }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="bank_account" class="form-label">Bankkontonummer:</label>

@@ -716,7 +716,7 @@ class EmployeeCVController extends Controller
             'postal_place' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'employer_and_place' => 'required|string|max:255',
-            'position_size' => 'required|integer|min:0|max:100',
+            'position_size' => 'required|numeric|min:0|max:100',
             'manager_name' => 'required|string|max:255',
             'bank_account' => 'nullable|string|max:255', // Added bank_account validation
             'manager_mobile' => 'required|string|max:255',

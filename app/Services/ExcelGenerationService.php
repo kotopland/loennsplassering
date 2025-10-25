@@ -66,24 +66,24 @@ class ExcelGenerationService
     private function prepareExcelData(EmployeeCV $application, float $totalMonths): array
     {
         $sheet1 = [
-            ['row' => 3, 'column' => 'E', 'value' => $application->personal_info['name'], 'datatype' => 'text'],
-            ['row' => 4, 'column' => 'E', 'value' => $application->personal_info['mobile'], 'datatype' => 'text'],
-            ['row' => 4, 'column' => 'Q', 'value' => $application->personal_info['email'], 'datatype' => 'text'],
-            ['row' => 5, 'column' => 'E', 'value' => $application->personal_info['address'], 'datatype' => 'text'],
-            ['row' => 6, 'column' => 'E', 'value' => $application->personal_info['postal_code'], 'datatype' => 'text'],
-            ['row' => 6, 'column' => 'H', 'value' => $application->personal_info['postal_place'], 'datatype' => 'text'],
-            ['row' => 7, 'column' => 'Q', 'value' => "'" . $application->personal_info['bank_account'], 'datatype' => 'text'], // Added bank_account
+            ['row' => 3, 'column' => 'E', 'value' => $application->personal_info['name'] ?? '', 'datatype' => 'text'],
+            ['row' => 4, 'column' => 'E', 'value' => $application->personal_info['mobile'] ?? '', 'datatype' => 'text'],
+            ['row' => 4, 'column' => 'Q', 'value' => $application->personal_info['email'] ?? '', 'datatype' => 'text'],
+            ['row' => 5, 'column' => 'E', 'value' => $application->personal_info['address'] ?? '', 'datatype' => 'text'],
+            ['row' => 6, 'column' => 'E', 'value' => $application->personal_info['postal_code'] ?? '', 'datatype' => 'text'],
+            ['row' => 6, 'column' => 'H', 'value' => $application->personal_info['postal_place'] ?? '', 'datatype' => 'text'],
+            ['row' => 7, 'column' => 'Q', 'value' => "'" . $application->personal_info['bank_account'] ?? '', 'datatype' => 'text'], // Added bank_account
             ['row' => 7, 'column' => 'E', 'value' => $application->birth_date, 'datatype' => 'date'],
             ['row' => 8, 'column' => 'E', 'value' => $application->job_title, 'datatype' => 'text'],
             ['row' => 9, 'column' => 'E', 'value' => $application->work_start_date, 'datatype' => 'date'],
-            ['row' => 10, 'column' => 'E', 'value' => $application->personal_info['position_size'], 'datatype' => 'text'],
-            ['row' => 11, 'column' => 'E', 'value' => $application->personal_info['employer_and_place'], 'datatype' => 'text'],
-            ['row' => 12, 'column' => 'G', 'value' => "{$application->personal_info['manager_name']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
-            ['row' => 12, 'column' => 'P', 'value' => "{$application->personal_info['manager_mobile']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
-            ['row' => 12, 'column' => 'R', 'value' => "{$application->personal_info['manager_email']} / {$application->personal_info['manager_mobile']} / {$application->personal_info['manager_email']}", 'datatype' => 'text'],
-            ['row' => 13, 'column' => 'G', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
-            ['row' => 13, 'column' => 'P', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
-            ['row' => 13, 'column' => 'R', 'value' => "{$application->personal_info['congregation_name']} / {$application->personal_info['congregation_mobile']} / {$application->personal_info['congregation_email']}", 'datatype' => 'text'],
+            ['row' => 10, 'column' => 'E', 'value' => floatval($application->personal_info['position_size'] ?? 0) / 100, 'datatype' => 'number'],
+            ['row' => 11, 'column' => 'E', 'value' => $application->personal_info['employer_and_place'] ?? '', 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'G', 'value' => $application->personal_info['manager_name'] ?? '', 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'P', 'value' => $application->personal_info['manager_mobile'] ?? '', 'datatype' => 'text'],
+            ['row' => 12, 'column' => 'R', 'value' => $application->personal_info['manager_email'] ?? '', 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'G', 'value' => $application->personal_info['congregation_name'] ?? '', 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'P', 'value' => $application->personal_info['congregation_mobile'] ?? '', 'datatype' => 'text'],
+            ['row' => 13, 'column' => 'R', 'value' => $application->personal_info['congregation_email'] ?? '', 'datatype' => 'text'],
         ];
         $sheet2 = [];
 
