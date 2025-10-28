@@ -49,8 +49,7 @@
                                                 <div class="row">
                                                     <!-- Topic and School -->
                                                     <div class="col-6 col-md-3">
-                                                        <label for="update_topic_and_school" class="form-check-label">Studienavn og
-                                                            sted</label>
+                                                        <label for="update_topic_and_school" class="form-check-label">Studienavn og sted / Fag / Eksamenssted / Kommentar</label>
                                                         <textarea id="update_topic_and_school" name="topic_and_school" _="on keydown[event.key == 'Enter'] halt" class="form-control @error('topic_and_school') is-invalid @enderror">{{ old('topic_and_school', $item['topic_and_school']) }}</textarea>
                                                         @error('topic_and_school')
                                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -188,7 +187,7 @@
                             <h4 class="mb-4">Legg til kompetanse:</h4>
                             <!-- Topic and School -->
                             <div class="col-6 col-md-3">
-                                <label for="topic_and_school" class="form-check-label">Studienavn og sted</label>
+                                <label for="topic_and_school" class="form-check-label">Studienavn og sted / Fag / Eksamenssted / Kommentar</label>
                                 <textarea id="topic_and_school" name="topic_and_school" _="on keyup if my.value is not empty add .disabled to #btn-next then remove .disabled from #btn-submit then remove .disabled from #btn-tilbake else remove .disabled from #btn-next then add .disabled to #btn-submit then add .disabled to #btn-tilbake end on keydown[event.key == 'Enter'] halt" class="form-control @error('topic_and_school') is-invalid @enderror">{{ old('topic_and_school') }}</textarea>
                                 @error('topic_and_school')
                                     <div class="alert alert-danger">{{ $message }}</div>
