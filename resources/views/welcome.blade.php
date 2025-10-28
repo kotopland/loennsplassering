@@ -6,11 +6,11 @@
     @endif
 
     <div class="">
-        <h1>Beregn din lønnsplassering</h1>
+        <h1>Beregn og send inn for behandling av lønnsplassering</h1>
         <p class="small">Oppdatert etter 2024 forhandlingene</p>
         <p class="teaser">
-            Lurer du på hva lønnen din bør være?
-            Denne kalkulatoren gir deg en indikasjon på lønnsplasseringen din basert på
+            Lurer du på hva lønnen din blir?
+            Denne webappen kan beregne og gi deg en indikasjon på hvilket lønnstrinn du kan få basert på
             stillingstittel, utdanningsnivå og relevant arbeidserfaring.
         </p>
         <div class="accordion " id="accordionInfoBox">
@@ -41,14 +41,19 @@
                 </h5>
                 <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfoBox">
                     <div class="accordion-body">
-                        For å få en
-                        indikasjon på hva lønnen blir, kan du bruke dette verktøyet for å beregne en omtrentlig lønnsplassering.
+                        Dette verktøyet kan
+                        <ul>
+                            <li>Gi deg en indikasjon på hva lønnsplasseringen.</li>
+                            <li>Sende alle opplysningene for endelig behandling og vedtak.</li>
+                        </ul>
+
                         Den vil:
                         <ul>
                             <li>Beregne kompetansepoeng og ansiennitet, og få din plassering i statens lønnstabell.</li>
                             <li>Se en tidslinje over din kompetanse og ansiennitet.</li>
                             <li>Se en tidslinje over maskinberegnet kompetanse og ansiennitet basert på lønnsavtalen.</li>
                             <li>Motta en ferdig utfylt oversikt med beregnet lønnsplassering som et Excel-vedlegg på e-post.</li>
+                            <li>Sende inn til endelig behandling og vedtak.</li>
                         </ul>
                     </div>
                 </div>
