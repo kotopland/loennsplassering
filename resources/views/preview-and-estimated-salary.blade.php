@@ -12,7 +12,7 @@
         <h1>
             Forhåndsvisning av din lønnsplassering
         </h1>
-        <div class="border rounded-2 p-2 border-danger">NB! Skjemaet er ennå ikke sendt inn til behandling hos Frikriken før du trykker på "Fyll ut Personalia og Send inn for behandling"</div>
+        <div class="border rounded-2 p-2 border-danger">Under ser du beregningen og du kan finne detaljene ved å trykke på knappene under. <br />NB! Skjemaet er ennå ikke sendt inn til behandling hos Frikriken før du trykker på "Fyll ut Personalia og Send inn for behandling"</div>
 
         @if (session()->has('message'))
             <p class="alert my-2 {{ session()->get('alert-class', 'alert-info') }}">{{ session()->get('message') }}</p>
@@ -29,14 +29,14 @@
                         <path fill="currentColor" d="M11 19v2H5v-2h2v-5H5v-2h2v-1h2v8zm8 0h-4v-2h2c1.103 0 2-.897 2-2v-2c0-1.103-.897-2-2-2h-4v2h4v2h-2c-1.103 0-2 .897-2 2v4h6zm6-8h-4v2h4v2h-3v2h3v2h-4v2h4c1.103 0 2-.897 2-2v-6c0-1.103-.897-2-2-2M2 4v4h2V4h4V2H4a2 2 0 0 0-2 2m26-2h-4v2h4v4h2V4a2 2 0 0 0-2-2M4 28v-4H2v4a2 2 0 0 0 2 2h4v-2zm24-4v4h-4v2h4a2 2 0 0 0 2-2v-4z">
                         </path>
                     </svg>
-                    Se beregnet Lønnsplassering
+                    Se en Detaljert Beregnet Lønnsplassering
                 </a>
 
                 <a href="#" class="btn btn-sm btn-success" _="on click remove .d-none from #tidslinje then wait 200ms then go to #tidslinje  @if (!$application->email_sent) then confirm('Ikke glem å trykke på knappen \'Send inn til Frikirkens hovedkontor for behandling\' etter at du har sett på den beregnede plasseringen') @endif">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 2048 2048">
                         <path fill="currentColor" d="M256 640h640v128H256zm1024 512h512v128h-512zm768-896v1408H0V256zm-127 128h-514v384h-127V384H768v128H640V384H128v1153h512V896h128v641h512v-129h127v129h514zM897 896h639v128H897z">
                         </path>
-                    </svg> Se en tidslinje over karriere og etter beregninger
+                    </svg> Se en tidslinje over karriere og utdannelse brukt for beregning
                 </a>
             </p>
 
@@ -108,7 +108,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="personal_email" class="form-label">E-post:</label>
+                                <label for="personal_email" class="form-label">E-post: <span class="text-danger small">(Vil motta en kopi av beregningen)</span></label>
                                 <input type="email" class="form-control" id="personal_email" name="email" value="{{ old('email', $application->personal_info['email'] ?? '') }}" required>
                             </div>
                             <div class="col-md-6">
@@ -124,7 +124,7 @@
                                 <input type="text" class="form-control" id="bank_account" name="bank_account" value="{{ old('bank_account', $application->personal_info['bank_account'] ?? '') }}">
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Nærmeste overordnede:</label>
+                                <label class="form-label">Nærmeste overordnede: <span class="text-success small">(Mottar ikke kopi av denne beregningen)</span></label>
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <input type="text" class="form-control" name="manager_name" placeholder="Navn" value="{{ old('manager_name', $application->personal_info['manager_name'] ?? '') }}" required>
@@ -134,15 +134,23 @@
                                     </div>
                                     <div class="col-md-4">
                                         <input type="email" class="form-control" name="manager_email" placeholder="E-post" value="{{ old('manager_email', $application->personal_info['manager_email'] ?? '') }}" required>
+                                        <span class="text-danger small">(Mottar ikke kopi av denne beregningen)</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Kontaktperson menighet:</label>
                                 <div class="row g-2">
-                                    <div class="col-md-4"><input type="text" class="form-control" name="congregation_name" placeholder="Navn" value="{{ old('congregation_name', $application->personal_info['congregation_name'] ?? '') }}" required></div>
-                                    <div class="col-md-4"><input type="text" class="form-control" name="congregation_mobile" placeholder="Mobil" value="{{ old('congregation_mobile', $application->personal_info['congregation_mobile'] ?? '') }}" required></div>
-                                    <div class="col-md-4"><input type="email" class="form-control" name="congregation_email" placeholder="E-post" value="{{ old('congregation_email', $application->personal_info['congregation_email'] ?? '') }}" required></div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" name="congregation_name" placeholder="Navn" value="{{ old('congregation_name', $application->personal_info['congregation_name'] ?? '') }}" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" name="congregation_mobile" placeholder="Mobil" value="{{ old('congregation_mobile', $application->personal_info['congregation_mobile'] ?? '') }}" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="email" class="form-control" name="congregation_email" placeholder="E-post" value="{{ old('congregation_email', $application->personal_info['congregation_email'] ?? '') }}" required>
+                                        <span class="text-danger small">(Mottar ikke kopi av denne beregningen)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
