@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
-uses(\Tests\TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
+
 
 beforeEach(function () {
     $this->service = new SalaryEstimationService();

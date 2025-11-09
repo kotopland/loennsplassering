@@ -8,7 +8,7 @@ use App\Models\EmployeeCV;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Seed necessary data for salary calculation and position details
