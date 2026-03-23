@@ -108,7 +108,13 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="personal_email" class="form-label">E-post: <span class="text-danger small">(Vil motta en kopi av beregningen)</span></label>
+                                <label for="personal_email" class="form-label">E-post: </label><span class="text-danger small">
+                                    @if (!auth()->check())
+                                        (Vil motta en kopi av beregningen)
+                                    @else
+                                        (Mottar ikke kopi av denne beregningen)
+                                    @endif
+                                </span>
                                 <input type="email" class="form-control" id="personal_email" name="email" value="{{ old('email', $application->personal_info['email'] ?? '') }}" required>
                             </div>
                             <div class="col-md-6">
