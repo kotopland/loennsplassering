@@ -743,10 +743,17 @@ class EmployeeCVController extends Controller
         // Clear the session and redirect the user to a thank you page
         $request->session()->forget('applicationId');
 
-        $this->flashMessage(
-            'Takk! Ditt skjema er mottatt og vil bli behandlet av Frikirkens hovedkontor.',
-            'success'
-        );
+        if (!auth()->check()) {
+            $this->flashMessage(
+                'Takk! Ditt skjema er mottatt og vil bli behandlet av Frikirkens hovedkontor.',
+                'success'
+            );
+        } else {
+            $this->flashMessage(
+                'Skjema registrert og kvittering sendt til hovedkontor på epost (ikke til kandidat).',
+                'success'
+            );
+        }
 
         return redirect()->route('welcome');
     }
