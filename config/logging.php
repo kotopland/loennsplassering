@@ -87,7 +87,7 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level' => env('LOG_LEVEL', 'critical'),
+            'level' => env('LOG_SLACK_LEVEL', 'error'),
             'replace_placeholders' => true,
         ],
 
@@ -96,7 +96,7 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL_CRITICAL'),
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
-            'level' => env('LOG_LEVEL', 'critical'),
+            'level' => env('LOG_SLACK_LEVEL', 'error'),
         ],
 
         'slack_info' => [
@@ -104,7 +104,7 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL_INFO'),
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
-            'level' => env('LOG_LEVEL', 'info'),
+            'level' => env('LOG_LEVEL', 'error'),
         ],
 
         'papertrail' => [
