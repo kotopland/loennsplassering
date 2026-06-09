@@ -35,6 +35,14 @@ export default defineConfig({
     build: {
         sourcemap: true,
     },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler',
+                quietDeps: true,
+            },
+        },
+    },
     // for running vite in development 'npm run dev'
     server: {
         https: true,
