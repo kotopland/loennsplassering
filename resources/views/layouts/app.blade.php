@@ -55,7 +55,8 @@
                     {{-- </a> --}}
                 </div>
                 <div class="d-flex align-items-center">
-                    <h1 class="m-0 p-0 app-header">{{ config('app.name', 'Laravel') }}<img src="{{ url('images/clarity--beta-white-line.png') }}" width="50px" style="margin-top: -40px" class="app-beta">
+                    <h1 class="m-0 p-0 app-header">
+                        {{ config('app.name', 'Laravel') }}
                     </h1>
                 </div>
                 <!-- Button Section -->
