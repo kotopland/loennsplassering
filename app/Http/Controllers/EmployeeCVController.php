@@ -542,8 +542,10 @@ class EmployeeCVController extends Controller
         return redirect()->route('enter-experience-information', compact('application'));
     }
 
-    public function enterCoursesAndActivityInformation(EmployeeCV $application)
+    public function enterCoursesAndActivityInformation(EmployeeCV $application, SalaryEstimationService $salaryEstimationService)
     {
+        $application = $salaryEstimationService->getOrCreateApplication($application);
+
         return view('enter-courses-and-activities', compact('application'));
     }
 
@@ -556,6 +558,21 @@ class EmployeeCVController extends Controller
         }
 
         $application = $salaryEstimationService->getOrCreateApplication($application);
+
+        if (!$application->areSteps1To4Completed()) {
+            if (!$application->isStep1Completed()) {
+                $this->flashMessage('Vennligst fyll ut stillingsinformasjon før du går til beregningen.', 'warning');
+                return redirect()->route('enter-employment-information', $application);
+            }
+            if ($application->hasEducationErrors()) {
+                $this->flashMessage('Vennligst rett opp mangler i utdanning før du går til beregningen.', 'warning');
+                return redirect()->route('enter-education-information', $application);
+            }
+            if ($application->hasExperienceErrors()) {
+                $this->flashMessage('Vennligst rett opp mangler i arbeidserfaring før du går til beregningen.', 'warning');
+                return redirect()->route('enter-experience-information', $application);
+            }
+        }
 
         $adjustedDataset = $salaryEstimationService->adjustEducationAndWork($application);
 

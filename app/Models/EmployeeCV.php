@@ -87,4 +87,57 @@ class EmployeeCV extends Model
 
         return null;
     }
+
+    public function isStep1Completed(): bool
+    {
+        return !empty($this->job_title) && !empty($this->birth_date) && !empty($this->work_start_date);
+    }
+
+    public function hasEducationErrors(): bool
+    {
+        if (empty($this->education) || !is_array($this->education)) {
+            return false;
+        }
+
+        foreach ($this->education as $item) {
+            if (in_array(null, [
+                @$item['topic_and_school'],
+                @$item['start_date'],
+                @$item['end_date'],
+                @$item['study_points'],
+                @$item['percentage'],
+                @$item['relevance'],
+            ], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasExperienceErrors(): bool
+    {
+        if (empty($this->work_experience) || !is_array($this->work_experience)) {
+            return false;
+        }
+
+        foreach ($this->work_experience as $item) {
+            if (in_array(null, [
+                @$item['title_workplace'],
+                ($item['percentage'] ?? '') === '' ? null : $item['percentage'],
+                ($item['start_date'] ?? '') === '' ? null : $item['start_date'],
+                ($item['end_date'] ?? '') === '' ? null : $item['end_date'],
+                @$item['relevance'],
+            ], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function areSteps1To4Completed(): bool
+    {
+        return $this->isStep1Completed() && !$this->hasEducationErrors() && !$this->hasExperienceErrors();
+    }
 }

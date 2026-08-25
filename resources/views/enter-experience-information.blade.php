@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar bg-success" style="width: 48%">48%</div>
-    </div>
+    <x-step-navigation :current-step="3" :application="$application" />
 
     <h1>
         Arbeidserfaring

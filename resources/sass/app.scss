@@ -440,3 +440,222 @@ table.responsivetable td span {
 .grecaptcha-badge {
     visibility: hidden;
 }
+
+/* HORIZONTAL STEP NAVIGATION (Rundinger med streker imellom) */
+.step-navigation-wrapper {
+    margin: 1.5rem 0 2rem 0;
+    width: 100%;
+}
+
+.step-navigation-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.step-navigation-item {
+    flex: 1;
+    position: relative;
+    text-align: center;
+
+    // Connecting line before each item (streker imellom)
+    &:not(:first-child)::before {
+        content: '';
+        position: absolute;
+        top: 22px;
+        left: -50%;
+        width: 100%;
+        height: 3px;
+        background-color: #dee2e6;
+        z-index: 1;
+        transform: translateY(-50%);
+        transition: background-color 0.3s ease;
+    }
+
+    // When item is active or completed, the connecting line before it is highlighted
+    &.active::before,
+    &.completed::before {
+        background-color: $primary;
+    }
+}
+
+.step-navigation-link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #6c757d;
+    position: relative;
+    z-index: 2;
+    transition: all 0.2s ease-in-out;
+    padding: 0 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        color: $primary;
+        text-decoration: none;
+
+        .step-navigation-circle {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 5px rgba(36, 48, 97, 0.15);
+        }
+
+        .step-navigation-label {
+            color: $primary;
+            font-weight: 600;
+        }
+    }
+
+    &:focus-visible {
+        outline: none;
+        .step-navigation-circle {
+            box-shadow: 0 0 0 4px rgba(36, 48, 97, 0.35);
+        }
+    }
+}
+
+.step-navigation-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 2.5px solid #dee2e6;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+
+    .step-check-icon {
+        stroke-width: 3;
+    }
+}
+
+.step-navigation-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #495057;
+    text-align: center;
+    line-height: 1.25;
+    transition: color 0.2s ease;
+    max-width: 120px;
+}
+
+// Active state
+.step-navigation-item.active {
+    .step-navigation-circle {
+        background-color: $primary;
+        border-color: $primary;
+        color: #fff;
+        box-shadow: 0 0 0 5px rgba(36, 48, 97, 0.2), 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .step-navigation-label {
+        color: $primary;
+        font-weight: 700;
+    }
+}
+
+// Completed state
+.step-navigation-item.completed {
+    .step-navigation-circle {
+        background-color: #eef4f8;
+        border-color: $primary;
+        color: $primary;
+    }
+
+    .step-navigation-label {
+        color: #212529;
+        font-weight: 600;
+    }
+
+    .step-navigation-link:hover .step-navigation-circle {
+        background-color: $primary;
+        color: #fff;
+    }
+}
+
+// Future state
+.step-navigation-item.future {
+    .step-navigation-circle {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+        color: #adb5bd;
+    }
+
+    .step-navigation-label {
+        color: #6c757d;
+    }
+
+    .step-navigation-link:hover {
+        .step-navigation-circle {
+            border-color: $primary;
+            color: $primary;
+        }
+        .step-navigation-label {
+            color: $primary;
+        }
+    }
+}
+
+// Disabled state (e.g. step 5 when steps 1-4 are incomplete)
+.step-navigation-item.disabled {
+    cursor: not-allowed;
+
+    .step-navigation-link {
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.55;
+    }
+
+    .step-navigation-circle {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #adb5bd;
+        box-shadow: none;
+    }
+
+    .step-navigation-label {
+        color: #adb5bd;
+    }
+
+    &::before {
+        background-color: #dee2e6 !important;
+    }
+}
+
+// Responsive adjustments for mobile screens
+@media (max-width: 576px) {
+    .step-navigation-wrapper {
+        margin: 1rem 0 1.5rem 0;
+    }
+
+    .step-navigation-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+        border-width: 2px;
+        margin-bottom: 0.25rem;
+    }
+
+    .step-navigation-item:not(:first-child)::before {
+        top: 18px;
+        height: 2px;
+    }
+
+    .step-navigation-label {
+        font-size: 0.72rem;
+        max-width: 62px;
+        word-break: break-word;
+    }
+}

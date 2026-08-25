@@ -5,9 +5,7 @@
 @endsection
 @section('content')
     <div class="container">
-        <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-bar bg-success" style="width: 81%">81%</div>
-        </div>
+        <x-step-navigation :current-step="5" :application="$application" />
 
         <h1>
             Forhåndsvisning av din lønnsplassering

@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar bg-success" style="width: 65%">65%</div>
-    </div>
+    <x-step-navigation :current-step="4" :application="$application" />
 
     <h1>
         Kurs, verv og frivillig arbeid, relevant for stillingen.
@@ -18,7 +16,9 @@
     </div>
     @php
         $empoyeeCV = new \app\Models\EmployeeCV();
-        $salaryCategory = $empoyeeCV->getPositionsLaddersGroups()[$application->job_title];
+        $salaryCategory = (isset($application->job_title) && isset($empoyeeCV->getPositionsLaddersGroups()[$application->job_title]))
+            ? $empoyeeCV->getPositionsLaddersGroups()[$application->job_title]
+            : ['ladder' => '', 'group' => ''];
     @endphp
 
     @if ($salaryCategory['ladder'] === 'A')
