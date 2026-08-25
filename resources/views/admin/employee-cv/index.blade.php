@@ -84,6 +84,9 @@
                                 @if ($employee->generated_file_path !== null)
                                     <a class="btn btn-sm btn-outline-primary text-nowrap" href="{{ route('admin.employee-cv.download-file', ['application' => $employee->id]) }}">Last ned XLS</a>
                                 @endif
+                                <button type="button" class="btn btn-sm btn-outline-info text-nowrap" data-bs-toggle="modal" data-bs-target="#employerEmailModal-{{ $employee->id }}" title="Send e-post med lønnsplassering til arbeidsgiver">
+                                    E-post
+                                </button>
                                 <form action="{{ route('admin.employee-cv.toggle-status', $employee->id) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-{{ $employee->status === 'generated' ? 'secondary' : 'success' }} text-nowrap" onclick="return confirm('{{ $employee->status === 'generated' ? 'Er du sikker på at du vil låse opp for kandidaten? Du som admin kan alltid redigere lønnskjemaer. Trykker du OK vil kandidaten igjen kunne redigere lønnskjemaet som nå er låst.' : 'Er du sikker på at du vil låse den for kandidaten? Da vil ikke kandidaten kunne redigere lønnskjemaet, men bare se det.' }} ? ')">
@@ -102,6 +105,67 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Employer Email Modals -->
+    @foreach ($employeeCV as $employee)
+        <div class="modal fade" id="employerEmailModal-{{ $employee->id }}" tabindex="-1" aria-labelledby="employerEmailModalLabel-{{ $employee->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="{{ route('admin.employee-cv.send-employer-email', $employee->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title" id="employerEmailModalLabel-{{ $employee->id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-envelope-at me-2 text-primary" viewBox="0 0 16 16">
+                                    <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l1.326-.795 5.64 3.47A1 1 0 0 1 14 13h-1.5a.5.5 0 0 0 0 1H14a2 2 0 0 0 2-1.99V4a2 2 0 0 0-2-2zm0 1h12a1 1 0 0 1 1 1v.79l-7 4.2-7-4.2V4a1 1 0 0 1 1-1m0 2.25 6.54 3.924a.5.5 0 0 0 .52 0L14 5.25V12a1 1 0 0 1-.034.254L8.534 8.79a.5.5 0 0 0-.534 0L2.534 12.254A1 1 0 0 1 2 12z"/>
+                                    <path d="M14.247 14.269c1.01 0 1.587-.857 1.587-2.025v-.21C15.834 10.43 14.64 9 12.52 9h-.035C10.42 9 9 10.36 9 12.432v.214C9 14.82 10.438 16 12.358 16h.044c.594 0 1.01-.14 1.25-.262a.5.5 0 0 0 .235-.436v-.4a.5.5 0 0 0-.696-.462c-.22.106-.52.18-.83.18-.99 0-1.63-.617-1.63-1.613v-.178c.32.252.75.407 1.25.407 1.218 0 2.12-.907 2.12-2.235 0-1.378-.96-2.316-2.22-2.316-1.588 0-2.58 1.282-2.58 2.877v.248c0 1.637 1.096 2.767 2.58 2.767.388 0 .74-.08 1.01-.2zM12.48 11.1c.677 0 1.13.498 1.13 1.215 0 .736-.453 1.233-1.13 1.233-.67 0-1.13-.497-1.13-1.233 0-.717.46-1.215 1.13-1.215"/>
+                                </svg>
+                                Send lønnsplassering til arbeidsgiver: {{ $employee->personal_info['name'] ?? 'Kandidat' }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Lukk"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Mottakers e-postadresse (arbeidsgiver/leder):</label>
+                                    <input type="email" name="recipient_email" class="form-control" value="{{ $employee->employer_email_data['recipient_email'] ?? '' }}" required>
+                                    <div class="form-text">
+                                        {{ $employee->personal_info['manager_name'] ?? 'Leder' }} ({{ $employee->personal_info['employer_and_place'] ?? '' }})
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Emne:</label>
+                                    <input type="text" name="subject" class="form-control" value="{{ $employee->employer_email_data['subject'] ?? '' }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">E-postinnhold:</label>
+                                    <textarea name="email_body" class="form-control font-monospace small" rows="16" required>{{ $employee->employer_email_data['body_text'] ?? '' }}</textarea>
+                                </div>
+                                @if ($employee->generated_file_path !== null)
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="attach_file" value="1" id="attachFile-{{ $employee->id }}" checked>
+                                            <label class="form-check-label" for="attachFile-{{ $employee->id }}">
+                                                Legg ved generert Excel-lønnsskjema som vedlegg (.xlsx)
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Avbryt</button>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send me-1" viewBox="0 0 16 16">
+                                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                                </svg>
+                                Send e-post til arbeidsgiver
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     <!-- Admin Help Modal -->
     <div class="modal fade" id="adminHelpModal" tabindex="-1" aria-labelledby="adminHelpModalLabel" aria-hidden="true">
@@ -154,6 +218,12 @@
                             <div class="border rounded p-2 h-100">
                                 <span class="btn btn-sm btn-outline-primary disabled mb-1">Last ned XLS</span>
                                 <p class="small text-muted mb-0">Laster ned den ferdig utfylte Excel-filen med alle beregninger og lønnstrinn.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 h-100">
+                                <span class="btn btn-sm btn-outline-info disabled mb-1">E-post</span>
+                                <p class="small text-muted mb-0">Åpner en forhåndsvisning med automatisk beregnet stige, tillegg, ansiennitet og opprykk, klar til sending til arbeidsgiver.</p>
                             </div>
                         </div>
                         <div class="col-md-6">

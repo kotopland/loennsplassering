@@ -106,3 +106,16 @@ test('submitting candidate form sets processing status to innsendt', function ()
     expect($employeeCV->fresh()->processing_status)->toBe('innsendt');
     expect($employeeCV->fresh()->status)->toBe('submitted');
 });
+
+test('admin can view system documentation page', function () {
+    $user = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get(route('admin.docs.show'));
+
+    $response->assertStatus(200);
+    $response->assertSee('Systemdokumentasjon: Frikirkens Lønnsberegner');
+    $response->assertSee('Beregningslogikk for Lønnsplassering');
+    $response->assertSee('Funksjon: E-post til Arbeidsgiver');
+});

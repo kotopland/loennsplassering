@@ -28,7 +28,16 @@ class AdminPageController extends Controller
             ]);
             $htmlContent = $converter->convert($markdownContent)->getContent();
         }
-
         return view('admin.readme', ['content' => $htmlContent]);
+    }
+
+    /**
+     * Display the system documentation page.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showSystemDocs()
+    {
+        return view('admin.system-docs');
     }
 }
