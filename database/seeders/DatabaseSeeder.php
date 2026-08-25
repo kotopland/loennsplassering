@@ -19,5 +19,9 @@ class DatabaseSeeder extends Seeder
             PositionsSeeder::class,
             SalaryLaddersSeeder::class,
         ]);
+
+        if (app()->environment('local', 'testing')) {
+            $this->call(TestDataSeeder::class);
+        }
     }
 }

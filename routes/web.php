@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('salary-ladders', SalaryLadderController::class);
         Route::resource('employee-cv', \App\Http\Controllers\Admin\EmployeeCVController::class)->only(['index', 'destroy']);
         Route::post('employee-cv/{employeeCv}/toggle-status', [\App\Http\Controllers\Admin\EmployeeCVController::class, 'toggleStatus'])->name('employee-cv.toggle-status');
+        Route::post('employee-cv/{employeeCv}/processing-status', [\App\Http\Controllers\Admin\EmployeeCVController::class, 'updateProcessingStatus'])->name('employee-cv.update-processing-status');
         Route::get('employee-cv/download-file/{application}', [\App\Http\Controllers\Admin\EmployeeCVController::class, 'downloadFile'])->name('employee-cv.download-file');
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'store', 'destroy']);
@@ -77,6 +78,8 @@ Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'upload'])->n
 Route::post('/lonnsberegner/upload', [EmployeeCVController::class, 'store'])->name('lonnsberegner.calculate');
 
 Route::get('/logg-ut', [EmployeeCVController::class, 'signout'])->name('signout');
+
+Route::mailPreview();
 
 Route::get('test-email', function () {
     return new \App\Mail\SimpleEmail('test', 'test');

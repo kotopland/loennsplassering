@@ -12,15 +12,16 @@ class EmployeeCVController extends Controller
 {
     public function index()
     {
-        $employeeCV = EmployeeCV::select(['id', 'job_title', 'work_start_date', 'birth_date', 'email_sent', 'last_viewed', 'status', 'generated_file_path', 'personal_info', 'updated_at'])
+        $employeeCV = EmployeeCV::select(['id', 'job_title', 'work_start_date', 'birth_date', 'email_sent', 'last_viewed', 'status', 'processing_status', 'generated_file_path', 'personal_info', 'updated_at'])
             ->whereNotNull('work_start_date')
             ->whereNotNull('job_title')
             ->whereNotNull('birth_date')
-            ->whereNotNull('education')
-            ->whereNotNull('work_experience')
+            // ->whereNotNull('education')
+            // ->whereNotNull('work_experience')
             ->get();
+        $processingStatuses = EmployeeCV::getProcessingStatuses();
 
-        return view('admin.employee-cv.index', compact('employeeCV'));
+        return view('admin.employee-cv.index', compact('employeeCV', 'processingStatuses'));
     }
 
     public function destroy(EmployeeCV $employeeCv)
@@ -28,6 +29,23 @@ class EmployeeCVController extends Controller
         $employeeCv->delete();
 
         return redirect()->route('admin.employee-cv.index')->with('success', 'Lønnsskjema slettet!');
+    }
+
+    public function updateProcessingStatus(Request $request, EmployeeCV $employeeCv)
+    {
+        $validated = $request->validate([
+            'processing_status' => 'required|string|in:innsendt,behandles,godkjent',
+        ]);
+
+        $employeeCv->processing_status = $validated['processing_status'];
+
+        if (in_array($validated['processing_status'], ['behandles', 'godkjent'])) {
+            $employeeCv->status = 'generated';
+        }
+
+        $employeeCv->save();
+
+        return redirect()->route('admin.employee-cv.index')->with('success', 'Behandlingsstatus er oppdatert!');
     }
 
     public function toggleStatus(EmployeeCV $employeeCv)

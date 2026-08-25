@@ -80,6 +80,7 @@ class EmployeeCVFactory extends Factory
             'work_experience' => $workExperienceData,
             'email_sent' => false,
             'last_viewed' => now(),
+            'processing_status' => 'innsendt',
             'personal_info' => $this->faker->boolean(25) ? [
                 'name' => $this->faker->name(),
                 'mobile' => $this->faker->phoneNumber(),

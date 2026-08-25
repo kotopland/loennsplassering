@@ -16,6 +16,25 @@ class EmployeeCV extends Model
 
     protected $table = 'employee_cvs';
 
+    public const PROCESSING_STATUS_INNSENDT = 'innsendt';
+    public const PROCESSING_STATUS_BEHANDLES = 'behandles';
+    public const PROCESSING_STATUS_GODKJENT = 'godkjent';
+
+    public static function getProcessingStatuses(): array
+    {
+        return [
+            self::PROCESSING_STATUS_INNSENDT => 'Innsendt',
+            self::PROCESSING_STATUS_BEHANDLES => 'Behandles',
+            self::PROCESSING_STATUS_GODKJENT => 'Godkjent',
+        ];
+    }
+
+    public function getProcessingStatusLabelAttribute(): string
+    {
+        $statuses = self::getProcessingStatuses();
+        return $statuses[$this->processing_status] ?? ($this->processing_status ? ucfirst($this->processing_status) : 'Innsendt');
+    }
+
     protected $casts = [
         'personal_info' => 'json',
         'education' => 'json',

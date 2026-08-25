@@ -752,6 +752,7 @@ class EmployeeCVController extends Controller
 
         $application->personal_info = $validatedData;
         $application->status = 'submitted';
+        $application->processing_status = EmployeeCV::PROCESSING_STATUS_INNSENDT;
         $application->save();
 
         // Dispatch a single job to generate excel and then notify
