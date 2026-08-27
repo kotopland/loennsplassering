@@ -48,26 +48,26 @@
                     1. Oversikt og Formål
                 </div>
                 <div class="card-body">
-                    <p>
+                    <p class="text-break">
                         <strong>Frikirkens Lønnsberegner</strong> (<em>lonnsberegner.frikirken.no</em>) er et webbasert beregnings- og saksbehandlingssystem for Den Evangelisk Lutherske Frikirke. Systemet estimerer og genererer lønnsplassering for ansatte i menigheter, FriBU og Frikirkens fellesarbeid/hovedkontor i tråd med synodestyrets gjeldende lønnsavtale og lønnstabeller.
                     </p>
                     <div class="row g-3 mt-1">
                         <div class="col-md-4">
                             <div class="border rounded p-3 bg-light h-100">
                                 <h6 class="fw-bold text-primary">For Kandidater / Ansatte</h6>
-                                <p class="small text-muted mb-0">Stegvis registrering av utdanning, arbeidserfaring og kurs. Forhåndsvisning av beregnet lønnstrinn og innsending til hovedkontoret.</p>
+                                <p class="small text-muted mb-0 text-break">Stegvis registrering av utdanning, arbeidserfaring og kurs. Forhåndsvisning av beregnet lønnstrinn og innsending til hovedkontoret.</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="border rounded p-3 bg-light h-100">
                                 <h6 class="fw-bold text-primary">For Arbeidsgivere / Menigheter</h6>
-                                <p class="small text-muted mb-0">Mottak av standardisert e-postvarsel med stige, tillegg, ansiennitetsdato og instruksjoner om oppfølging i SDWorks og personalarkiv.</p>
+                                <p class="small text-muted mb-0 text-break">Mottak av standardisert e-postvarsel med stige, tillegg, ansiennitetsdato og instruksjoner om oppfølging i SDWorks og personalarkiv.</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="border rounded p-3 bg-light h-100">
                                 <h6 class="fw-bold text-primary">For Administratorer</h6>
-                                <p class="small text-muted mb-0">Full saksbehandlingsoversikt, statusstyring, låsing/opplåsing, Excel-nedlasting og konfigurering av stiger, stillinger og maler.</p>
+                                <p class="small text-muted mb-0 text-break">Full saksbehandlingsoversikt, statusstyring, låsing/opplåsing, Excel-nedlasting og konfigurering av stiger, stillinger og maler.</p>
                             </div>
                         </div>
                     </div>
@@ -80,47 +80,49 @@
                     2. Teknisk Arkitektur & Stakk
                 </div>
                 <div class="card-body">
-                    <table class="table table-sm table-bordered mb-3">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 25%;">Komponent</th>
-                                <th style="width: 35%;">Teknologi / Bibliotek</th>
-                                <th>Beskrivelse / Funksjon</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Backend Rammeverk</strong></td>
-                                <td>Laravel 12 / 13 (PHP 8.3+)</td>
-                                <td>MVC-arkitektur, Eloquent ORM, ruting, mellomvare og validering.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Database</strong></td>
-                                <td>MySQL / MariaDB</td>
-                                <td>UUID som primærnøkler for skjemaer (<code>employee_cvs</code>), JSON-felter for fleksibel utdannings- og erfaringsstruktur.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Frontend</strong></td>
-                                <td>Blade, Bootstrap 5, SCSS, HTMX, _hyperscript</td>
-                                <td>Responsivt brukergrensesnitt, dynamisk tidslinje, modalhåndtering.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Excel-behandling</strong></td>
-                                <td>PhpSpreadsheet & Maatwebsite Excel</td>
-                                <td>Beregning og skriving til maler (<code>14lonnsskjema.xlsx</code>, expanded-varianter).</td>
-                            </tr>
-                            <tr>
-                                <td><strong>E-post & Kø</strong></td>
-                                <td>Symfony Mailer, SMTP / Mailgun / Spatie Preview</td>
-                                <td>Asynkrone jobber for generering og e-postutsendelse (<code>database</code> queue).</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Sikkerhet & Botvern</strong></td>
-                                <td>Google reCAPTCHA v3 & Signed Login Links</td>
-                                <td>Passordfri magisk innlogging for admin og botbeskyttelse på skjema.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0" style="word-break: break-word;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="min-width: 160px; width: 25%;">Komponent</th>
+                                    <th style="min-width: 180px; width: 35%;">Teknologi / Bibliotek</th>
+                                    <th>Beskrivelse / Funksjon</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-break"><strong>Backend Rammeverk</strong></td>
+                                    <td class="text-break">Laravel 12 / 13 (PHP 8.3+)</td>
+                                    <td class="text-break">MVC-arkitektur, Eloquent ORM, ruting, mellomvare og validering.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><strong>Database</strong></td>
+                                    <td class="text-break">MySQL / MariaDB</td>
+                                    <td class="text-break">UUID som primærnøkler for skjemaer (<code>employee_cvs</code>), JSON-felter for fleksibel utdannings- og erfaringsstruktur.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><strong>Frontend</strong></td>
+                                    <td class="text-break">Blade, Bootstrap 5, SCSS, HTMX, _hyperscript</td>
+                                    <td class="text-break">Responsivt brukergrensesnitt, dynamisk tidslinje, modalhåndtering.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><strong>Excel-behandling</strong></td>
+                                    <td class="text-break">PhpSpreadsheet & Maatwebsite Excel</td>
+                                    <td class="text-break">Beregning og skriving til maler (<code>14lonnsskjema.xlsx</code>, expanded-varianter).</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><strong>E-post & Kø</strong></td>
+                                    <td class="text-break">Symfony Mailer, SMTP / Mailgun / Spatie Preview</td>
+                                    <td class="text-break">Asynkrone jobber for generering og e-postutsendelse (<code>database</code> queue).</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><strong>Sikkerhet & Botvern</strong></td>
+                                    <td class="text-break">Google reCAPTCHA v3 & Signed Login Links</td>
+                                    <td class="text-break">Passordfri magisk innlogging for admin og botbeskyttelse på skjema.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -130,7 +132,7 @@
                     3. Beregningslogikk for Lønnsplassering (SalaryEstimationService)
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">
+                    <p class="mb-3 text-break">
                         Kjerneberegningen i systemet utføres av <code>App\Services\SalaryEstimationService</code>. Beregningen følger Frikirkens offisielle tariffregler gjennom følgende steg:
                     </p>
 
@@ -142,7 +144,7 @@
                                 </button>
                             </h2>
                             <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#calcAccordion">
-                                <div class="accordion-body small">
+                                <div class="accordion-body small text-break">
                                     <ul>
                                         <li>All utdanning og arbeidserfaring før fylte 18 år filtreres bort (unntatt VGS/fagskole som registreres som bakgrunn).</li>
                                         <li>Perioder som strekker seg over 18-årsdagen justeres slik at startdato settes til 18-årsdagen (eller dagen etter for arbeid).</li>
@@ -160,7 +162,7 @@
                                 </button>
                             </h2>
                             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#calcAccordion">
-                                <div class="accordion-body small">
+                                <div class="accordion-body small text-break">
                                     <p>Kompetansepoeng tildeles basert på gradsnivå, studiepoeng og relevans:</p>
                                     <ul>
                                         <li><strong>Cand. Theol.:</strong> 7 poeng (Stige A, B, E, F) / 4 poeng (Stige D).</li>
@@ -187,7 +189,7 @@
                                 </button>
                             </h2>
                             <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#calcAccordion">
-                                <div class="accordion-body small">
+                                <div class="accordion-body small text-break">
                                     <ul>
                                         <li><strong>Frikirkestillinger etter 1. mai 2014:</strong> Får automatisk 100% stillingsprosent og markeres som fullt relevant ansiennitet.</li>
                                         <li><strong>Maks 100% per tidsrom:</strong> Samlet arbeidsprosent for overlappende stillinger kan aldri overstige 100%. Systemet splitter tidsintervaller og capper prosenten med prioritet basert på startdato.</li>
@@ -204,7 +206,7 @@
                                 </button>
                             </h2>
                             <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#calcAccordion">
-                                <div class="accordion-body small">
+                                <div class="accordion-body small text-break">
                                     <ul>
                                         <li><strong>Total ansiennitet:</strong> Summeres i måneder (ikke-relevant erfaring vektes med 50%).</li>
                                         <li><strong>Ansiennitet beregnet fra:</strong> Tiltredelsesdato fratrukket totalt antall opptjente ansiennitetsmåneder.</li>
@@ -258,43 +260,45 @@
                     </div>
 
                     <h6 class="fw-bold mt-3">Skjematilstander (Status & Behandlingsstatus):</h6>
-                    <table class="table table-sm table-bordered small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Felt</th>
-                                <th>Verdi</th>
-                                <th>Betydning / Effekt</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td rowspan="3"><strong>processing_status</strong><br>(Behandlingsstatus)</td>
-                                <td><span class="badge bg-secondary">innsendt</span></td>
-                                <td>Skjemaet er levert av kandidaten og venter på at administrator starter vurdering.</td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge bg-warning text-dark">behandles</span></td>
-                                <td>Administrator behandler søknaden. Skjemaet <em>låses automatisk for kandidatredigering</em> (status settes til <code>generated</code>).</td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge bg-success">godkjent</span></td>
-                                <td>Lønnsplasseringen er ferdigbehandlet og godkjent. Skjemaet forblir låst for kandidaten.</td>
-                            </tr>
-                            <tr>
-                                <td rowspan="3"><strong>status</strong><br>(Teknisk låsestatus)</td>
-                                <td><code>null / modified</code></td>
-                                <td>Skjemaet er åpent for redigering av kandidaten.</td>
-                            </tr>
-                            <tr>
-                                <td><code>submitted</code></td>
-                                <td>Kandidaten har trykket "Send inn for behandling".</td>
-                            </tr>
-                            <tr>
-                                <td><code>generated</code></td>
-                                <td>Lønnsskjema Excel er generert. Skrivebeskyttet for kandidaten (kan kun åpnes i lesemodus).</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered small mb-0" style="word-break: break-word;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="min-width: 150px; width: 25%;">Felt</th>
+                                    <th style="min-width: 120px; width: 20%;">Verdi</th>
+                                    <th>Betydning / Effekt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="3" class="text-break"><strong>processing_status</strong><br>(Behandlingsstatus)</td>
+                                    <td class="text-break"><span class="badge bg-secondary">innsendt</span></td>
+                                    <td class="text-break">Skjemaet er levert av kandidaten og venter på at administrator starter vurdering.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><span class="badge bg-warning text-dark">behandles</span></td>
+                                    <td class="text-break">Administrator behandler søknaden. Skjemaet <em>låses automatisk for kandidatredigering</em> (status settes til <code>generated</code>).</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><span class="badge bg-success">godkjent</span></td>
+                                    <td class="text-break">Lønnsplasseringen er ferdigbehandlet og godkjent. Skjemaet forblir låst for kandidaten.</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="text-break"><strong>status</strong><br>(Teknisk låsestatus)</td>
+                                    <td class="text-break"><code>null / modified</code></td>
+                                    <td class="text-break">Skjemaet er åpent for redigering av kandidaten.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>submitted</code></td>
+                                    <td class="text-break">Kandidaten har trykket "Send inn for behandling".</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>generated</code></td>
+                                    <td class="text-break">Lønnsskjema Excel er generert. Skrivebeskyttet for kandidaten (kan kun åpnes i lesemodus).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -307,31 +311,31 @@
                     <div class="list-group small">
                         <div class="list-group-item">
                             <h6 class="mb-1 fw-bold text-primary">Lønnskjemaer (<code>/admin/employee-cv</code>)</h6>
-                            <p class="mb-1 text-muted">
+                            <p class="mb-1 text-muted text-break">
                                 Hovedoversikt over alle innsendte og opprettede lønnsskjemaer. Inneholder kolonner for Stillingstittel, Navn, Arbeidssted, Fødselsdato, Ansettelse, Status, Sist åpnet, Behandlingsstatus (dropdown), og Valg (Se/endre, Last ned XLS, E-post til arbeidsgiver, Lås/Lås opp, Slett).
                             </p>
                         </div>
                         <div class="list-group-item">
                             <h6 class="mb-1 fw-bold text-primary">Stillinger (<code>/admin/positions</code>)</h6>
-                            <p class="mb-1 text-muted">
+                            <p class="mb-1 text-muted text-break">
                                 Oversikt og opprettelse av stillinger knyttet til stillingsstiger (A, B, C, D, E, F) og grupper (1, 2) samt stillingsbeskrivelser.
                             </p>
                         </div>
                         <div class="list-group-item">
                             <h6 class="mb-1 fw-bold text-primary">Lønnsstiger (<code>/admin/salary-ladders</code>)</h6>
-                            <p class="mb-1 text-muted">
+                            <p class="mb-1 text-muted text-break">
                                 Definisjon av lønnstrinn og tabeller for hver lønnsstige og gruppe.
                             </p>
                         </div>
                         <div class="list-group-item">
                             <h6 class="mb-1 fw-bold text-primary">Lønnskjema Maler (<code>/admin/excel-templates</code>)</h6>
-                            <p class="mb-1 text-muted">
+                            <p class="mb-1 text-muted text-break">
                                 Administrasjon og opplasting av de offisielle Excel-malene: <code>14lonnsskjema.xlsx</code>, <code>14lonnsskjema-expanded.xlsx</code>, og <code>14lonnsskjema-extraexpanded.xlsx</code>.
                             </p>
                         </div>
                         <div class="list-group-item">
                             <h6 class="mb-1 fw-bold text-primary">Admin Brukere & E-post (<code>/admin/users</code> & <code>/admin/settings</code>)</h6>
-                            <p class="mb-1 text-muted">
+                            <p class="mb-1 text-muted text-break">
                                 Håndtering av administratorer som har tilgang til systemet, samt konfigurering av rapport-/varslingsepost (<code>report_email</code>).
                             </p>
                         </div>
@@ -345,26 +349,25 @@
                     6. Funksjon: E-post til Arbeidsgiver
                 </div>
                 <div class="card-body">
-                    <p class="small">
+                    <p class="small text-break">
                         Fra oversikten over lønnsskjemaer kan administrator trykke på knappen <strong>«E-post»</strong> for å generere et offisielt lønnsplasseringsbrev til arbeidsgiver/leder:
                     </p>
-                    <div class="bg-light p-3 border rounded font-monospace small mb-3">
-                        Stige: [Beregnet stige, f.eks. A 1]<br>
-                        Kompetansetillegg: [Beregnet tillegg]<br>
-                        Ansvarstillegg*: 0<br>
-                        Lønnsplassering inkl tillegg: [Beregnet trinn]<br>
-                        Ansiennitet fra: [Dato d.m.Y]<br>
-                        Neste ansiennitetsopprykk: [Dato d.m.Y]<br><br>
-                        Vi minner om at arbeidsgiver er ansvarlig for å:<br>
-                        - sjekke at informasjonen er riktig i lønnsskjema og i mail...<br>
-                        - sjekke at attester og vitnemål stemmer overens...<br>
-                        - gjennomgå lønnsplasseringen med ansatt...<br>
-                        - Legge inn lønnsinformasjonen i SDWorks...<br>
-                        - følge med på lønnsavtalen...<br>
-                        - oppbevare lønnsplassering i personalarkiv...<br>
-                        - sende inn skjema ved ansettelse, endringer og opphør...
-                    </div>
-                    <ul class="small text-muted mb-0">
+                    <div class="bg-light p-3 border rounded font-monospace small mb-3 text-break" style="word-break: break-word; white-space: pre-wrap;">Stige: [Beregnet stige, f.eks. A 1]
+Kompetansetillegg: [Beregnet tillegg]
+Ansvarstillegg*: 0
+Lønnsplassering inkl tillegg: [Beregnet trinn]
+Ansiennitet fra: [Dato d.m.Y]
+Neste ansiennitetsopprykk: [Dato d.m.Y]
+
+Vi minner om at arbeidsgiver er ansvarlig for å:
+- sjekke at informasjonen er riktig i lønnsskjema og i mail...
+- sjekke at attester og vitnemål stemmer overens...
+- gjennomgå lønnsplasseringen med ansatt...
+- Legge inn lønnsinformasjonen i SDWorks...
+- følge med på lønnsavtalen...
+- oppbevare lønnsplassering i personalarkiv...
+- sende inn skjema ved ansettelse, endringer og opphør...</div>
+                    <ul class="small text-muted mb-0 text-break">
                         <li>Administrator kan redigere mottakers e-post, emne og selve meldingsteksten før sending.</li>
                         <li>Dersom Excel-fil er generert, kan den automatisk legges ved e-posten.</li>
                     </ul>
@@ -377,42 +380,44 @@
                     7. Bakgrunnsjobber & Planlagte Oppgaver (Scheduler)
                 </div>
                 <div class="card-body">
-                    <table class="table table-sm table-bordered small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Kommando / Jobb</th>
-                                <th>Frekvens</th>
-                                <th>Hensikt</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>GenerateExcelJob</code></td>
-                                <td>Ved innsending</td>
-                                <td>Kjører ExcelGenerationService, skriver til mal og lagrer filen i <code>storage/app/public</code>.</td>
-                            </tr>
-                            <tr>
-                                <td><code>NotifyAdminOfSubmissionJob</code></td>
-                                <td>Ved fullført Excel</td>
-                                <td>Sender e-postvarsel til konfigurert <code>report_email</code> om ny generert søknad.</td>
-                            </tr>
-                            <tr>
-                                <td><code>ProcessUserSubmissionJob</code></td>
-                                <td>Ved fullført Excel</td>
-                                <td>Sender kvittering til kandidaten (dersom skjemaet ble sendt inn av kandidat, ikke admin).</td>
-                            </tr>
-                            <tr>
-                                <td><code>employee-cvs:delete-old-records</code></td>
-                                <td>Daglig (00:00)</td>
-                                <td>Sletter lønnsskjemaer som ikke har vært åpnet på over 1 år i tråd med personvernregler.</td>
-                            </tr>
-                            <tr>
-                                <td><code>employee-cvs:delete-emtpy-records</code></td>
-                                <td>Hver time</td>
-                                <td>Rydder bort tomme, forlatte påbegynte økter eldre enn 2 timer.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered small mb-0" style="word-break: break-word;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="min-width: 180px; width: 25%;">Kommando / Jobb</th>
+                                    <th style="min-width: 120px; width: 20%;">Frekvens</th>
+                                    <th>Hensikt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-break"><code>GenerateExcelJob</code></td>
+                                    <td class="text-break">Ved innsending</td>
+                                    <td class="text-break">Kjører ExcelGenerationService, skriver til mal og lagrer filen i <code class="text-break">storage/app/public</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>NotifyAdminOfSubmissionJob</code></td>
+                                    <td class="text-break">Ved fullført Excel</td>
+                                    <td class="text-break">Sender e-postvarsel til konfigurert <code class="text-break">report_email</code> om ny generert søknad.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>ProcessUserSubmissionJob</code></td>
+                                    <td class="text-break">Ved fullført Excel</td>
+                                    <td class="text-break">Sender kvittering til kandidaten (dersom skjemaet ble sendt inn av kandidat, ikke admin).</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>employee-cvs:delete-old-records</code></td>
+                                    <td class="text-break">Daglig (00:00)</td>
+                                    <td class="text-break">Sletter lønnsskjemaer som ikke har vært åpnet på over 1 år i tråd med personvernregler.</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-break"><code>employee-cvs:delete-emtpy-records</code></td>
+                                    <td class="text-break">Hver time</td>
+                                    <td class="text-break">Rydder bort tomme, forlatte påbegynte økter eldre enn 2 timer.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -421,7 +426,7 @@
                 <div class="card-header bg-light fw-bold text-primary">
                     8. Sikkerhet og Personvern
                 </div>
-                <div class="card-body small">
+                <div class="card-body small text-break">
                     <ul>
                         <li><strong>Dataminimering:</strong> Før kandidaten trykker "Send inn for behandling", lagres kun anonymiserte data knyttet til økten (ingen navn/adresse).</li>
                         <li><strong>Autentisering:</strong> Administratorer logger inn via sikre, tidsbegrensede engangslenker (Magic Links) sendt til e-post.</li>
@@ -436,7 +441,7 @@
                 <div class="card-header bg-light fw-bold text-primary">
                     9. Feilsøking og Vedlikehold
                 </div>
-                <div class="card-body small">
+                <div class="card-body small text-break">
                     <h6 class="fw-bold">Viktige loggfiler:</h6>
                     <ul>
                         <li><code>storage/logs/laravel.log</code>: Generelle systemfeil og unntak.</li>
@@ -444,7 +449,7 @@
                     </ul>
 
                     <h6 class="fw-bold mt-3">Nyttige Artisan-kommandoer:</h6>
-                    <pre class="bg-light p-2 border rounded"><code># Kjøre kø-arbeider i bakgrunnen
+                    <pre class="bg-light p-2 border rounded" style="white-space: pre-wrap; word-break: break-word;"><code># Kjøre kø-arbeider i bakgrunnen
 php artisan queue:work
 
 # Kjøre planlagte oppgaver manuelt
