@@ -47,8 +47,8 @@
                 @foreach ($employeeCV->sortByDesc('updated_at') as $employee)
                     <tr class="py-4 align-middle">
                         <td title="{{ $employee->job_title }}">{{ Str::limit($employee->job_title, 20) }}</td>
-                        <td title="{{ $employee->personal_info['name'] ?? ''}}">{{ Str::limit($employee->personal_info['name'], 20) }}</td>
-                        <td title="{{ $employee->personal_info['employer_and_place'] ?? ''}}">{{ Str::limit($employee->personal_info['employer_and_place'], 25) }}</td>
+                        <td title="{{ $employee->personal_info['name'] ?? ''}}">{{ Str::limit($employee->personal_info['name'] ?? '', 20) }}</td>
+                        <td title="{{ $employee->personal_info['employer_and_place'] ?? ''}}">{{ Str::limit($employee->personal_info['employer_and_place'] ?? '', 25) }}</td>
                         <td title="{{ $employee->birth_date }}">{{ $employee->age }}</td>
                         <td title="{{ $employee->work_start_date }}">{{ $employee->formatted_work_start_date }}</td>
                         <td>
