@@ -84,7 +84,7 @@
                                 @if ($employee->generated_file_path !== null)
                                     <a class="btn btn-sm btn-outline-primary text-nowrap" href="{{ route('admin.employee-cv.download-file', ['application' => $employee->id]) }}">Last ned XLS</a>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-outline-info text-nowrap" data-bs-toggle="modal" data-bs-target="#employerEmailModal-{{ $employee->id }}" title="Send e-post med lønnsplassering til arbeidsgiver">
+                                <button type="button" class="btn btn-sm btn-outline-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#employerEmailModal-{{ $employee->id }}" title="Send e-post med lønnsplassering til arbeidsgiver">
                                     E-post
                                 </button>
                                 <form action="{{ route('admin.employee-cv.toggle-status', $employee->id) }}" method="POST">
