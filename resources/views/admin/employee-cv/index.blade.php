@@ -35,7 +35,7 @@
                     <th>Stilling tittel</th>
                     <th>Navn</th>
                     <th>Arbeidssted</th>
-                    <th>Fødselsdato</th>
+                    <th>Alder</th>
                     <th>Ansettelse</th>
                     <th>Status</th>
                     <th>Sist åpnet</th>
@@ -46,11 +46,11 @@
             <tbody>
                 @foreach ($employeeCV->sortByDesc('updated_at') as $employee)
                     <tr class="py-4 align-middle">
-                        <td title="{{ $employee->job_title }}">{{ Str::limit($employee->job_title, 30) }}</td>
+                        <td title="{{ $employee->job_title }}">{{ Str::limit($employee->job_title, 20) }}</td>
                         <td>{{ $employee->personal_info['name'] ?? '' }}</td>
                         <td>{{ $employee->personal_info['employer_and_place'] ?? '' }}</td>
-                        <td>{{ $employee->birth_date }}</td>
-                        <td>{{ $employee->work_start_date }}</td>
+                        <td title="{{ $employee->birth_date }}">{{ $employee->age }}</td>
+                        <td title="{{ $employee->work_start_date }}">{{ $employee->formatted_work_start_date }}</td>
                         <td>
                             @if ($employee->status === 'generated')
                                 <span class="badge bg-secondary">generert (låst)</span>
@@ -62,7 +62,7 @@
                                 <span class="badge bg-light text-muted border">åpen</span>
                             @endif
                         </td>
-                        <td>{{ $employee->last_viewed }}</td>
+                        <td title="{{ $employee->last_viewed?->format('Y-m-d H:i:s') }}">{{ $employee->last_viewed?->format('j M') }}</td>
                         <td>
                             <form action="{{ route('admin.employee-cv.update-processing-status', $employee->id) }}" method="POST" class="d-inline">
                                 @csrf

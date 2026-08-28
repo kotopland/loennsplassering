@@ -35,6 +35,22 @@ class EmployeeCV extends Model
         return $statuses[$this->processing_status] ?? ($this->processing_status ? ucfirst($this->processing_status) : 'Innsendt');
     }
 
+    public function getAgeAttribute(): ?int
+    {
+        return $this->birth_date ? \Carbon\Carbon::parse($this->birth_date)->age : null;
+    }
+
+    public function getFormattedWorkStartDateAttribute(): ?string
+    {
+        if (! $this->work_start_date) {
+            return null;
+        }
+
+        $date = \Carbon\Carbon::parse($this->work_start_date);
+
+        return $date->isCurrentYear() ? $date->format('j M') : $date->format('j M y');
+    }
+
     protected $casts = [
         'personal_info' => 'json',
         'education' => 'json',
