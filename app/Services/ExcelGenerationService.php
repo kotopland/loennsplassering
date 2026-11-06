@@ -90,7 +90,7 @@ class ExcelGenerationService
         $rowSheet1 = 15;
         $rowSheet2 = 4;
 
-        $wECollection = collect(array_merge($application->education, $application->work_experience));
+        $wECollection = collect(array_merge($application->education ?? [], $application->work_experience ?? []));
         foreach ($application->education_adjusted ?? [] as $item) {
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'B', 'value' => $item['topic_and_school'], 'datatype' => 'text'];
             $sheet1[] = ['row' => $rowSheet1, 'column' => 'S', 'value' => @$wECollection->firstWhere('id', $item['id'])['start_date'] ?? '', 'datatype' => 'date'];
@@ -135,12 +135,12 @@ class ExcelGenerationService
             $rowSheet1 = 28;
             $originalFilePath = '14lonnsskjema.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
-        } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) <= 29) {
+        } elseif (count($application->education ?? []) <= 21 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 29) {
             // long education / experience lines
             $rowSheet1 = 39;
             $originalFilePath = '14lonnsskjema-expanded.xlsx'; // Stored in storage/app/public
             $modifiedFilePath = 'generert-lonnsskjema-' . $application->id . '.xlsx'; // New modified file path
-        } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted ?? [])) > 29) {
+        } elseif (count($application->education ?? []) > 21 || (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) > 29) {
             // long education / experience lines
             $rowSheet1 = 55;
             $originalFilePath = '14lonnsskjema-extraexpanded.xlsx'; // Stored in storage/app/public
@@ -181,10 +181,10 @@ class ExcelGenerationService
         if (count($application->education ?? []) <= 11 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 15) {
             // short education / experience lines
             $rowSheet1 = 62;
-        } elseif (count($application->education) <= 21 && (count($application->work_experience) + count($application->work_experience_adjusted)) <= 29) {
+        } elseif (count($application->education ?? []) <= 21 && (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) <= 29) {
             // long education / experience lines
             $rowSheet1 = 88;
-        } elseif (count($application->education) > 21 || (count($application->work_experience) + count($application->work_experience_adjusted)) > 29) {
+        } elseif (count($application->education ?? []) > 21 || (count($application->work_experience ?? []) + count($application->work_experience_adjusted ?? [])) > 29) {
             // long education / experience lines
             $rowSheet1 = 127;
         }

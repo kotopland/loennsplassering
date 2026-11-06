@@ -71,3 +71,40 @@ test('generate excel job creates file, updates application, and dispatches notif
     // Assert that the NotifyAdminOfSubmissionJob was also dispatched
     Bus::assertDispatched(NotifyAdminOfSubmissionJob::class);
 });
+
+test('generate excel job succeeds when education and work experience are null', function () {
+    $application = EmployeeCV::factory()->create([
+        'status' => 'submitted',
+        'education' => null,
+        'work_experience' => null,
+        'personal_info' => [
+            'name' => 'No Education User',
+            'email' => 'noedu@example.com',
+            'mobile' => '12345678',
+            'address' => '123 Test Street',
+            'postal_code' => '5432',
+            'postal_place' => 'Testville',
+            'bank_account' => '12345678901',
+            'position_size' => '100',
+            'employer_and_place' => 'Test Employer',
+            'manager_name' => 'Test Manager',
+            'manager_mobile' => '87654321',
+            'manager_email' => 'manager.test@example.com',
+            'congregation_name' => 'Test Congregation',
+            'congregation_mobile' => '11223344',
+            'congregation_email' => 'congregation.test@example.com',
+        ],
+    ]);
+
+    $job = new GenerateExcelJob($application->id, true);
+    app()->call([$job, 'handle']);
+
+    $application->refresh();
+
+    expect($application->generated_file_path)->not->toBeNull();
+    Storage::disk('public')->assertExists($application->generated_file_path);
+    expect($application->status)->toBe('generated');
+
+    Bus::assertDispatched(ProcessUserSubmissionJob::class);
+    Bus::assertDispatched(NotifyAdminOfSubmissionJob::class);
+});
